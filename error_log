@@ -1,0 +1,1 @@
+[18-Jun-2025 09:24:08 UTC] PHP Fatal error:  Trait "App\Models\HasRoles" not found in /home/brosistechnology/bamryashipping.brosistechnology.in/app/Models/User.php on line 11
