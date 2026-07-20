@@ -3,8 +3,15 @@
 namespace App\Models\Operations;
 
 use App\Models\MasterImportParty;
+use App\Models\MasterExportParty;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+use App\Models\Operations\OperationSeaImport;
+use App\Models\Operations\OperationSeaExport;
+use App\Models\Operations\OperationAirImport;
+use App\Models\Operations\OperationAirExport;
+use App\Models\User;
 
 class OperationJobMaster extends Model
 {
@@ -14,6 +21,7 @@ class OperationJobMaster extends Model
 
 
     protected $fillable = [
+        'uuid',
         'company_id',
         'issued_by',
         'job_no',
@@ -31,11 +39,48 @@ class OperationJobMaster extends Model
         'transportation',
         'booking_date',
         'cargo_ready_date',
-        'pickup_date'
+        'pickup_date','user_id'
     ];
-
-    public function job_party()
+    
+    public function consigneeName()
     {
         return $this->belongsTo(MasterImportParty::class, 'job_party_id');
     }
+    
+    public function shipperName(){
+        return $this->belongsTo(MasterExportParty::class, 'job_party_id');
+    }
+    
+    public function seaExport()
+    {
+        return $this->hasOne(OperationSeaExport::class, 'job_no', 'id');
+    }
+    
+    public function seaImport()
+    {
+        return $this->hasOne(OperationSeaImport::class, 'job_no', 'id');
+    }
+    
+    public function airExport()
+    {
+        return $this->hasOne(OperationAirExport::class, 'job_no', 'id');
+    }
+    
+    public function airImport()
+    {
+        return $this->hasOne(OperationAirImport::class, 'job_no', 'id');
+    }
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+    
+    // public function import_job_party(){
+    //     return $this->belongsTo(MasterExportParty::class, 'job_party_id');
+    // }
+    
+    // public function export_job_party(){
+    //     return $this->belongsTo(MasterImportParty::class, 'job_party_id');
+    // }
 }

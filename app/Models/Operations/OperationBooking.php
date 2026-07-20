@@ -4,8 +4,10 @@ namespace App\Models\Operations;
 
 use App\Models\MasterVessel;
 use App\Models\MasterParty;
+use App\Models\Operations\OperationBookingContainer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class OperationBooking extends Model
 {
@@ -22,7 +24,7 @@ class OperationBooking extends Model
         'port_transhipment_id', 'port_destination_id',
         'imo_cd', 'uno_cd', 'cancel_remark', 'special_remark', 'full_do_no',
 
-        'cont_category', 'container_no', 'size', 'customer_seal_no', 'cont_do_no',
+        'cont_category', 'container_no', 'size', 'customer_seal_no', 'cont_do_no','user_id',
 
         'uploaded_file_path',
     ];
@@ -35,4 +37,13 @@ class OperationBooking extends Model
         return $this->belongsTo(MasterParty::class, 'sales_person_id ');
     }
     
+    public function containers()
+    {
+        return $this->hasMany(OperationBookingContainer::class, 'booking_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

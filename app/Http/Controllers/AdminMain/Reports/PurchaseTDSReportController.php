@@ -6,6 +6,8 @@ use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Illuminate\Http\Request;
 use App\Models\MasterImportParty;
+use App\Models\Accounts\PurchaseParties;
+use App\Models\MasterParty;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Auth;
@@ -27,28 +29,38 @@ class PurchaseTDSReportController extends Controller
 
     public function index(){
 
-        $parties = MasterImportParty::where('company_id', $this->company_id)->get();
-        return view('admin-main.admin.purchaseTDSReport.first', compact('parties'));
+        $parties = PurchaseParties::where('company_id', $this->company_id)->get();
+        $party_lists  = MasterParty::all();
+        $invoices = AccountPurchaseInvoice::where('company_id', $this->company_id)
+                            ->whereNotNull('full_job_no')
+                            ->select('full_job_no')
+                            ->distinct()
+                            ->orderBy('full_job_no')
+                            ->get();
+        
+        return view('admin-main.admin.purchaseTDSReport.first', compact(['parties', 'party_lists','invoices']));
     }
 
     public function preview(Request $request)
     {
-        $invoices = AccountPurchaseInvoice::with('partyName') // important
+        $invoices = AccountPurchaseInvoice::with(['partyName', 'chargesContainer']) // important
         ->where('company_id', $this->company_id)
         ->when($request->filled('from_date') && $request->filled('to_date'), function ($q) use ($request) {
-            $from = Carbon::parse($request->from_date)->startOfDay();   // 00:00:00
-            $to   = Carbon::parse($request->to_date)->endOfDay();       // 23:59:59
+            $from = Carbon::parse($request->from_date)->startOfDay();  
+            $to   = Carbon::parse($request->to_date)->endOfDay();     
             $q->whereBetween('created_at', [$from, $to]);
         })
         ->when($request->filled('party_id'), function ($q) use ($request) {
             $q->where('billing_party_id', $request->party_id);
         })
+        ->when($request->filled('full_job_no'), function ($q) use ($request) {
+            $q->where('full_job_no', $request->full_job_no);
+        })
         ->orderBy('created_at', 'desc')
         ->paginate(25);
-
-
+        
         $html = '
-            <h4 style="text-align:center; font-weight:bold;">PURCHASE TDS REPORT <span style="font-size:14px;">(Dated - ' . now()->format('d/m/Y') . ')</span></h4>
+            <h4 style="text-align:center; font-weight:bold;">PURCHASE REPORT <span style="font-size:14px;"></span></h4>
             
             <div>
                 <div class="dropdown mb-3">
@@ -56,9 +68,29 @@ class PurchaseTDSReportController extends Controller
                         Download
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="'.route('purchase-tds-report.download', ['format' => 'pdf']).'" target="_blank">Download PDF</a></li>
-                        <li><a class="dropdown-item" href="'.route('purchase-tds-report.download', ['format' => 'excel']) .'" target="_blank">Download Excel</a></li>
-                        <li><a class="dropdown-item" href="'.route('purchase-tds-report.download', ['format' => 'word']) .'" target="_blank">Download Word</a></li>
+                        <li><a class="dropdown-item" href="'.route('purchase-tds-report.download', [
+                            'format'      => 'pdf',
+                            'party_id'    => $request->party_id,
+                            'full_job_no' => $request->full_job_no,
+                            'from_date'   => $request->from_date,
+                            'to_date'     => $request->to_date,
+                        ]).'" target="_blank">Download PDF</a></li>
+                        
+                        <li><a class="dropdown-item" href="'.route('purchase-tds-report.download', [
+                            'format'      => 'excel',
+                            'party_id'    => $request->party_id,
+                            'full_job_no' => $request->full_job_no,
+                            'from_date'   => $request->from_date,
+                            'to_date'     => $request->to_date,
+                        ]).'" target="_blank">Download Excel</a></li>
+                        
+                        <li><a class="dropdown-item" href="'.route('purchase-tds-report.download', [
+                            'format'      => 'word',
+                            'party_id'    => $request->party_id,
+                            'full_job_no' => $request->full_job_no,
+                            'from_date'   => $request->from_date,
+                            'to_date'     => $request->to_date,
+                        ]).'" target="_blank">Download Word</a></li>
                     </ul>
                 </div>
             </div>
@@ -70,12 +102,10 @@ class PurchaseTDSReportController extends Controller
                         <th>Job No</th>
                         <th>Invoice No</th>
                         <th>INV DT</th>
-                        <th>Bill Amount</th>
-                        <th>Basic Amount</th>
-                        <th>TDS AMT</th>
-                        <th>TDS %</th>
-                        <th>Payable Amt</th>
-                        <th>PAN No</th>
+                        <th>GSTIN No</th>
+                        <th>Taxable Amount</th>
+                        <th>GST Amount</th>
+                        <th>Total Amount</th>
                     </tr>
                 </thead>
                 <tbody>';
@@ -85,42 +115,46 @@ class PurchaseTDSReportController extends Controller
             $totalBasic = 0;
             $totalTds = 0;
             $totalPayable = 0;
+            $totalTaxableAmount = 0;
+            $totalGstAmount = 0;
 
             foreach ($invoices as $item) {
-                $billAmount = $item->amount ?? 0;
-                $basicAmount = $item->basic_amount ?? 0;
-                $tdsAmt = $item->tds_amount ?? 0;
-                $tdsPercent = $item->tds ?? 0;
-                $payableAmt = $billAmount - $tdsAmt;
-                $panNo = $item->partyName->pan_no ?? '--';
+                $charges = $item['chargesContainer'];
+                if ($charges->isEmpty()) continue;
+                
+                $cgstAmount  = $charges->sum('cgst');
+                $sgstAmount  = $charges->sum('sgst');
+                $igstAmount  = $charges->sum('igst');
+                $gstAmount = $igstAmount + $sgstAmount + $cgstAmount;
+            
+                $taxableAmount  = $charges->sum('freight');
+                $payableAmt  = $taxableAmount + $gstAmount;
+                
+                $panNo       = $item->partyName->gstin ?? '--';
 
-                $totalBill += $billAmount;
-                $totalBasic += $basicAmount;
-                $totalTds += $tdsAmt;
-                $totalPayable += $payableAmt;
-
+                $totalPayable  += $payableAmt;
+                $totalTaxableAmount += $taxableAmount;
+                $totalGstAmount += $gstAmount;
+            
                 $html .= '<tr style="text-align: center;">
                     <td>' . ($item->partyName->party_name ?? '--') . '</td>
-                    <td>' . ($item->job_no ?? '--') . '</td>
+                    <td>' . ($item->operationJob->job_no ?? '--') . '</td>
                     <td>' . ($item->invoice_no ?? '--') . '</td>
-                    <td>' . optional($item->invoice_date)->format('d-m-Y') . '</td>
-                    <td align="right">' . number_format($billAmount, 2) . '</td>
-                    <td align="right">' . number_format($basicAmount, 2) . '</td>
-                    <td align="right">' . number_format($tdsAmt, 2) . '</td>
-                    <td>' . number_format($tdsPercent, 2) . '%</td>
-                    <td align="right">' . number_format($payableAmt, 2) . '</td>
+                    <td>'. ($item->invoice_date ? \Carbon\Carbon::parse($item->invoice_date)->format('d-m-Y') : '' ).'</td>
                     <td>' . $panNo . '</td>
+                    <td>' . number_format($taxableAmount, 2) . '</td>
+                    <td>' . number_format($gstAmount, 2) . '</td>
+                    <td>' . number_format($payableAmt, 2) . '</td>
+                    
                 </tr>';
             }
 
         $html .= '
             <tr style="font-weight: bold; background-color: #f9f9f9; text-align: center;">
-                <td colspan="4">GRAND TOTAL :</td>
-                <td align="right">' . number_format($totalBill, 2) . '</td>
-                <td align="right">' . number_format($totalBasic, 2) . '</td>
-                <td align="right">' . number_format($totalTds, 2) . '</td>
-                <td></td>
-                <td align="right">' . number_format($totalPayable, 2) . '</td>
+                <td align="right" colspan="5">GRAND TOTAL :</td>
+                <td>' . number_format($totalTaxableAmount, 2) . '</td>
+                <td>' . number_format($totalGstAmount, 2) . '</td>
+                <td>' . number_format(round($totalPayable), 2) . '</td>
                 <td></td>
             </tr>
         </tbody>
@@ -131,9 +165,27 @@ class PurchaseTDSReportController extends Controller
         return response()->json(['html' => $html]);
     }
 
-    public function download($format)
+    public function download(Request $request, $format)
     {
-        $query = AccountPurchaseInvoice::where('company_id', $this->company_id)->get();
+        $query = AccountPurchaseInvoice::with(['partyName', 'chargesContainer'])
+            ->where('company_id', $this->company_id)
+    
+            ->when($request->filled('from_date') && $request->filled('to_date'), function ($q) use ($request) {
+                $from = Carbon::parse($request->from_date)->startOfDay();
+                $to   = Carbon::parse($request->to_date)->endOfDay();
+    
+                $q->whereBetween('created_at', [$from, $to]);
+            })
+    
+            ->when($request->filled('party_id'), function ($q) use ($request) {
+                $q->where('billing_party_id', $request->party_id);
+            })
+    
+            ->when($request->filled('full_job_no'), function ($q) use ($request) {
+                $q->where('full_job_no', $request->full_job_no);
+            })
+    
+            ->get();
 
         if ($format == 'pdf') {
             $html = View::make('admin-main.admin.purchaseTDSReport.report', compact('query'))->render();
@@ -148,7 +200,7 @@ class PurchaseTDSReportController extends Controller
         }
 
         if ($format == 'excel') {
-            return Excel::download(new PurchaseTDSReportExport($query), 'Purchase-TDS-report.xlsx');
+            return Excel::download(new PurchaseTDSReportExport($query), 'Purchase-report.xlsx');
         }
 
         if ($format == 'word') {

@@ -13,6 +13,15 @@ use Illuminate\Support\Str;
 
 class MasterVoyageController extends Controller
 {
+    public $company_id ;
+
+    public function __construct(){
+        $this->middleware(function ($request, $next) {
+            $this->company_id = Auth::user()->company_id;
+            return $next($request);
+        });
+    }
+    
      public function index(Request $request)
     {
         $query = MasterVoyage::query();
@@ -25,34 +34,35 @@ class MasterVoyageController extends Controller
             $query->where('voyage_number', 'like', '%' . $request->voyage_number . '%');
         }
 
-        $MasterVoyages = $query->orderBy('created_at', 'desc')->paginate(10);
+        $MasterVoyages = $query->where('company_id', $this->company_id)->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin-main.admin.voyage.index', compact('MasterVoyages'));
     }
 
     public function create()
     {
-        $vessels = MasterVessel::all();
-        $shippings = MasterShipping::all();
+        $vessels = MasterVessel::where('company_id', $this->company_id)->get();
+        $shippings = MasterShipping::where('company_id', $this->company_id)->get();
 
         return view('admin-main.admin.voyage.create', compact('vessels', 'shippings'));
     }
 
     public function store(Request $request)
     {
+        $userId = auth()->user()->id;
         $request->validate([
-            'voyage_code' => 'required|string|max:10',
-            'voyage_number' => 'required|string|max:10',
+            'voyage_code' => 'required|string|max:255',
+            'voyage_number' => 'required|string|max:255',
             'm_vessel_id' => 'nullable|exists:master_vessels,id',
             'arrival_date' => 'nullable|date',
-            'igm_number' => 'nullable|string|max:10',
+            'igm_number' => 'nullable|string|max:255',
             'igm_date' => 'nullable|date',
             'shipping_line_id' => 'nullable|exists:master_shippings,id',
             'f_voyage_no' => 'nullable|string|max:255',
             'f_vessel_id' => 'nullable|exists:master_vessels,id',
             'mumbai_igm_no' => 'nullable|string|max:255',
             'mumbai_igm_date' => 'nullable|date',
-            'overseas_agent_id' => 'nullable|integer',
+            'overseas_agent' => 'nullable',
             'status' => 'required|in:1,0',
         ]);
 
@@ -71,8 +81,9 @@ class MasterVoyageController extends Controller
         $voyage->f_vessel_id = $request->f_vessel_id;
         $voyage->mumbai_igm_no = $request->mumbai_igm_no;
         $voyage->mumbai_igm_date = $request->mumbai_igm_date;
-        $voyage->overseas_agent_id = $request->overseas_agent_id;
+        $voyage->overseas_agent = $request->overseas_agent;
         $voyage->status = $request->status;
+        $voyage->user_id = $userId;
         $voyage->save();
 
         return redirect()->route('voyages.index')->with('success', 'Voyage added successfully.');
@@ -89,22 +100,24 @@ class MasterVoyageController extends Controller
 
     public function update(Request $request, string $id)
     {
+        $userId = auth()->user()->id;
         $validated = $request->validate([
             'company_id' => 'required',
-            'voyage_code' => 'required|string|max:10',
-            'voyage_number' => 'required|string|max:10',
+            'voyage_code' => 'required|string|max:255',
+            'voyage_number' => 'required|string|max:255',
             'm_vessel_id' => 'nullable|exists:master_vessels,id',
             'arrival_date' => 'nullable|date',
-            'igm_number' => 'nullable|string|max:10',
+            'igm_number' => 'nullable|string|max:255',
             'igm_date' => 'nullable|date',
             'shipping_line_id' => 'nullable|exists:master_shippings,id',
             'f_voyage_no' => 'nullable|string|max:255',
             'f_vessel_id' => 'nullable|exists:master_vessels,id',
             'mumbai_igm_no' => 'nullable|string|max:255',
             'mumbai_igm_date' => 'nullable|date',
-            'overseas_agent_id' => 'nullable|integer',
+            'overseas_agent' => 'nullable',
             'status' => 'required|in:1,0',
         ]);
+        $validated['user_id'] = $userId;
 
         $MasterVoyage = MasterVoyage::findOrFail($id);
         $MasterVoyage->update($validated);

@@ -17,7 +17,7 @@
                     <form class="row align-items-end" method="get" action="{{route('purchase-invoices.index')}}">                   
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Job No.</label>
-                            <select id="statusFilter" class="form-control default-select" name="job_no">
+                            <select id="statusFilter" class="form-control select2" name="job_no">
                                 <option value="">select</option>
                                 @foreach ($job_nums as $job_no => $display)
                                     <option value="{{ $job_no }}" {{ request('job_no') == $job_no ? 'selected' : '' }}>{{ $display }}</option>
@@ -26,7 +26,7 @@
                         </div>
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Invoice No.</label>
-                            <select id="departmentFilter" class="form-control default-select" name="invoice_no">
+                            <select id="departmentFilter" class="form-control select2" name="invoice_no">
                                 <option value="">select</option>
                                 @foreach ($purchase_invoices as $purchase_invoice)
                                     <option value="{{$purchase_invoice->invoice_no}}">{{$purchase_invoice->invoice_no}}</option>
@@ -35,13 +35,22 @@
                         </div>
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Party Name</label>
-                            <select id="genderFilter" class="form-control default-select" name="billing_party_id">
+                            <select id="genderFilter" class="form-control select2" name="billing_party_id">
                                 <option value="">select</option>
                                 @foreach ($purchase_invoices as $purchase_invoice)
-                                    <option value="{{$purchase_invoice->billing_party_id}}">{{$purchase_invoice->partyName->party_name}}</option>
+                                    <option value="{{$purchase_invoice->billing_party_id}}">{{$purchase_invoice->partyName->party_name ?? ''}}</option>
                                 @endforeach
                             </select>
-                        </div>                       
+                        </div>
+                        <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
+                        <!--    <label class="form-label">Start Date</label>-->
+                        <!--    <input type="date" placeholder="dd/mm/yy" class="form-control" name="start_date" value="{{ request('start_date') }}">-->
+                        <!--</div>-->
+                        
+                        <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
+                        <!--    <label class="form-label">End Date</label>-->
+                        <!--    <input type="date" placeholder="dd/mm/yy" class="form-control" name="end_date" value="{{ request('end_date') }}">-->
+                        <!--</div>-->
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <button id="applyFilter" class="btn btn-primary" type="submit">Apply</button>
                             <a href="{{route('purchase-invoices.index')}}" class="btn btn-danger light ms-2" type="button">Reset</a>
@@ -54,13 +63,15 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Party Name</th>
                                     <th>Job NO</th>
                                     <th>Invoice NO</th>
-                                    <th>Party Type</th>
-                                    <th>Party Name</th>
-                                    <th>FinYear</th>
+                                    <th>INV_DT</th>
+                                    <th>Inv Type</th>
                                     <th>Inv Cat</th>
-                                    <th>INR/USD</th>
+                                    <th>FinYear</th>
+                                    <th>Inv Amt</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -108,21 +119,37 @@
                                                 break;
                                         }
                                     @endphp
+                                    @php
+                                        $latestCharge = $purchase_invoice->chargesContainer
+                                            ->sortByDesc('updated_at')
+                                            ->first();
+                                    
+                                        if (
+                                            $latestCharge &&
+                                            $latestCharge->updated_at > $purchase_invoice->updated_at
+                                        ) {
+                                            $userName = optional($latestCharge->user)->name;
+                                        } else {
+                                            $userName = optional($purchase_invoice->user)->name;
+                                        }
+                                    @endphp
 
                                     <tr>
-                                        <td>{{$purchase_invoice->id}}</td>
-                                        <td>{{$purchase_invoice->inv_cat}}/{{$purchase_invoice->job_no ?? '--'}}/{{$fy}}</td>
-                                        <td>{{$purchase_invoice->invoice_no ?? '--'}}</td>
-                                        <td>{{$party_Type ?? '--'}}</td>
+                                        <td>{{$loop->iteration ?? '--'}}</td>
                                         <td>{{$purchase_invoice->partyName->party_name ?? '--'}}</td>
-                                        <td>{{$fy}}</td>
-                                        <td>{{$Inv_cat ?? '--'}}</td>
-                                        <td>{{$purchase_invoice->currency}}</td>
+                                        <td>{{$purchase_invoice->inv_cat}}/{{$purchase_invoice->operationJob->job_no ?? '--'}}/{{$fy}}</td>  
+                                        <td>{{$purchase_invoice->invoice_no ?? '--'}}</td>
+                                            <td>{{$purchase_invoice->invoice_date ? \Carbon\Carbon::parse($purchase_invoice->invoice_date)->format('d-m-Y') :'--'}}</td>
+                                        <td>{{ $purchase_invoice->invoice_type ?? '--'}}</td>
+                                        <td>{{ $Inv_cat ?? '--'}}</td>
+                                        <td>{{$fy ?? '--'}}</td>
+                                        <td style="color: red;">{{round($purchase_invoice->chargesContainer->sum('total')) ?? '--'}}</td>
+                                        <td>{{ $userName ?? '-' }}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/purchase-invoices/'.$purchase_invoice->uuid.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-purchaseInvoice" href="javascript:void(0);" data-id="{{$purchase_invoice->id}}">Delete</a>
                                         </td>
-                                    </tr>                                 
+                                    </tr>  
                                 @endforeach                                
                             </tbody>
                         </table>
@@ -138,6 +165,11 @@
 
 @push('scripts')
     <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                width: '100%'
+            })
+        })
         $(document).on('click', '.delete-purchaseInvoice', function(e) {
             e.preventDefault();
             if (!confirm('Are you sure you want to delete this Purchase Invoice record?')) return;

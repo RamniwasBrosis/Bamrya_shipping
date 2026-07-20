@@ -53,8 +53,7 @@
                                 </div>
                                 <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
                                     <label class="form-label">Shipping Line:</label>
-                                    <span class="text-danger">*</span>
-                                    <select name="shipping_line_id" class="default-select form-control wide" required>
+                                    <select name="shipping_line_id" class="select2 form-control wide">
                                         <option value="">Select Shipping Line</option>
                                         @foreach($shippings as $line)
                                             <option value="{{ $line->id }}" {{ old('shipping_line_id', $MasterVoyage->shipping_line_id) == $line->id ? 'selected' : '' }}>
@@ -89,15 +88,13 @@
                                 </div>
                                 <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
                                     <label class="form-label">Overseas Agent:</label>
-                                    <span class="text-danger">*</span>
-                                    <select name="overseas_agent_id" class="default-select form-control wide">
-                                        {{-- <option value="">Select Agent</option> --}}
-                                        {{-- @foreach($agents as $agent)
-                                            <option value="{{ $agent->id }}" {{ old('overseas_agent_id', $MasterVoyage->overseas_agent_id) == $agent->id ? 'selected' : '' }}>
-                                                {{ $agent->agent_name }}
-                                            </option>
-                                        @endforeach --}}
-                                    </select>
+                                    
+                                     <input type="text" id="overseas_agent" name="overseas_agent"
+                                        class="form-control @error('overseas_agent') is-invalid @enderror"
+                                        value="{{ old('overseas_agent') }}">
+                                    @error('overseas_agent_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
                                     <label class="form-label">Status:</label>
@@ -124,6 +121,9 @@
 <script>
 $(document).ready(function() {
     $('#smartwizard').smartWizard();
+    $('.select2').select2({
+            'width' : '100%'
+        })
 });
 </script>
 @endpush

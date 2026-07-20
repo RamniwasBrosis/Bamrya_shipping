@@ -33,7 +33,10 @@ class OperationSeaImportCont extends Model
         'printed',
         'selected',
         'sector',
-        'previous_days',
+        'do_date',
+        'previous_days','net_weight','cust_seal_no','ex_rate','rate',
+        
+        'agentSealNo', 'sobDate', 'mark_and_numbers', 'bill_of_entry_date', 'goods_description', 'customer_inv_no', 'out_off_charge_date', 'destuffing_date', 'check_list_date',
 
         'company_id',
         'uuid',

@@ -3,6 +3,7 @@
 namespace App\Models\Accounts;
 
 use App\Models\MasterImportParty;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,18 +12,19 @@ class AccountPurchasePayment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'company_id',
+        'company_id','user_id',
         'uuid',
         'billing_party_id',
-        'invoice_f_year',
-        'pp_date',
-        'radio_type',
-        'neft_details',
-        'neft_date',
-        'bank_name',
-        'total_amount_payable',
-        'billing_party',
+        'purchase_date',
+        'amount',
+        'invoice_type',
+        'invoice_no'
     ];
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 
     public function partyName(){
         return $this->belongsTo(MasterImportParty::class, 'billing_party_id');

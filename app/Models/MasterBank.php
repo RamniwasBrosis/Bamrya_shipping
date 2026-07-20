@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class MasterBank extends Model
 {
@@ -34,7 +35,12 @@ class MasterBank extends Model
         'notes7',
         'notes8',
         'notes9',
-        'notes10',
+        'notes10','user_id'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class,'user_id', 'id');        
+    }
 
 }

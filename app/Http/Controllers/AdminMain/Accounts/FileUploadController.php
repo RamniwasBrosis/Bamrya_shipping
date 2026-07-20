@@ -66,8 +66,42 @@ class FileUploadController extends Controller
         return back()->with('success', 'File uploaded successfully.');
     }
 
+    // public function searchFile(Request $request)
+    // {  
+    //     $request->validate([
+    //         'search_query' => 'required'
+    //     ]);
+
+    //     $file = AccountFileUpload::find($request->search_query);
+       
+    //     $html = '
+    //     <div class="table-responsive">
+    //         <table class="table table-bordered">
+    //             <thead>
+    //                 <tr>
+    //                     <th>File ID</th>
+    //                     <th>File Name</th>
+    //                     <th>Download PDF</th>
+    //                     <th>Remove PDF</th>
+    //                 </tr>
+    //             </thead>
+    //             <tbody>
+    //                 <tr>
+    //                     <td>' . $file->id . '</td>
+    //                     <td>' . $file->file_name . '</td>
+    //                     <td><a href="' . route('file-upload.downloadFile', $file->id) . '" target="_blank" class="text-success">Download</a></td>
+    //                     <td>
+    //                         <button class="btn btn-sm btn-danger" onclick="clearSearchFile()">×</button>
+    //                     </td>
+    //                 </tr>
+    //             </tbody>
+    //         </table>
+    //     </div>';
+    //     return response($html);
+    // }
+    
     public function searchFile(Request $request)
-    {  
+    {        
         $request->validate([
             'search_query' => 'required'
         ]);
@@ -90,7 +124,7 @@ class FileUploadController extends Controller
                         <td>' . $file->id . '</td>
                         <td>' . $file->file_name . '</td>
                         <td><a href="' . route('file-upload.downloadFile', $file->id) . '" target="_blank" class="text-success">Download</a></td>
-                        <td>
+                        <td id="delete_td">
                             <button class="btn btn-sm btn-danger" onclick="clearSearchFile()">×</button>
                         </td>
                     </tr>
@@ -100,17 +134,40 @@ class FileUploadController extends Controller
         return response($html);
     }
 
+
+
     public function downloadFile($id)
     {
-        $file = AccountFileUpload::findOrFail($id);
-
+        $file = AccountFileUpload::find($id);
+    
         $filePath = 'public/' . $file->file_path;
         $fileName = $file->file_name;
-
+    
         if (Storage::exists($filePath)) {
             return Storage::download($filePath, $fileName);
         }
-
+    
         return back()->with('error', 'File not found.');
     }
+    
+    public function destroy($id)
+    {
+        $file = AccountFileUpload::findOrFail($id);
+    
+        // Delete file from storage
+        if (Storage::disk('public')->exists($file->file_path)) {
+            Storage::disk('public')->delete($file->file_path);
+        }
+    
+        // Delete database record
+        $file->delete();
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'File deleted successfully.'
+        ]);
+    }
+
+    
+
 }

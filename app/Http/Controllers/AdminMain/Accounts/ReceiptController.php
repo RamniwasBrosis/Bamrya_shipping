@@ -18,6 +18,7 @@ class ReceiptController extends Controller
     public function __construct(){
         $this->middleware(function ($request, $next) {
             $this->company_id = Auth::user()->company_id;
+            $this->user_id = auth()->user()->id;
             return $next($request);
         });
     }
@@ -55,8 +56,8 @@ class ReceiptController extends Controller
     public function create()
     {
         $parties = MasterImportParty::where('company_id', $this->company_id)->get();
-        $partyNames = MasterParty::all();
-        return view('admin-main.admin.receipt.create', compact('parties', 'partyNames'));
+        $party_lists = MasterParty::all();
+        return view('admin-main.admin.receipt.create', compact('parties', 'party_lists'));
     }
 
     /**
@@ -64,44 +65,34 @@ class ReceiptController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'neft_details' => 'nullable|string|max:255',
-            'neft_date' => 'nullable|date',
-            'bank_name' => 'nullable|string|max:255',
-            'total_amount_received' => 'nullable|numeric|min:0',
-            'received_from_party' => 'nullable|string|max:255',
-            'billing_party_id' => 'required|exists:master_import_parties,id',
-            'invoice_f_year' => 'required|string|max:9',
-            'receipt_date' => 'required|date',
-            'inv_type' => 'nullable',
-            'inv_no' => 'nullable',
+        $validated = $request->validate([
+            'billing_party_id'      => 'required|exists:master_import_parties,id',
+            'receipt_date'          => 'required|date',
+            'invoice_type'          => 'required|string|max:50',
+            'invoice_no'            => 'required|string|max:255',
+            'amount'                => 'required|numeric|min:0',
         ]);
-
+    
         $receipt = new AccountReceipt();
-
+    
         $receipt->company_id = $this->company_id;
+        $receipt->user_id = $this->user_id;
         $receipt->uuid = Str::uuid();
-
-        $receipt->billing_party_id = $request->billing_party_id ;  
-        $receipt->invoice_f_year = $request->invoice_f_year ;  
-        $receipt->receipt_date = $request->receipt_date ;  
-        $receipt->radio_type = $request->radio_type ;
-
-        if($request->radio_type == 'neft_cash'){
-
-            $receipt->neft_details = $request->neft_details;
-            $receipt->neft_date = $request->neft_date;
-            $receipt->bank_name = $request->bank_name;
-            $receipt->total_amount_received = $request->total_amount_received;
-            $receipt->received_from_party = $request->received_from_party;
-
-        }
+    
+        $receipt->billing_party_id = $validated['billing_party_id'];
+        $receipt->receipt_date = $validated['receipt_date'];
+        $receipt->invoice_type = $validated['invoice_type'];
+        $receipt->invoice_no = $request->invoice_no;
+        $receipt->amount = $validated['amount']; // matching DB column
+    
         $receipt->save();
-
-        return redirect()->back()->with('success', 'Entry Insert Successfully. !');
-
-
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'Receipt entry stored successfully!',
+        ]);
     }
+
 
     /**
      * Display the specified resource.
@@ -118,8 +109,9 @@ class ReceiptController extends Controller
     {
         $receipt = AccountReceipt::where('uuid', $uuid)->firstOrFail();
         $parties = MasterImportParty::where('company_id', $this->company_id)->get();
+        $party_lists = MasterParty::all();
 
-        return view('admin-main.admin.receipt.edit', compact('receipt', 'parties'));
+        return view('admin-main.admin.receipt.edit', compact('receipt', 'parties', 'party_lists'));
     }
 
     /**
@@ -129,37 +121,51 @@ class ReceiptController extends Controller
     {
         $validated = $request->validate([
             'billing_party_id'      => 'required|exists:master_import_parties,id',
-            'invoice_f_year'        => 'required|in:2020-21,2021-22,2022-23,2023-24,2024-25,2025-26,2026-27,2027-28,2028-29,2029-30',
             'receipt_date'          => 'required|date',
-            'radio_type'            => 'required|in:onaccount,neft_cash',
-            'neft_details'          => 'nullable|string|max:255',
-            'neft_date'             => 'nullable|date',
-            'bank_name'             => 'nullable|string|max:255',
-            'total_amount_received' => 'required|numeric|min:0',
-            'received_from_party'   => 'required|string|max:255',
+            'invoice_type'          => 'required|string|max:50',
+            'invoice_no'            => 'required|string|max:255',
+            'amount'                => 'required|numeric|min:0',
         ]);
-
+        $validated['user_id'] = $this->user_id;
         $receipt = AccountReceipt::findOrFail($id);
-
         $receipt->update($validated);
-
-        return back()->with('success', 'Receipt details updated successfully.');
-
+    
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Receipt details updated successfully.',
+                'data' => $receipt,
+            ]);
+        }
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    // public function destroy(string $id)
+    // {
+    //     $receipt = AccountReceipt::findOrFail($id);
+    
+    //     // Delete related payment details if exist
+    //     $paymentDetail = AccountReceiptPaymentDetail::where('receipt_id', $id)->first();
+    //     if ($paymentDetail) {
+    //         $paymentDetail->delete();
+    //     }
+    
+    //     $receipt->delete();
+    
+    //     return response()->json(['success' => 'Receipt deleted successfully!']);
+    // }
+    
+    public function destroy($id)
     {
-        $delete = AccountReceipt::findOrFail($id);
-        $delete->delete();
-
-        $delete_pay_details = AccountReceiptPaymentDetail::where('receipt_id', $id)->first();
-        $delete_pay_details->delete();
-
-        return response()->json(['success' => 'Receipt Deleted Successfully. !']);
+        $receipt = AccountReceipt::findOrFail($id);
+        $receipt->delete();
+    
+        return redirect()->route('receipts.index')->with('success', 'Receipt deleted successfully.');
     }
+
 
     public function paymentDetails(Request $request, $id){
 

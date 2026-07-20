@@ -59,6 +59,7 @@
                                     <tr>
                                         <th>File Id</th>
                                         <th>File Name</th>
+                                        <th>Updated By</th>
                                         <th>Download PDF</th>
                                         <th>Delete PDF</th>
                                     </tr>
@@ -66,8 +67,9 @@
                                 <tbody>
                                     @foreach($files as $file)
                                         <tr>
-                                            <td>{{ $file->id }}</td>
+                                            <td>{{ $loop->iteration }}</td>
                                             <td>{{ $file->file_name }}</td>
+                                            <td>{{ $file->user->name ?? '' }}</td>
                                             <td>
                                                 <a href="{{ route('files.download', $file->id) }}" class="text-success">Download</a>
                                             </td>
@@ -82,7 +84,7 @@
                                     @endforeach
                                     @if($files->isEmpty())
                                         <tr>
-                                            <td colspan="4">No files found.</td>
+                                            <td colspan="5">No files found.</td>
                                         </tr>
                                     @endif
                                 </tbody>

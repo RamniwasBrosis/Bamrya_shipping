@@ -2,7 +2,9 @@
 @section('content')
 <div class="page-titles">
     <ol class="breadcrumb">
-        <li><h5 class="bc-title"> MANAGE Transport</h5></li>
+        <li>
+            <h5 class="bc-title"> MANAGE Transport</h5>
+        </li>
     </ol>
     <a class="text-primary fs-13" href="{{url('admin/transports/create')}}">+ Add Transport</a>
 </div>
@@ -20,7 +22,7 @@
                             <select name="full_job_no" class="form-control default-select">
                                 <option value="">select</option>
                                 @foreach ($transportDetails as $transportDetail)
-                                    <option value="{{$transportDetail->full_job_no}}">{{$transportDetail->full_job_no}}</option>
+                                <option value="{{$transportDetail->full_job_no}}">{{$transportDetail->full_job_no}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -30,17 +32,17 @@
                             <select name="booking_no" class="form-control default-select">
                                 <option value="">select</option>
                                 @foreach ($transportDetails as $transportDetail)
-                                    <option value="{{$transportDetail->booking_no}}">{{$transportDetail->booking_no}}</option>
+                                <option value="{{$transportDetail->booking_no}}">{{$transportDetail->booking_no}}</option>
                                 @endforeach
                             </select>
-                        </div>                       
+                        </div>
 
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Shipping Bill No.</label>
                             <select name="shipping_bill_no" class="form-control default-select">
                                 <option value="">select</option>
                                 @foreach ($transportDetails as $transportDetail)
-                                    <option value="{{$transportDetail->shipping_bill_no}}">{{$transportDetail->shipping_bill_no}}</option>
+                                <option value="{{$transportDetail->shipping_bill_no}}">{{$transportDetail->shipping_bill_no}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -61,24 +63,26 @@
                                     <th>Booking No</th>
                                     <th>Cust. Inv. No</th>
                                     <th>Shipping Bill No</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($transportDetails as $transportDetail)
-                                    <tr>
-                                        <td>{{$transportDetail->id}}</td>
-                                        <td>{{$transportDetail->full_job_no}}</td>
-                                        <td>{{$transportDetail->importParty->party_name}}</td>
-                                        <td>{{$transportDetail->booking_no}}</td>
-                                        <td>{{$transportDetail->customer_inv_no}}</td>
-                                        <td>{{$transportDetail->shipping_bill_no}}</td>
-                                        <td>
-                                            <a class="badge badge-info light border-0" href="{{url('admin/transports/'.$transportDetail->uuid.'/edit')}}">Edit</a>
-                                            <a class="badge badge-danger light border-0 delete-transport" href="javascript:void(0);" data-id="{{$transportDetail->id}}">Delete</a>
-                                        </td>
-                                    </tr>
-                                @endforeach                                
+                                <tr>
+                                    <td>{{$loop->iteration}}</td>
+                                    <td>{{$transportDetail->full_job_no}}</td>
+                                    <td>{{$transportDetail->importParty->party_name ?? 'N/A'}}</td>
+                                    <td>{{$transportDetail->booking_no}}</td>
+                                    <td>{{$transportDetail->customer_inv_no}}</td>
+                                    <td>{{$transportDetail->shipping_bill_no}}</td>
+                                    <td>{{$transportDetail->user->name??''}}</td>
+                                    <td>
+                                        <a class="badge badge-info light border-0" href="{{url('admin/transports/'.$transportDetail->uuid.'/edit')}}">Edit</a>
+                                        <a class="badge badge-danger light border-0 delete-transport" href="javascript:void(0);" data-id="{{$transportDetail->id}}">Delete</a>
+                                    </td>
+                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -92,24 +96,24 @@
 @endsection
 
 @push('scripts')
-    <script>
-        $(document).on('click', '.delete-transport', function(e) {
-            e.preventDefault();
-            if (!confirm('Are you sure you want to delete this transport record?')) return;
+<script>
+    $(document).on('click', '.delete-transport', function(e) {
+        e.preventDefault();
+        if (!confirm('Are you sure you want to delete this transport record?')) return;
 
-            const transportId = $(this).data('id');
+        const transportId = $(this).data('id');
 
-            $.ajax({
-                url: '/admin/transports/' + transportId,
-                type: 'DELETE',
-                data: {
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    alert('transport record deleted successfully.');
-                    location.reload();
-                },
-                error: function(xhr) {
+        $.ajax({
+            url: '/admin/transports/' + transportId,
+            type: 'DELETE',
+            data: {
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                alert('transport record deleted successfully.');
+                location.reload();
+            },
+            error: function(xhr) {
                 $('.error-text').text(''); // Clear all error texts
 
                 if (xhr.status === 422) {
@@ -118,8 +122,8 @@
                     alert(xhr.responseJSON.message ?? 'Unknown error occurred.');
                 }
             }
-            });
         });
-    </script>
+    });
+</script>
 
 @endpush

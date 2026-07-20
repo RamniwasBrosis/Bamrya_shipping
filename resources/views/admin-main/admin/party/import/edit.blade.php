@@ -13,10 +13,10 @@
         <div class="col-xl-12 col-xxl-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('import-parties.update', $importParty->id) }}" method="POST">
+                    <form action="{{ route('import-parties.update', $importParty->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
-                        <input type="hidden" name="company_id" value="2">
+                        <input type="hidden" name="company_id" value="{{ $importParty->company_id }}">
                         <div class="row form-material">
                             <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
                                 <label class="form-label">Party Code:</label>
@@ -55,7 +55,7 @@
                                 <select name="party_type" class="default-select form-control wide">
                                     <option value="">-- Select --</option>
                                     @foreach($partyTypes as $type)
-                                        <option value="{{ $type->id }}" {{ old('party_type', $importParty->party_type) == $type->id ? 'selected' : '' }}>
+                                        <option value="{{ $type->id }}" {{ old('party_type', $importParty->party_type) == $type->party_type ? 'selected' : '' }}>
                                             {{ $type->party_name }}
                                         </option>
                                     @endforeach
@@ -94,6 +94,20 @@
                                 <input type="number" name="tds_percent" class="form-control" value="{{ old('tds_percent', $importParty->tds_percent) }}">
                             </div>
                             <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
+                                <label class="form-label">State:</label>
+                                <input type="number" name="state" class="form-control" value="{{ old('state', $importParty->state) }}">
+                            </div>
+                            <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
+                                <label class="form-label">State Code:</label>
+                                <input type="number" name="state_code" class="form-control" value="{{ old('state_code', $importParty->state_code) }}">
+                            </div>
+                            @if($importParty->party_type == 1)
+                            <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
+                                <label class="form-label">Documents</label>
+                                <input type="file" class="form-control" name="documents[]" multiple>
+                            </div>
+                            @endif
+                            <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
                                 <label class="form-label">Status: <span class="text-danger">*</span></label>
                                 <select name="status" class="default-select form-control wide">
                                     <option value="1" {{ old('status', $importParty->status) == 1 ? 'selected' : '' }}>Active</option>
@@ -109,6 +123,71 @@
             </div>
         </div>
     </div>
+    
+    @if($importParty->party_type == 1)
+        <div class="row">
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+            <div class="col-xl-12 col-xxl-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width: 5%">#</th>
+                                <th>Document Name</th>
+                                <th style="width: 15%">Download</th>
+                                <th style="width: 15%">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse(optional($importParty)->document ?? [] as $index => $doc)
+                            
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+            
+                                    <td class="text-start">
+                                        {{ $doc['name'] ?? 'N/A' }}
+                                    </td>
+            
+                                    <td>
+                                        <a href="{{ asset('storage/'.$doc['path']) }}"
+                                           class="btn btn-sm btn-success"
+                                           download>
+                                            <i class="bi bi-download"></i> Download
+                                        </a>
+                                    </td>
+            
+                                    <td>
+                                        <form action="{{ route('shipper.document.delete', [$importParty->id, $doc['name']]) }}"
+                                              method="POST"
+                                              onsubmit="return confirm('Are you sure you want to delete this document?');">
+                                            @csrf
+                                            @method('DELETE')
+            
+                                            <button type="submit" class="btn btn-sm btn-danger" >
+                                                <i class="bi bi-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-muted">
+                                        No documents found.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    
+        </div>
+    @endif
 </div>
 
 @endsection

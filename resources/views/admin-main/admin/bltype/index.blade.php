@@ -33,6 +33,7 @@
                                 <tr>
                                     <th>BL Descrition</th>
                                     <th>Status</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -48,6 +49,7 @@
                                             @endif
                                             
                                         </td>
+                                        <td>{{$blType->user->name??''}}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/bl-types/'.$blType->id.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-blType" href="javascript:void(0);" data-id="{{$blType->id}}">Delete</a>
@@ -57,7 +59,9 @@
                             </tbody>
                         </table>
                     </div>
-                    {{ $blTypes->appends(request()->query())->links() }}
+                    <div class="d-flex justify-content-center mt-3">
+                        {!! $blTypes->links('pagination::bootstrap-5') !!}
+                    </div>
                 </div>
             </div>
         </div>

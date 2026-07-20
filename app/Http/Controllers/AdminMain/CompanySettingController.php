@@ -103,55 +103,164 @@ class CompanySettingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+     public function update(Request $request, string $id)
     {
+        // ------------------------------
+        // 1. Validation
+        // ------------------------------
         $request->validate([
             'company_name' => 'required|max:200',
             'company_email' => 'required|email|max:200',
             'address' => 'required',
-            'company_phone' => 'required',
+            'company_phone' => 'nullable',
+    
+            // Optional fields
             'reg_no' => 'nullable|max:50',
-            'icegate_no' => 'nullable|max:50',
-            // 'branch' => 'nullable|array',
+            'job_no' => 'nullable',
             'branch' => 'nullable',
-            'carn_no' => 'nullable|max:15',
-            'mlo_code' => 'nullable|max:10',
-            'jnpt_code' => 'nullable|max:5',
-            'gti_code' => 'nullable|max:5',
-            'nsict_code' => 'nullable|max:5',
-            'nsgit_code' => 'nullable|max:5',
+            'land_line_ph' => 'nullable',
+            
+            'pan_no' => 'nullable|max:150',
+            'gstin_no' => 'nullable|max:150',
+            'cin_no' => 'nullable|max:150',
+            'fax_no' => 'nullable|max:150',
+            'tan_no' => 'nullable|max:150',
+            'phone' => 'nullable|max:150',
+            'email' => 'nullable|max:150',
+            
+            'nsgit_code' => 'nullable',
+    
             'status' => 'required|boolean',
+    
+            // Logo validation
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
-
+    
+        // ------------------------------
+        // 2. Fetch Company
+        // ------------------------------
         $company = Company::findOrFail($id);
-        $company->company_name = $request->company_name;
+    
+        // ------------------------------
+        // 3. Update Basic Company Details
+        // ------------------------------
+        $company->company_name  = $request->company_name;
         $company->company_email = $request->company_email;
         $company->company_phone = $request->company_phone;
-        $company->address = $request->address;
-        $company->save();
-
-        $companySetting = CompanySetting::where('company_id', $id)->first();
-
-        if (!$companySetting) {
-            $companySetting = new CompanySetting();
-            $companySetting->company_id = $id;
+        $company->address       = $request->address;
+    
+        // ------------------------------
+        // 4. Handle Logo Upload
+        // ------------------------------
+        if ($request->hasFile('logo')) {
+    
+            // Create directory if not exists
+            $path = public_path('uploads/company_logo');
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
+            }
+    
+            // Delete old logo
+            if ($company->logo && file_exists($path . '/' . $company->logo)) {
+                unlink($path . '/' . $company->logo);
+            }
+    
+            // Upload new file
+            $file = $request->file('logo');
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($path, $filename);
+    
+            // Save to DB
+            $company->logo = $filename;
         }
-
-        $companySetting->reg_no = $request->reg_no;
-        $companySetting->icegate_no = $request->icegate_no;
-        $companySetting->branches = $request->branch;
-        $companySetting->carn_no = $request->carn_no;
-        $companySetting->mlo_code = $request->mlo_code;
-        $companySetting->jnpt_code = $request->jnpt_code;
-        $companySetting->gti_code = $request->gti_code;
-        $companySetting->nsict_code = $request->nsict_code;
-        $companySetting->nsgit_code = $request->nsgit_code;
-        $companySetting->status = $request->status;
-
+    
+        $company->save();
+    
+        // ------------------------------
+        // 5. Update Company Settings
+        // ------------------------------
+        $companySetting = CompanySetting::firstOrCreate(
+            ['company_id' => $id]
+        );
+    
+        $companySetting->reg_no       = $request->reg_no;
+        $companySetting->job_no       = $request->job_no;
+        $companySetting->company_code = $request->company_code;
+        $companySetting->pan_no   = $request->pan_no;
+        $companySetting->branches     = $request->branch;
+        $companySetting->gstin_no      = $request->gstin_no;
+        $companySetting->cin_no     = $request->cin_no;
+        $companySetting->fax_no    = $request->fax_no;
+        $companySetting->tan_no    = $request->tan_no;
+        $companySetting->phone     = $request->phone;
+        $companySetting->email   = $request->email;
+        $companySetting->nsgit_code   = $request->nsgit_code;
+        $companySetting->status       = $request->status;
+        $companySetting->land_line_ph       = $request->land_line_ph;
+    
         $companySetting->save();
-
-        return redirect()->route('company-settings.edit')->with('success', 'Company updated successfully.');
+    
+        // ------------------------------
+        // 6. Redirect with success
+        // ------------------------------
+        return redirect()
+            ->route('company-settings.edit')
+            ->with('success', 'Company updated successfully.');
     }
+
+     
+     
+    // public function update(Request $request, string $id)
+    // {
+    //     $request->validate([
+    //         'company_name' => 'required|max:200',
+    //         'company_email' => 'required|email|max:200',
+    //         'address' => 'required',
+    //         'company_phone' => 'required',
+    //         'reg_no' => 'nullable|max:50',
+    //         'icegate_no' => 'nullable|max:50',
+    //         'job_no' => 'nullable',
+    //         'branch' => 'nullable',
+    //         'carn_no' => 'nullable|max:15',
+    //         'mlo_code' => 'nullable|max:10',
+    //         'jnpt_code' => 'nullable|max:5',
+    //         'gti_code' => 'nullable|max:5',
+    //         'nsict_code' => 'nullable|max:5',
+    //         'nsgit_code' => 'nullable|max:5',
+    //         'status' => 'required|boolean',
+    //     ]);
+
+    //     $company = Company::findOrFail($id);
+    //     $company->company_name = $request->company_name;
+    //     $company->company_email = $request->company_email;
+    //     $company->company_phone = $request->company_phone;
+    //     $company->address = $request->address;
+    //     $company->save();
+
+    //     $companySetting = CompanySetting::where('company_id', $id)->first();
+
+    //     if (!$companySetting) {
+    //         $companySetting = new CompanySetting();
+    //         $companySetting->company_id = $id;
+    //     }
+
+    //     $companySetting->reg_no = $request->reg_no;
+    //     $companySetting->job_no = $request->job_no;
+    //     $companySetting->company_code = $request->company_code;
+    //     $companySetting->icegate_no = $request->icegate_no;
+    //     $companySetting->branches = $request->branch;
+    //     $companySetting->carn_no = $request->carn_no;
+    //     $companySetting->mlo_code = $request->mlo_code;
+    //     $companySetting->jnpt_code = $request->jnpt_code;
+    //     $companySetting->gti_code = $request->gti_code;
+    //     $companySetting->nsict_code = $request->nsict_code;
+    //     $companySetting->nsgit_code = $request->nsgit_code;
+    //     $companySetting->status = $request->status;
+
+    //     $companySetting->save();
+
+    //     return redirect()->route('company-settings.edit')->with('success', 'Company updated successfully.');
+    // }
 
     // public function destroy(string $id)
     // {

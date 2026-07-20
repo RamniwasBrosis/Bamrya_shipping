@@ -7,21 +7,23 @@
         <a class="text-primary fs-13" href="{{ url('admin/purchase-payment') }}"><- Go Back</a>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{session('success')}}
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li class="mb-2">{{$error}}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <div id="alert-container">
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+    
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li class="mb-2">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+    </div>
 
 
 
@@ -40,135 +42,61 @@
                         <div id="smartwizard" class="form-wizard order-create">
                             <div class="row form-material">
                                 <div class="form-validation">
-                                    <form class="needs-validation" method="post" action="{{route('purchase-payment.store')}}">
+                                    <form id="purchasePaymentForm" class="needs-validation" method="post" action="{{ route('purchase-payment.store') }}">
                                         @csrf
-                                        <div class="row">
+                                        <div class="row g-3">
+                                            <!-- Billing Party -->
                                             <div class="col-xl-6">
-                                                <div class="mb-3 row">
-                                                    <label class="col-sm-3 col-form-label">Billing Party:</label>
-                                                    <div class="col-sm-9">
-                                                        <div class="d-flex">
-                                                            <select class="form-control me-2" placeholder="Select" name="billing_party_id">
-                                                                <option value="">select</option>
-                                                                @foreach ($parties as $party)
-                                                                    <option value="{{$party->id}}">{{$party->party_name}}"</option>
-                                                                @endforeach
-                                                            </select>
-                                                            <button type="button" class="btn btn-sm btn-outline-primary"
-                                                                data-bs-toggle="modal" data-bs-target="#partyDetailsModal">
-                                                                <i class="bi bi-plus-lg">+</i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
+                                                <label class="form-label">Billing Party:</label>
+                                                <div class="d-flex">
+                                                    <select class="form-control me-2 select2" name="billing_party_id">
+                                                        <option value="">Select</option>
+                                                        @foreach ($parties->where('party_type', 10) as $party)
+                                                            <option value="{{ $party->id }}">{{ $party->party_name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        data-bs-toggle="modal" data-bs-target="#partyDetailsModal"
+                                                        data-target-field="billing_party_id">
+                                                        <i class="bi bi-plus-lg">+</i>
+                                                    </button>
                                                 </div>
+                                            </div>
+                                    
+                                            <!-- Receipt Date -->
+                                            <div class="col-xl-6">
+                                                <label class="form-label">Purchase Date:</label>
+                                                <input type="date" class="form-control" name="purchase_date">
+                                            </div>
+                                    
+                                            <div class="mb--xl-6">
+                                                <label for="invoice_type" class="col-sm-4 col-form-label">Invoice Type:<span class="text-danger">*</span></label>
+                                                <div class="col-sm-6">
+                                                    <select class="default-select form-control wide" id="invoice_type" name="invoice_type">
+                                                        <option value="">Select Invoice Type</option>
+                                                        <option value="Purchase">Purchase</option>
+                                                        <option value="Journal">Journal</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6">
+                                                <label class="form-label">Invoice No:</label>
+                                                <input type="text" class="form-control" name="invoice_no">
                                             </div>
                                             
                                             <div class="col-xl-6">
-                                                <div class="mb-3 row">
-                                                    <label class="col-sm-3 col-form-label">Invoice F-Year:</label>
-                                                    <div class="col-sm-9">
-                                                        <select class="form-control me-2" placeholder="Select" name="invoice_f_year">
-                                                            <option value="">select</option>
-                                                            <option value="2020-21">2020-21</option>
-                                                            <option value="2021-22">2021-22</option>
-                                                            <option value="2022-23">2022-23</option>
-                                                            <option value="2023-24">2023-24</option>
-                                                            <option value="2024-25">2024-25</option>
-                                                            <option value="2025-26">2025-26</option>
-                                                            <option value="2026-27">2026-27</option>
-                                                            <option value="2027-28">2027-28</option>
-                                                            <option value="2028-29">2028-29</option>
-                                                            <option value="2029-30">2029-30</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
+                                                <label class="form-label">Amount:</label>
+                                                <input type="text" class="form-control" name="amount">
                                             </div>
-                                            <div class="col-xl-6">
-                                                <div class="mb-3 row">
-                                                    <label class="col-sm-3 col-form-label">P.P. Date:</label>
-                                                    <div class="col-sm-9">
-                                                        <input type="date" class="form-control" name="pp_date" value="{{date('Y-m-d')}}">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-xl-12 d-flex">
-                                                <div class="me-4">
-                                                    <input type="radio" name="radio_type" id="onaccount" value="onaccount" checked>
-                                                    <label for="">ONACCOUTN</label>
-                                                </div>
-                                                <div>
-                                                    <input type="radio" name="radio_type" id="neft_cash" value="neft_cash" >
-                                                    <label for="">NEFT/CASH</label>
-                                                </div>
-                                                
-                                            </div>
-                                            <div id="Bank_Details" style="display: none;">
-                                                <div class="row">
-                                                    <div class="col-xl-4">
-                                                        <label class="col-form-label">Cash/Bank/Neft Details:</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="text" class="form-control" name="neft_details" >
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-xl-4">
-                                                        <label class=" col-form-label">Neft/Cheque Date:</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="date" class="form-control" name="neft_date" >
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-xl-4">
-                                                        <label class="col-form-label">Bank Name:</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="text" class="form-control" name="bank_name" >
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-xl-6">
-                                                        <label class="col-form-label">Total Amount Payable:</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="text" class="form-control" name="total_amount_payable" >
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-xl-6">
-                                                        <label class="col-form-label">Billing Party:</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="text" class="form-control" name="billing_party" >
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                                <a href="{{route('purchase-payment.index')}}" type="button" class="btn btn-warning btn-sm">Cancle</a>
+                                    
+                                            <!-- Buttons -->
+                                            <div class="col-12 d-flex justify-content-end gap-2">
+                                                <a href="{{ route('purchase-payment.index') }}" class="btn btn-warning btn-sm">Cancel</a>
                                                 <button type="submit" class="btn btn-primary btn-sm">Save</button>
                                             </div>
                                         </div>
                                     </form>
-                                </div>
-                            </div>
 
-                            <h4>Enter Payment Details</h4>
-                            <hr>
-                            <div class="row">
-                                <div class="col-xl-6">
-                                    <div class="mb-3 row">
-                                        <label class="col-sm-3 col-form-label">Inv. Type:<span
-                                                class="text-danger">*</span></label>
-                                        <div class="col-sm-9">
-                                            <select class="default-select form-control wide" placeholder="Select"></select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-6">
-                                    <div class="mb-3 row">
-                                        <label class="col-sm-3 col-form-label">Pur. Inv. No:<span
-                                            class="text-danger">*</span></label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control">
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -178,252 +106,34 @@
         </div>
     </div>
     </div>
-
-    <!-- Modal Party Details -->
-    <div class="modal fade" id="partyDetailsModal" tabindex="-1" aria-labelledby="oceanVslModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="oceanVslModalLabel">Party</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="oceanVslForm" method="post" action="{{route('new-party.store')}}">
-                        @csrf
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Party Code:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="party_code">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Party Name:<span
-                                    class="text-danger">*</span></label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="party_name">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Address Line 1:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="address_1">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Address Line 2:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="address_2">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Address Line 3:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="address_3">
-                            </div>
-                        </div>
-                        {{-- <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Address Line 4:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="">
-                            </div>
-                        </div> --}}
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">City:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="city">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Pincode:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="pincode">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Party Type:<span
-                                    class="text-danger">*</span></label>
-                            <div class="col-sm-8">
-                                <select class="default-select  form-control wide" name="party_type" placeholder="Select">
-                                    <option value="">select</option>
-                                    @foreach ($partyNames as $partyName)
-                                        <option value="{{$partyName->id}}">{{$partyName->party_name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Contact Person:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="contact_person">
-                            </div>
-                        </div>
-
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Tel / Contact No:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="tel_no">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Email:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="email">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">GSTIN NO:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="gstin">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">PAN No:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="pan_no">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">CIN No:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="cin_no">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Credit Days:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="credit_days">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">TDS %:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="tds_percent">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Status:<span
-                                    class="text-danger">*</span></label>
-                            <div class="col-sm-8">
-                                <select class="default-select  form-control wide" name="status" placeholder="Active">
-                                    <option value="">select</option>
-                                    <option value="1">Active</option>
-                                    <option value="0">Deactive</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="d-grid d-md-flex justify-content-md-end">
-                            <button class="btn btn-outline-primary" type="submit">Save</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add New Charge Details -->
-    <div class="modal fade" id="AddNewChargeDetailsModal" tabindex="-1" aria-labelledby="oceanVslModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="oceanVslModalLabel">Party</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="oceanVslForm">
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Party Code:<span
-                                    class="text-danger">*</span></label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Charge Name:<span
-                                    class="text-danger">*</span></label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Tally Ledger(Name):<span
-                                    class="text-danger">*</span></label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Rs/Other Currency(I/U):</label>
-                            <div class="col-sm-8">
-                                <select class="default-select form-control wide me-2" placeholder="Select"></select>
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Type CHG:<span
-                                    class="text-danger">*</span></label>
-                            <div class="col-sm-8">
-                                <select class="default-select form-control wide me-2" placeholder="Select"></select>
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">GST:</label>
-                            <div class="col-sm-8">
-                                <select class="default-select form-control wide me-2" placeholder="Select"></select>
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">GST %:<span
-                                    class="text-danger">*</span></label>
-                            <div class="col-sm-8">
-                                <select class="default-select form-control wide me-2" placeholder="Select"></select>
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Formula (Y/N):</label>
-                            <div class="col-sm-8">
-                                <select class="default-select form-control wide me-2" placeholder="Select"></select>
-                            </div>
-                        </div>
-
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Limit:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Percentage:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">SAC Code:<span
-                                    class="text-danger">*</span></label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Status:<span
-                                    class="text-danger">*</span></label>
-                            <div class="col-sm-8">
-                                <select class="default-select  form-control wide" placeholder="Active"></select>
-                            </div>
-                        </div>
-                        <div class="d-grid d-md-flex justify-content-md-end">
-                            <button class="btn btn-outline-primary" type="button">Save</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+<!--party model-->
+@include('admin-main.admin.commonModelForms.modelPartyDetails')
+    
 @endsection
 
 
 @push('scripts')
+<script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: 'Select a value',
+                'allowClear': true,
+                width: '100%'
+            })
+        })
+        
+        // When Billing Party changes, set Received From Party
+        $('select[name="billing_party_id"]').on('change', function() {
+            let selectedText = $(this).find('option:selected').text().trim();
+        
+            if (selectedText && selectedText.toLowerCase() !== 'select') {
+                $('input[name="received_from_party"]').val(selectedText);
+            } else {
+                $('input[name="received_from_party"]').val('');
+            }
+        });
+
+    </script>
     <script>
         $(document).ready(function() {
             $('#smartwizard').smartWizard();
@@ -451,4 +161,101 @@
         });
 
     </script>
+    <script>
+        // party details model
+        let targetField = null;
+    
+        // Capture which button triggered the modal
+        $(document).on('click', '[data-bs-target="#partyDetailsModal"]', function () {
+            targetField = $(this).data('target-field'); // e.g. 'billing_party_id', 'notify_id', etc.
+        });
+        
+        // Handle form submission
+        $('#modelPartyDetails').on('submit', function (e) {
+            e.preventDefault();
+        
+            $.ajax({
+                url: "{{ route('new-party.store') }}",
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        const partyId = response.party.id;
+                        const partyName = response.party.name;
+                        const activeSelect = $('select[name="' + targetField + '"]');
+
+                        if (activeSelect.find('option[value="' + partyId + '"]').length === 0) {
+                            const newOption = new Option(partyName, partyId, true, true);
+                            activeSelect.append(newOption).trigger('change');
+                        }
+        
+                        $('#modelPartyDetails')[0].reset();
+                        $('#partyDetailsModal').modal('hide');
+                        toastr.success('Party added successfully!');
+                    } else {
+                        toastr.error(response.message || 'Something went wrong.');
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error('Failed to add party details.');
+                    console.error('Error:', xhr.responseText);
+                }
+            });
+        });
+        
+        // Reset target field after modal closes
+        $('#partyDetailsModal').on('hidden.bs.modal', function () {
+            targetField = null;
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#purchasePaymentForm').on('submit', function (e) {
+                e.preventDefault();
+        
+                let form = $(this);
+                let url = form.attr('action');
+                let formData = form.serialize();
+        
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    beforeSend: function () {
+                        form.find('button[type="submit"]').prop('disabled', true);
+                    },
+                    success: function (response) {
+                        $('#alert-container').html(`
+                            <div class="alert alert-success">${response.message}</div>
+                        `);
+        
+                        // Reset form completely (including select2)
+                        form[0].reset();
+                        $('.select2').val('').trigger('change');
+                        $('#Bank_Details').hide();
+        
+                        form.find('button[type="submit"]').prop('disabled', false);
+                    },
+                    error: function (xhr) {
+                        form.find('button[type="submit"]').prop('disabled', false);
+        
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            let errorHtml = '<div class="alert alert-danger"><ul>';
+                            $.each(errors, function (key, value) {
+                                errorHtml += `<li>${value[0]}</li>`;
+                            });
+                            errorHtml += '</ul></div>';
+                            $('#alert-container').html(errorHtml);
+                        } else {
+                            $('#alert-container').html(`
+                                <div class="alert alert-danger">Something went wrong. Please try again.</div>
+                            `);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
 @endpush

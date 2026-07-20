@@ -29,8 +29,8 @@
                                 <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
                                     <label class="form-label">Status: <span class="text-danger">*</span></label>
                                     <select name="status" class="form-control default-select wide">
-                                        <option value="">Select Status</option>
-                                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Active</option>
+                                        <!--<option value="">Select Status</option>-->
+                                        <option value="1" {{ old('status', '1') == '1' ? 'selected' : '' }}>Active</option>
                                         <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Inactive</option>
                                     </select>
                                     @error('status')

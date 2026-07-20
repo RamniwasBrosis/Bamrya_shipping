@@ -31,6 +31,7 @@
                                     <th>Mumbai IGM Date</th>
                                     <th>Overseas Agent</th>
                                     <th>Status</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -56,6 +57,7 @@
                                                 <span class="badge badge-danger light border-0">Deactive</span>
                                             @endif
                                         </td>
+                                        <td>{{$MasterVoyage->user->name}}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/voyages/'.$MasterVoyage->id.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-voyage" href="javascript:void(0);" data-id="{{$MasterVoyage->id}}">Delete</a>
@@ -65,7 +67,9 @@
                             </tbody>
                         </table>
                     </div>
-                    {{ $MasterVoyages->appends(request()->query())->links() }}
+                    <div class="d-flex justify-content-center mt-3">
+                        {!! $MasterVoyages->links('pagination::bootstrap-5') !!}
+                    </div>
                 </div>
             </div>
         </div>

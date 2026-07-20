@@ -15,32 +15,32 @@
                 </div>
                 <div class="card-header d-block pb-2">
                     <form class="row align-items-end" method="GET" action="{{ route('ports.index') }}">
-                        <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
-                            <label class="form-label">Search By Port code</label>
-                            <input type="text" placeholder="Enter code" class="form-control" name="port_code" id="port_code" value="{{ request('port_code') }}">
-                        </div>
+                        <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
+                        <!--    <label class="form-label">Search By Port code</label>-->
+                        <!--    <input type="text" placeholder="Enter code" class="form-control" name="port_code" id="port_code" value="{{ request('port_code') }}">-->
+                        <!--</div>-->
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">search by port name</label>
                             <input type="text" placeholder="Enter Name" class="form-control" name="port_name" id="port_name" value="{{ request('port_name') }}">
                         </div>
 
-                        <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
-                            <label class="form-label">search by EDI code</label>
-                            <input type="text" placeholder="Enter edi code" class="form-control" name="edi_code" id="edi_code" value="{{ request('edi_code') }}">
-                        </div>
-                        <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
-                            <label class="form-label">search by JNPT code </label>
-                            <input type="text" placeholder="Enter jnpt code " class="form-control" name="jnpt_code " id="jnpt_code " value="{{ request('jnpt_code ') }}">
-                        </div>
+                        <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
+                        <!--    <label class="form-label">search by EDI code</label>-->
+                        <!--    <input type="text" placeholder="Enter edi code" class="form-control" name="edi_code" id="edi_code" value="{{ request('edi_code') }}">-->
+                        <!--</div>-->
+                        <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
+                        <!--    <label class="form-label">search by JNPT code </label>-->
+                        <!--    <input type="text" placeholder="Enter jnpt code " class="form-control" name="jnpt_code " id="jnpt_code " value="{{ request('jnpt_code ') }}">-->
+                        <!--</div>-->
 
-                        <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
-                            <label class="form-label">search by NSICT code</label>
-                            <input type="text" placeholder="Enter Name" class="form-control" name="nsict_code" id="nsict_code" value="{{ request('nsict_code') }}">
-                        </div>
-                        <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
-                            <label class="form-label">search by GTI code</label>
-                            <input type="text" placeholder="Enter Name" class="form-control" name="gti_code" id="gti_code" value="{{ request('gti_code') }}">
-                        </div>
+                        <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
+                        <!--    <label class="form-label">search by NSICT code</label>-->
+                        <!--    <input type="text" placeholder="Enter Name" class="form-control" name="nsict_code" id="nsict_code" value="{{ request('nsict_code') }}">-->
+                        <!--</div>-->
+                        <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
+                        <!--    <label class="form-label">search by GTI code</label>-->
+                        <!--    <input type="text" placeholder="Enter Name" class="form-control" name="gti_code" id="gti_code" value="{{ request('gti_code') }}">-->
+                        <!--</div>-->
 
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <button id="applyFilter" class="btn btn-primary" type="submit">Apply</button>
@@ -62,6 +62,7 @@
                                     <th>GTI Code</th>
                                     <th>GTI GROUP Name</th>
                                     <th>Status</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -83,6 +84,7 @@
                                                 <span class="badge badge-danger light border-0">Deactive</span>
                                             @endif
                                         </td>
+                                        <td>{{$port->user->name??''}}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/ports/'.$port->id.'/edit')}}">Edit</a>
                                             <a href="javascript:void(0);" class="badge badge-danger light border-0 delete-port" data-id='{{$port->id}}'>Delete</a>
@@ -93,7 +95,9 @@
                             </tbody>
                         </table>
                     </div>
-                    {{ $ports->appends(request()->query())->links() }}
+                    <div class="d-flex justify-content-center mt-3">
+                        {!! $ports->links('pagination::bootstrap-5') !!}
+                    </div>
                 </div>
             </div>
         </div>

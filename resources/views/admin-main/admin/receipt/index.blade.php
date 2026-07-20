@@ -64,33 +64,64 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive active-projects style-1">
-                        <table id="empoloyees-tblwrapper" class="table">
+                        <table id="employees-tblwrapper" class="table">
                             <thead>
                                 <tr>
                                     <th>Receipt No</th>
                                     <th>Billing Party</th>
+                                    <th>Invoice Type</th>
+                                    <th>Invoice No</th>
                                     <th>Receipt Date</th>
-                                    <th>Received Amount</th>
-                                    <th>OnAccount/Neft</th>
+                                    <th>Debit</th>
+                                    <th>Credit</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($receipt_lists as $receipt_list)
                                     <tr>
-                                        <td>{{$receipt_list->id}}</td>
-                                        <td>{{$receipt_list->billingParty->party_name}}</td>
-                                        <td>{{ \Carbon\Carbon::parse($receipt_list->receipt_date)->format('Y-F-d') }}</td>
-                                        <td>{{$receipt_list->total_amount_received ?? 'N/A'}}</td>
-                                        <td>{{$receipt_list->radio_type}}</td>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $receipt_list->billingParty->party_name ?? '' }}</td>
+                                        <td>{{ $receipt_list->invoice_type ?? '' }}</td>
+                                        <td>{{ $receipt_list->invoice_no ?? '' }}</td>
+                                        <td>{{ $receipt_list->receipt_date ? \Carbon\Carbon::parse($receipt_list->receipt_date)->format('d-F-Y') : '' }}</td>
+                        
+                                        {{-- Conditional Debit / Credit --}}
                                         <td>
-                                            <a class="badge badge-info light border-0" href="{{url('admin/receipts/'.$receipt_list->uuid.'/edit')}}">Edit</a>
-                                            <a class="badge badge-danger light border-0 delete-receipt" href="javascript:void(0);" data-id="{{$receipt_list->id}}">Delete</a>
+                                            @if ($receipt_list->invoice_type === 'Sales')
+                                                {{ number_format($receipt_list->amount, 2) }}
+                                            @elseif($receipt_list->invoice_type === 'Payment')
+                                                {{ number_format($receipt_list->amount, 2) }}
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($receipt_list->invoice_type === 'Receipt')
+                                                {{ number_format($receipt_list->amount, 2) }}
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td>{{ $receipt_list->user->name ?? '' }}</td>
+                                        <td>
+                                            <a class="badge badge-info light border-0" href="{{ url('admin/receipts/'.$receipt_list->uuid.'/edit') }}">Edit</a>
+                        
+                                            <form action="{{ route('receipts.destroy', $receipt_list->id) }}" method="POST" style="display:inline-block;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="badge badge-danger light border-0"
+                                                        onclick="return confirm('Are you sure you want to delete this receipt?')">
+                                                    Delete
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+
                     </div>
                 </div>
             </div>
@@ -103,33 +134,61 @@
 
 @push('scripts')
     <script>
-        $(document).on('click', '.delete-receipt', function(e) {
-            e.preventDefault();
-            if (!confirm('Are you sure you want to delete this Receipt?')) return;
-
-            const ReceiptId = $(this).data('id');
-
-            $.ajax({
-                url: '/admin/receipts/' + ReceiptId,
-                type: 'DELETE',
-                data: {
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    alert('Receipt record deleted successfully.');
-                    location.reload();
-                },
-                error: function(xhr) {
-                $('.error-text').text(''); // Clear all error texts
-
-                if (xhr.status === 422) {
-                    let errors = xhr.responseJSON.errors;
-                } else {
-                    alert(xhr.responseJSON.message ?? 'Unknown error occurred.');
-                }
+    $(document).on('click', '.delete-receipt', function(e) {
+        e.preventDefault();
+        let id = $(this).data('id');
+    
+        if (!id) return console.log("⚠️ No ID found!");
+    
+        let url = "{{ route('receipts.destroy', ':id') }}";
+        url = url.replace(':id', id);
+    
+        Swal.fire({
+            title: 'Delete Receipt?',
+            text: "Are you sure you want to delete this receipt permanently?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        _method: "DELETE"
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted!',
+                            text: response.success,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+    
+                        $(`.delete-receipt[data-id='${id}']`).closest('tr').fadeOut(500, function() {
+                            $(this).remove();
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message || 'Failed to delete receipt. Try again later!'
+                        });
+                    }
+                });
             }
-            });
         });
+    });
     </script>
+
+
+
 
 @endpush

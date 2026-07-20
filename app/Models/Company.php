@@ -16,7 +16,8 @@ class Company extends Authenticatable
         'company_email',
         'company_phone',
         'address',
-        'website'
+        'website',
+        'status'
     ];
 
     public function user()

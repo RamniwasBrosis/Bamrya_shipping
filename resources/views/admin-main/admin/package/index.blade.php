@@ -34,6 +34,7 @@
                                     <th>Package Code</th>
                                     <th>Description</th>
                                     <th>Status</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -50,6 +51,7 @@
                                             @endif
                                             
                                         </td>
+                                        <td>{{$package->user->name??''}}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/packages/'.$package->id.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-package" href="javascript:void(0);" data-id="{{$package->id}}">Delete</a>
@@ -59,7 +61,9 @@
                             </tbody>
                         </table>
                     </div>
-                    {{ $packages->appends(request()->query())->links() }}
+                    <div class="d-flex justify-content-center mt-3">
+                        {!! $packages->links('pagination::bootstrap-5') !!}
+                    </div>
                 </div>
             </div>
         </div>

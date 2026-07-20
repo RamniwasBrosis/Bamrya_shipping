@@ -10,6 +10,16 @@ use Illuminate\Support\Str;
 
 class MasterBankController extends Controller
 {
+    public $company_id ;
+
+    public function __construct(){
+        $this->middleware(function ($request, $next) {
+            $this->company_id = Auth::user()->company_id;
+            $this->user_id = auth()->user()->id;
+            return $next($request);
+        });
+    }
+    
     /**
      * Display a listing of the resource.
      */
@@ -24,7 +34,7 @@ class MasterBankController extends Controller
             $query->orWhere('account_no', 'LIKE', '%'.$request->account_no.'%');
         }
       
-        $banks = $query->orderBy('created_at', 'desc')->paginate(10);
+        $banks = $query->where('company_id', $this->company_id)->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin-main.admin.bank.index', compact('banks'));
     }
@@ -84,12 +94,13 @@ class MasterBankController extends Controller
         $bank->notes8 = $request->notes8;
         $bank->notes9 = $request->notes9;
         $bank->notes10 = $request->notes10;
+        $bank->user_id = $this->user_id;
 
         $bank->save();
 
         return redirect()->route('banks.index')->with('success', 'Bank Master added successfully.');
     }
-
+    
     /**
      * Display the specified resource.
      */
@@ -152,6 +163,7 @@ class MasterBankController extends Controller
         $bank->notes8 = $request->notes8;
         $bank->notes9 = $request->notes9;
         $bank->notes10 = $request->notes10;
+        $bank->user_id = $this->user_id;
 
         $bank->save();
 

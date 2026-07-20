@@ -16,25 +16,25 @@
                     <div class="mb-6 row">
                         <div class="d-flex gap-3">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" value="AI" name="search_by">
+                                <input class="form-check-input" type="radio" value="AIRIMP.FWD" name="search_by" checked>
                                 <label class="form-check-label" for="lcl">
                                     Air Import
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" value="AE" name="search_by">
+                                <input class="form-check-input" type="radio" value="AIREXP.FWD" name="search_by">
                                 <label class="form-check-label" for="fcl20">
                                     Air Export
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" value="SI" name="search_by">
+                                <input class="form-check-input" type="radio" value="SEAIMP.FWD" name="search_by">
                                 <label class="form-check-label" for="fcl40">
                                     Sea Import
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" value="SE" name="search_by">
+                                <input class="form-check-input" type="radio" value="SEAEXP.FWD" name="search_by">
                                 <label class="form-check-label" for="air">
                                     Sea Export
                                 </label>
@@ -51,7 +51,7 @@
                             <label class="col-sm-3 col-form-label">Full Job No:</label>
                             <div class="col-sm-9">
                                 <div class="d-flex align-items-center">
-                                    <select class="form-control me-2" id="full_job_nums" name="job_no">
+                                    <select class="form-control me-2 select2" id="full_job_nums" name="job_no">
                                         <option value="">select</option>
                                     </select>
                                 </div>
@@ -60,7 +60,7 @@
                         <div class="mb-3 col-sm-5">
                             <label class="col-sm-3 col-form-label">Party Name :</label>
                             <div class="col-sm-9 d-flex align-items-center">
-                                <select class="form-control me-2" id="job_party_id" name="job_party_id">
+                                <select class="form-control me-2 select2" id="job_party_id" name="job_party_id">
                                     <option value="">select</option>
                                 </select>                                
                             </div>                            
@@ -81,7 +81,7 @@
         </div>
 
 
-        <form action="{{ route('job-open-close.bulkUpdate') }}" method="POST">
+        <form action="{{ route('job-open-close.bulkUpdate') }}" method="POST" id="bulkUpdateForm">
             @csrf
             <div>
                 <div class="mb-3 row d-flex">
@@ -103,7 +103,7 @@
                     <table id="empoloyees-tblwrapper" class="table">
                         <thead>
                             <tr>
-                                <th>Select All</th>
+                                <th><input type="checkbox" id="selectAll">Select All</th>
                                 <th>Job No</th>
                                 <th>Party Name</th>
                                 <th>Date</th>
@@ -125,79 +125,159 @@
 @push('scripts')
     <script>
         $(document).ready(function(){
+            
+            $('.select2').select2({
+                // placeholder: 'Select a value',
+                // 'allowClear': true,
+                width: '100%'
+            })
+            
+            fetchJobData('AI');
+            
             $('input[name="search_by"]').on('change', function() {
-                $('#searchForm').submit();
+                let type = $(this).val();
+                fetchJobData(type);
             });
 
-            $('#searchForm').on('submit', function(e){
-                e.preventDefault(); // prevent default form submission
-                var data = $(this).serialize();
-
+            function fetchJobData(type) {
                 $.ajax({
-                    url : '{{ route('job-open-close.store') }}',
-                    type : 'POST',
-                    data : data,
-                    success : function(res){
-                        if(res.status === 'success'){
-                            $('#table').html(res.result);
-                            $('#full_job_nums').html(res.full_job_nums);
-                            $('#job_party_id').html(res.party_name);
+                    url : '{{ route("job-open-close.fetch") }}',
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        search_by: type
+                    },
+                    beforeSend: function() {
+                        $('#table').html('<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>');
+                    },
+                    success: function(response) {
+                        $('#table').html(response.html);
+                        
+                        $('#full_job_nums').empty().append('<option value="">select</option>');
+                        $('#job_party_id').empty().append('<option value="">select</option>');
+                        
+                        if (response.jobs && response.jobs.length > 0) {
+                            response.jobs.forEach(function(job) {
+                                $('#full_job_nums').append(
+                                    `<option value="${job.job_no}">${job.job_no}</option>`
+                                );
+                                
+                                console.log('job job job', job);
+                                
+                                if(job.job_activity == 'AIRIMP.FWD' || job.job_activity == 'SEAIMP.FWD' ){
+                                    if (job.consignee_name && job.consignee_name.party_name) {
+                                        $('#job_party_id').append(
+                                            `<option value="${job.consignee_name.id}">${job.consignee_name.party_name}</option>`
+                                        );
+                                    }
+                                }else{
+                                    if (job.shipper_name && job.shipper_name.party_name) {
+                                        $('#job_party_id').append(
+                                            `<option value="${job.shipper_name.id}">${job.shipper_name.party_name}</option>`
+                                        );
+                                    }
+                                }
+                            });
                         }
                     },
-                    error: function(xhr){
-                        console.log('Error:', xhr.responseText);
+                    error: function() {
+                        $('#table').html('<tr><td colspan="6" class="text-center text-danger">Error loading data</td></tr>');
                     }
                 });
+            }
+            
+            $(document).on('change', '#selectAll', function() {
+                $('input[name="job_ids[]"]').prop('checked', $(this).prop('checked'));
             });
-
-            $('#filter_record').on('submit', function(e){
+            
+            $('#bulkUpdateForm').on('submit', function(e) {
                 e.preventDefault();
+            
+                if ($('input[name="job_ids[]"]:checked').length === 0) {
+                    alert('Please select at least one job.');
+                    return;
+                }
+            
+                if (confirm('Are you sure you want to update the selected jobs?')) {
+                    this.submit();
+                }
+            });
+            
+            
+            
+            
+            
+            
+            
 
-                var data = $(this).serialize();
-
+            $('#filter_record').on('submit', function(e) {
+                e.preventDefault();
+            
                 $.ajax({
-                    url : '{{ route("job-open-close.filter") }}',
-                    type : 'POST',
-                    data : data,
-                    success : function(res){
-                        if(res.status === 'success'){
-                            $('#table').html(res.result);
+                    url: '{{ route("job-open-close.filter") }}',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    beforeSend: function() {
+                        $('#table').html('<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>');
+                    },
+                    success: function(res) {
+                        if (res.status === 'success') {
+                            $('#table').html(res.html);
+                        } else {
+                            $('#table').html('<tr><td colspan="6" class="text-center text-danger">No data found</td></tr>');
                         }
                     },
-                    error: function(xhr){
+                    error: function(xhr) {
                         console.log('Error:', xhr.responseText);
                     }
                 });
             });
-
-            $('#resetFilter').on('click', function () {
-                // Reset form fields
+            
+            $('#resetFilter').on('click', function() {
                 $('#filter_record')[0].reset();
-
-                // Clear select options (if you want to reset dropdowns manually)
-                $('#full_job_nums').val('');
-                $('#job_party_id').val('');
-
-                // Trigger AJAX to reload all data
+            
                 $.ajax({
-                    url: '{{ route("job-open-close.store") }}', // Same as initial load
+                    url: '{{ route("job-open-close.fetch") }}', // same route used on page load
                     type: 'POST',
                     data: {
-                        _token: '{{ csrf_token() }}', // CSRF token for POST
-                        search_by: $('input[name="search_by"]:checked').val() || 'AI' // fallback to AI
+                        _token: '{{ csrf_token() }}',
+                        search_by: $('input[name="search_by"]:checked').val() || 'AI'
                     },
-                    success: function (res) {
-                        if (res.status === 'success') {
-                            $('#table').html(res.result);
-                            $('#full_job_nums').html(res.full_job_nums);
-                            $('#job_party_id').html(res.party_name);
-                        }
-                    },
-                    error: function (xhr) {
-                        console.log('Error:', xhr.responseText);
+                    success: function(res) {
+                        $('#table').html(res.html);
                     }
                 });
             });
+
+
+            // $('#resetFilter').on('click', function () {
+            //     // Reset form fields
+            //     $('#filter_record')[0].reset();
+
+            //     // Clear select options (if you want to reset dropdowns manually)
+            //     $('#full_job_nums').val('');
+            //     $('#job_party_id').val('');
+
+            //     // Trigger AJAX to reload all data
+            //     $.ajax({
+            //         url: '{{ route("job-open-close.store") }}', // Same as initial load
+            //         type: 'POST',
+            //         data: {
+            //             _token: '{{ csrf_token() }}', // CSRF token for POST
+            //             search_by: $('input[name="search_by"]:checked').val() || 'AI' // fallback to AI
+            //         },
+            //         success: function (res) {
+            //             if (res.status === 'success') {
+            //                 $('#table').html(res.result);
+            //                 $('#full_job_nums').html(res.full_job_nums);
+            //                 $('#job_party_id').html(res.party_name);
+            //             }
+            //         },
+            //         error: function (xhr) {
+            //             console.log('Error:', xhr.responseText);
+            //         }
+            //     });
+            // });
 
 
         });

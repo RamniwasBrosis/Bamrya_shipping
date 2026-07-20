@@ -2,7 +2,7 @@
 @section('content')
 <div class="page-titles">
     <ol class="breadcrumb">
-        <li><h5 class="bc-title">MANAGE EXPORT DELIVERY ORDER</h5></li>
+        <li><h5 class="bc-title">MANAGE BOOKINGS</h5></li>
     </ol>
     <a class="text-primary fs-13" href="{{url('admin/bookings/create')}}">+ Add Booking</a>
 </div>
@@ -17,7 +17,7 @@
                     <form class="row align-items-end" method="get" action="{{route('bookings.index')}}">
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Booking Number</label>
-                            <select id="statusFilter" class="form-control default-select select2" name="booking_no">
+                            <select id="statusFilter" class="form-control select2" name="booking_no">
                                 <option value="">select</option>
                                 @foreach ($filters as $filter)
                                     <option value="{{$filter->booking_no}}">{{$filter->booking_no}}</option>
@@ -26,7 +26,7 @@
                         </div>
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Cargo Type</label>
-                            <select id="departmentFilter" class="form-control default-select" name="cargo_type">
+                            <select id="departmentFilter" class="form-control select2" name="cargo_type">
                                 <option value="">select</option>
                                 @foreach ($filters as $filter)
                                     <option value="{{$filter->cargo_type}}">{{$filter->cargo_type}}</option>
@@ -56,6 +56,7 @@
                                     <th>Ocean_Vsl</th>
                                     <th>CargoType</th>
                                     <th>Entry Date</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                     <th>Print</th>
                                 </tr>
@@ -69,6 +70,9 @@
                                         <td>{{$bookingList->cargo_type}}</td>
                                         <td>
                                             {{$bookingList->entry_date}}
+                                        </td>
+                                        <td>
+                                            {{$bookingList->user->name??''}}
                                         </td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/bookings/'.$bookingList->uuid.'/edit')}}">Edit</a>
@@ -128,14 +132,14 @@
     </script>
     <!--<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
     <!--<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>-->
-    <!--<script>-->
-    <!--    $(document).ready(function() {-->
-    <!--        $('.select2').select2({-->
-    <!--            placeholder: "Select an option",-->
-    <!--            allowClear: true-->
-    <!--        });-->
-    <!--    });-->
-    <!--</script>-->
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: "Select an option",
+                allowClear: true
+            });
+        });
+    </script>
     
     <!--<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
     

@@ -15,10 +15,20 @@ class OperationSeaExportCont extends Model
         'remarks', 'cont_job_no', 'container_no', 'cbm', 'cargo_type',
         'vgm_wt', 'soc', 'commodity', 'size', 'refer', 'agent_seal_no',
         'imo_code', 'disposal', 'sector', 'cust_seal_no', 'fcl_lcl',
-        'net_weight', 'uno_no', 'detent_date', 'prev_days'
+        'net_weight', 'uno_no', 'detent_date', 'prev_days',
+        
+        'commodity', 'sbill_no', 'customer_inv_no', 'goods_description', 'mark_number','leo_date', 'sob_date', 'cartining_date', 'check_list_date'
     ];
 
     public function seaExport(){
         return $this->belongsTo(OperationSeaExport::class, 'sea_export_id');
+    }
+    
+    public function shipmentLines()
+    {
+        return $this->hasMany(
+            OperationSeaExportShipmentLine::class,
+            'sea_export_cont_id'
+        );
     }
 }

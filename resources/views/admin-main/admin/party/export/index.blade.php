@@ -15,13 +15,13 @@
                 </div>
                 <div class="card-header d-block pb-2">
                     <form class="row align-items-end" method="get" action="{{route('export-parties.index')}}">
-                        <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
-                            <label class="form-label">Search</label>
-                            <input type="text" class="form-control" id="searchFilter">
-                        </div>
+                        <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
+                        <!--    <label class="form-label">Search</label>-->
+                        <!--    <input type="text" class="form-control" id="searchFilter">-->
+                        <!--</div>-->
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search by party name</label>
-                            <select id="party_name" name="party_name" class="form-control default-select">
+                            <select id="party_name" name="party_name" class="form-control select2">
                                 <option value="">--select--</option>
                                 @foreach ($partyNameList as $partyName)
                                     <option value="{{$partyName->party_name}}">{{$partyName->party_name}}</option>
@@ -45,6 +45,7 @@
                                     <th>Email</th>
                                     <th>PAN No</th>
                                     <th>Status</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -62,6 +63,7 @@
                                                 <span class="badge badge-danger light border-0">Deactive</span>
                                             @endif
                                         </td>
+                                        <td>{{$exportParty->user->name??''}}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/export-parties/'.$exportParty->id.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-export-party" href="javascript:void(0);" data-id="{{$exportParty->id}}">Delete</a>
@@ -71,7 +73,9 @@
                             </tbody>
                         </table>
                     </div>
-                    {{ $exportParties->appends(request()->query())->links() }}
+                    <div class="d-flex justify-content-center mt-3">
+                        {!! $exportParties->links('pagination::bootstrap-5') !!}
+                    </div>
                 </div>
             </div>
         </div>
@@ -82,6 +86,15 @@
 @endsection
 
 @push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: 'Select a value',
+                'allowClear': true,
+                width: '100%'
+            })
+        })
+    </script>
     <script>
         $(document).on('click', '.delete-export-party', function(e) {
             e.preventDefault();

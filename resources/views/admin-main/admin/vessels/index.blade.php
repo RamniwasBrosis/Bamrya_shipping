@@ -37,6 +37,7 @@
                                     <th>Vessel Name</th>
                                     <th>Call Sign</th>
                                     <th>Status</th>
+                                    <th>Update By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -56,6 +57,7 @@
                                         @endif
                                         
                                     </td>
+                                    <td>{{$vesselData->user->name??''}}</td>
                                     <td>
                                         <a class="badge badge-info light border-0" href="{{url('admin/vessels/'.$vesselData->id.'/edit')}}">Edit</a>
                                         <a href="javascript:void(0);" class="badge badge-danger light border-0 delete-vessel" data-id="{{ $vesselData->id }}">Delete</a>
@@ -66,7 +68,9 @@
                         </table>
                         
                     </div>
-                    {{ $vesselDatas->appends(request()->query())->links() }}
+                    <div class="d-flex justify-content-center mt-3">
+                        {!! $vesselDatas->links('pagination::bootstrap-5') !!}
+                    </div>
                 </div>
             </div>
         </div>

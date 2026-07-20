@@ -14,15 +14,16 @@ class CompanySetting extends Model
         'company_name',
         'company_email',
         'reg_no',
-        'icegate_no',
+        'pan_no',
         'branches',
-        'carn_no',
-        'mlo_code',
-        'jnpt_code',
-        'gti_code',
-        'nsict_code',
+        'gstin_no',
+        'cin_no',
+        'tan_no',
+        'phone',
+        'email',
         'nsgit_code',
         'status',
+        'fax_no','land_line_ph'
     ];
     
     public function company()

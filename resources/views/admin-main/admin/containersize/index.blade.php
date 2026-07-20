@@ -40,6 +40,7 @@
                                     <th>Description</th>
                                     <th>ISO Code</th>
                                     <th>Status</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -56,6 +57,7 @@
                                                 <span class="badge badge-danger light border-0">Deactive</span> 
                                             @endif
                                         </td>
+                                        <td>{{$containerSize->user->name??''}}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/container-sizes/'.$containerSize->id.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-container-size" href="javascript:void(0);" data-id="{{$containerSize->id}}">Delete</a>

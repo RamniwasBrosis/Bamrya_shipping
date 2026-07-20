@@ -25,7 +25,7 @@
                                     <label class="form-label">Package Code:</label>
                                     <span class="text-danger">*</span>
                                     <input type="text" name="package_code" class="form-control"
-                                           value="{{ old('package_code', $package->package_code) }}" required maxlength="6">
+                                           value="{{ old('package_code', $package->package_code) }}" required>
                                     @error('package_code')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror

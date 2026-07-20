@@ -4,20 +4,28 @@ namespace App\Models\Accounts;
 
 use App\Models\MasterBank;
 use App\Models\MasterImportParty;
+use App\Models\MasterPort;
+use App\Models\User;
+use App\Models\MasterCharge;
+use App\Models\Accounts\AccountSaleInvoiceContainer;
+use App\Models\Operations\OperationJobMaster;  //gajendra
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class AccountSaleInvoice extends Model
 {
     use HasFactory;
+    
+    protected $table = 'account_sale_invoices'; 
 
     protected $fillable = [
-        'company_id',
+        'company_id','user_id',
         'uuid',
         'Inv_cat',
         'job_no',
+        'full_job_no',
         'voyage_code',
-        'pod',
+        'pod','pol','pkgType',
         'container',
         'consignee',
         'cbm',
@@ -32,45 +40,41 @@ class AccountSaleInvoice extends Model
         'invoice_date',
         'full_invoice_no',
         'bank_id',
-
-        'charge_name',
-        'gst',
-        'currency',
-        'prepaid_coll',
-        'rate_basis',
-        'gst_applicable',
-        'per_unit',
-        'exchange_rate',
-        'rate_per_unit',
-        'freight',
-        'amount',
-        'charge_full_invoice_no',
-        'remarks',
-
-        'caf_percent',
-        'caf_amount',
-        'baf_percent',
-        'baf_amount',
-        'cc_percent',
-        'cc_amount',
-
-        'cc_apply',
-        'caf_apply',
-
-        'gstin',
-        'sac_code',
-
-        'cgst',
-        'sgst',
-        'igst',
-        'total',
+        'vessel_name',
+        'awb_bl_no',
+        'sale_purchase','container_qty',
+        'shipping_no',
+        'remarks','packages','bl_no','hawb_no','job_date','invoice_due_date','shipper_name','eta_date','etd_date','freight_terms','mawb_no','hbl_no','sales_person',
+        
+        'invoice_amount',
+        'recieved_amount',
+        'outstanding_amount',
+        'invoice_amount_status',
     ];
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 
-    public function partyName(){
-        return $this->belongsTo(MasterImportParty::class, 'billing_party_id');
+    public function partyName()
+    {
+        return $this->belongsTo(MasterImportParty::class, 'billing_party_id', 'id');
     }
 
     public function accountNumber(){
         return $this->belongsTo(MasterBank::class, 'bank_id');
+    }
+    
+    public function operationJob(){
+        return $this->belongsTo(OperationJobMaster::class, 'job_no', 'id');
+    }
+    
+    public function chargeName(){
+        return $this->belongsTo(MasterCharge::class, 'charge_name', 'id');
+    }
+    
+    public function chargesContainer(){
+        return $this->hasMany(AccountSaleInvoiceContainer::class, 'sales_invoice_id');
     }
 }

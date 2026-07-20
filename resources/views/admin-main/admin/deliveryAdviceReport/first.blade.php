@@ -65,31 +65,7 @@
                                 </div>
                             </form>
                         </div>
-                        
-                        <!--<div class="col-xl-12 col-lg-12 col-sm-12 active-p">-->
-                        <!--    <div class="card">-->
-                        <!--        <div class="card-body p-0">-->
-                        <!--            <div class="table-responsive active-projects shorting">-->
-                
-                        <!--                <div class="tbl-caption">-->
-                        <!--                    <h4 class="heading mb-0">SUBJECT : LOADING LIST</h4>-->
-                        <!--                </div>-->
-                        <!--                <table id="projects-tblss" class="table ItemsCheckboxSec">-->
-                        <!--                    <thead>-->
-                        <!--                        <tr>-->
-                        <!--                            <th></th>-->
-                        <!--                        </tr>-->
-                        <!--                    </thead>-->
-                        <!--                    <tbody>-->
-                        <!--                        <tr>-->
-                        <!--                            <td>Job No : SI/BSCPL/2278/1/MAY/2025-26</td>-->
-                        <!--                        </tr>-->
-                        <!--                    </tbody>-->
-                        <!--                </table>-->
-                        <!--            </div>-->
-                        <!--        </div>-->
-                        <!--    </div>-->
-                        <!--</div>-->
+                       
                         <br>
                         <div class="col-xl-12 col-lg-12 col-sm-12 active-p">
                             <div class="card">
@@ -97,10 +73,10 @@
                                     <div class="row">
                                         <div class="col-xl-6">
                                             <div class="mb-3 row">
-                                                <label class="col-sm-3 col-form-label">Job No : SI/BSCPL/2278/1/MAY/2025-26</label>
-                                                <div class="col-sm-9 d-flex align-items-center">
+                                                <!--<label class="col-sm-3 col-form-label">Job No : SI/BSCPL/2278/1/MAY/2025-26</label>-->
+                                                <!--<div class="col-sm-9 d-flex align-items-center">-->
                                                     
-                                                </div>
+                                                <!--</div>-->
                                             </div>
                                         </div>
                                     </div>

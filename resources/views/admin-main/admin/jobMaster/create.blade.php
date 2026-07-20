@@ -15,6 +15,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
+        
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
 
         {{-- Error Message --}}
         @if ($errors->any())
@@ -35,7 +42,8 @@
             <div class="col-xl-12 col-xxl-12">
                 <div class="card">
                     <div class="card-body">
-                        <form action="{{ route('job-masters.store') }}" method="POST">
+                        
+                        <form   id="jobMasterForm" action="{{ route('job-masters.store') }}" method="POST">
                             @csrf
                             <div class="row form-material">
 
@@ -43,16 +51,25 @@
                                     <label class="col-sm-3 col-form-label">BL Issued By:</label>
                                     <div class="col-sm-9">
                                         <div class="d-flex gap-3">
+                                            
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" value="{{  $company_code->company_code; }}"
+                                                    id="lcl" name="bl_issue" checked>
+                                                <label class="form-check-label" for="lcl">
+                                                    {{  $company_code->company_code; }}
+                                                </label>
+                                            </div>
+                                            
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" value="Nominated"
-                                                    id="lcl" name="bl_issue">
-                                                <label class="form-check-label" for="lcl">
+                                                    id="lcl10" name="bl_issue">
+                                                <label class="form-check-label" for="lcl10">
                                                     Nominated
                                                 </label>
                                             </div>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" value="Enquiry"
-                                                    id="fcl20" name="bl_issue" checked>
+                                                    id="fcl20" name="bl_issue">
                                                 <label class="form-check-label" for="fcl20">
                                                     Enquiry
                                                 </label>
@@ -63,9 +80,9 @@
 
 
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
-                                    <label class="col-sm-3 col-form-label">Job No:</label>
+                                    <label class="col-sm-3 col-form-label">Job No:<span class="text-danger">*</span></label>
                                     <div class="col-sm-9">
-                                        <input type="text" disabled style="cursor: not-allowed;" name="job_no" class="form-control" value="0">
+                                        <input type="text" disabled style="cursor: not-allowed;" name="job_no" class="form-control" value="{{$nextJobNo}}">
                                     </div>
                                 </div>
 
@@ -77,30 +94,28 @@
                                 </div>
 
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
-                                    <label class="col-sm-3 col-form-label">Job Activity:<span class="text-danger">*</span></label>
-                                    <div class="col-sm-9">
-                                        <select name="job_activity" class="form-control" value={{old('job_activity')}} required>
-                                            <option value="">Select</option>
-                                            <option value="SEAIMP.FWD">SEAIMP.FWD</option>
-                                            <option value="SEAEXP.FWD">SEAEXP.FWD</option>
-                                            <option value="AIRIMP.FWD">AIRIMP.FWD</option>
-                                            <option value="AIREXP.FWD">AIREXP.FWD</option>
-                                            <option value="SEAIMP.NVOCC">SEAIMP.NVOCC</option>
-                                            <option value="SEAEXP.NVOCC">SEAEXP.NVOCC</option>
-                                        </select>
-                                    </div>
+                                <label class="col-sm-3 col-form-label">Job Activity:<span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
+                                    <select name="job_activity" id="job_activity" class="form-control select2" required>
+                                        <option value="">Select</option>
+                                        <option value="SEAIMP.FWD">SEAIMP.FWD</option>
+                                        <option value="SEAEXP.FWD">SEAEXP.FWD</option>
+                                        <option value="AIRIMP.FWD">AIRIMP.FWD</option>
+                                        <option value="AIREXP.FWD">AIREXP.FWD</option>
+                                        <option value="SEAIMP.NVOCC">SEAIMP.NVOCC</option>
+                                        <option value="SEAEXP.NVOCC">SEAEXP.NVOCC</option>
+                                    </select>
                                 </div>
+                            </div>
 
                                 <div class="mb-3 row">
                                     <label class="col-sm-3 col-form-label">Job Party:<span class="text-danger">*</span></label>
                                     <div class="col-sm-9 d-flex align-items-center">
-                                        <select name="job_party_id" class="form-control me-2" required>
+                                        <select name="job_party_id" id="job_party_id" class="form-control me-2 select2" required>
                                             <option value="">Select</option>
-                                            @foreach($parties as $party)
-                                                <option value="{{ $party->id }}">{{ $party->party_name }}</option>
-                                            @endforeach
+                                            <!-- Initially blank; JavaScript will populate it -->
                                         </select>
-                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#partyDetailsModal">+</button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addNewPartyModal">+</button>
                                     </div>
                                 </div>
 
@@ -123,12 +138,15 @@
                                     <div class="col-sm-9">                            
                                         <select name="enquiry_reference_no" class="form-control" id="">
                                             <option value="">select</option> 
+                                            @foreach($enquiries as $enquiry)
+                                                <option value="{{$enquiry->id}}">{{$enquiry->reference_id}}</option> 
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
 
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
-                                    <label class="col-sm-3 col-form-label">Job Activity Type:</label>
+                                    <label class="col-sm-3 col-form-label">Job Activity Type:<span class="text-danger">*</span></label>
                                     <div class="col-sm-9 d-flex gap-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="job_activity_type" value="1" checked>
@@ -142,7 +160,7 @@
                                 </div>
 
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
-                                    <label class="col-sm-3 col-form-label">Shipment Type:</label>
+                                    <label class="col-sm-3 col-form-label">Shipment Type:<span class="text-danger">*</span></label>
                                     <div class="col-sm-9 d-flex gap-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="shipment_type" value="FCL" checked>
@@ -160,7 +178,7 @@
                                 </div>
 
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
-                                    <label class="col-sm-3 col-form-label">Job Status:</label>
+                                    <label class="col-sm-3 col-form-label">Job Status:<span class="text-danger">*</span></label>
                                     <div class="col-sm-9 d-flex gap-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="job_status" value="O" checked>
@@ -174,7 +192,7 @@
                                 </div>
 
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
-                                    <label class="col-sm-3 col-form-label">Insurance:</label>
+                                    <label class="col-sm-3 col-form-label">Insurance:<span class="text-danger">*</span></label>
                                     <div class="col-sm-9 d-flex gap-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="insurance" value="Y" checked>
@@ -188,7 +206,7 @@
                                 </div>
 
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
-                                    <label class="col-sm-3 col-form-label">Clearance:</label>
+                                    <label class="col-sm-3 col-form-label">Clearance:<span class="text-danger">*</span></label>
                                     <div class="col-sm-9 d-flex gap-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="clearance" value="Y" checked>
@@ -202,7 +220,7 @@
                                 </div>
 
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
-                                    <label class="col-sm-3 col-form-label">Transportation:</label>
+                                    <label class="col-sm-3 col-form-label">Transportation:<span class="text-danger">*</span></label>
                                     <div class="col-sm-9 d-flex gap-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="transportation" value="Y" checked>
@@ -220,21 +238,21 @@
                                 <h4>Pre-Shipment Details</h4>
 
                                 <div class="mb-3 row">
-                                    <label class="col-sm-3 col-form-label">Booking Date:</label>
+                                    <label class="col-sm-3 col-form-label">Booking Date:<span class="text-danger">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="date" name="booking_date" class="form-control">
                                     </div>
                                 </div>
 
                                 <div class="mb-3 row">
-                                    <label class="col-sm-3 col-form-label">Cargo Ready Date:</label>
+                                    <label class="col-sm-3 col-form-label">Cargo Dispatch Date:</label>
                                     <div class="col-sm-9">
                                         <input type="date" name="cargo_ready_date" class="form-control">
                                     </div>
                                 </div>
 
                                 <div class="mb-3 row">
-                                    <label class="col-sm-3 col-form-label">Pickup Date:</label>
+                                    <label class="col-sm-3 col-form-label">Pickup Date:<span class="text-danger">*</span></label>
                                     <div class="col-sm-9">
                                         <input type="date" name="pickup_date" class="form-control">
                                     </div>
@@ -248,14 +266,15 @@
                             </div>
                         </form>
                     </div>
+                    <div id="responseMessage"></div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Modal Party Details -->
-    <div class="modal fade" id="partyDetailsModal" tabindex="-1" aria-labelledby="oceanVslModalLabel"
-        aria-hidden="true">
+    
+    <!--Model-->
+    <div class="modal fade" id="addNewPartyModal" tabindex="-1" aria-labelledby="oceanVslModalLabel"
+    aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -263,8 +282,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="oceanVslForm" method="post" action="{{route('new-party.store')}}">
+                    <form id="modelPartyDetails" method="post" action="{{route('new-party.store')}}" enctype="multipart/form-data">
                         @csrf
+                        <input type="hidden" name="party_mode" value="local" />
                         <div class="mb-3 row">
                             <label for="password" class="col-sm-4 col-form-label">Party Code:</label>
                             <div class="col-sm-8">
@@ -279,7 +299,8 @@
                             </div>
                         </div>
                         <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Address Line 1:</label>
+                            <label for="password" class="col-sm-4 col-form-label">Address Line 1:<span
+                                    class="text-danger">*</span></label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control" name="address_1">
                             </div>
@@ -290,18 +311,7 @@
                                 <input type="text" class="form-control" name="address_2">
                             </div>
                         </div>
-                        <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Address Line 3:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="address_3">
-                            </div>
-                        </div>
-                        {{-- <div class="mb-3 row">
-                            <label for="password" class="col-sm-4 col-form-label">Address Line 4:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="">
-                            </div>
-                        </div> --}}
+                  
                         <div class="mb-3 row">
                             <label for="password" class="col-sm-4 col-form-label">City:</label>
                             <div class="col-sm-8">
@@ -318,10 +328,10 @@
                             <label for="password" class="col-sm-4 col-form-label">Party Type:<span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-8">
-                                <select class="default-select  form-control wide" name="party_type" placeholder="Select">
+                                <select class="form-control" name="party_type">
                                     <option value="">select</option>
-                                    @foreach($party_lists as $party_list)
-                                        <option value="{{$party_list->id}}">{{$party_list->party_name}}</option>
+                                    @foreach($party_lists as $type)
+                                    <option value="{{ $type->party_type }}">{{ $type->party_name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -332,7 +342,7 @@
                                 <input type="text" class="form-control" name="contact_person">
                             </div>
                         </div>
-
+    
                         <div class="mb-3 row">
                             <label for="password" class="col-sm-4 col-form-label">Tel / Contact No:</label>
                             <div class="col-sm-8">
@@ -376,12 +386,17 @@
                             </div>
                         </div>
                         <div class="mb-3 row">
+                            <label for="file" class="col-sm-4 col-form-label">Document <span class="text-danger">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="file" class="form-control" name="documents[]" multiple>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
                             <label for="password" class="col-sm-4 col-form-label">Status:<span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-8">
-                                <select class="default-select  form-control wide" name="status" placeholder="Active">
-                                    <option value="">select</option>
-                                    <option value="1">Active</option>
+                                <select class="form-control" name="status" required>
+                                    <option value="1" selected>Active</option>
                                     <option value="0">Deactive</option>
                                 </select>
                             </div>
@@ -389,18 +404,198 @@
                         <div class="d-grid d-md-flex justify-content-md-end">
                             <button class="btn btn-outline-primary" type="submit">Save</button>
                         </div>
+                        
+            
+                        <small id="partyNameError" class="text-danger"></small>
+    
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    
-    
+
 @endsection
 @push('scripts')
+<!--<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>-->
     <script>
         $(document).ready(function() {
-            $('#smartwizard').smartWizard();
-        });
+            
+            $('.select2').select2({
+                width: '100%'
+            })
+    
+            const importParties = @json($importParties);
+            const exportParties = @json($exportParties);
+        
+            const importTypes = ['SEAIMP.FWD', 'AIRIMP.FWD', 'SEAIMP.NVOCC'];
+            const exportTypes = ['SEAEXP.FWD', 'AIREXP.FWD', 'SEAEXP.NVOCC'];
+        
+            $('#job_activity').on('change', function () {
+                const selected = $(this).val();
+                const partySelect = $('#job_party_id');
+                partySelect.empty().append('<option value="">Select</option>');
+        
+                let relevantParties = [];
+        
+                if (importTypes.includes(selected)) {
+                    relevantParties = importParties;
+                } else if (exportTypes.includes(selected)) {
+                    relevantParties = exportParties;
+                }
+        
+                relevantParties.forEach(party => {
+                    partySelect.append(`<option value="${party.id}">${party.party_name}</option>`);
+                });
+        
+                partySelect.trigger('change'); 
+                if (selected === "AIRIMP.FWD" || selected === "AIREXP.FWD") {
+                    $('input[name="shipment_type"][value="AIR"]').prop('checked', true);
+                } else {
+                    // Otherwise select FCL by default (optional)
+                    $('input[name="shipment_type"][value="FCL"]').prop('checked', true);
+                }
+                
+            });
+            
+            
+            $('#modelPartyDetails').on('submit', function(e) {
+                e.preventDefault();
+                
+                $('#subBtn').text('submitting form').prop('disabled', true);
+            
+                let formData = new FormData(this);
+            
+                $.ajax({
+                    url: "{{ route('job-master.new-party.store') }}",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(res) {
+            
+                        if(res.status === 'success') {
+            
+                            const { id, name } = res.party;
+                
+                            $('select[name="job_party_id"]').each(function() {
+                                $(this).append(`<option value="${id}" selected>${name}</option>`);
+                            });
+            
+                            // Reset form and hide modal
+                            $('#modelPartyDetails')[0].reset();
+                            var modalEl = document.getElementById('addNewPartyModal');
+                            var modal = bootstrap.Modal.getInstance(modalEl);
+                            modal.hide();
+                            
+                            $('#subBtn').text('save').prop('disabled', flase);
+            
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: res.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                            
+                        }else{
+                            $('#partyNameError').text(res.message).addClass('alert alert-danger');
+                        }
+                        
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            let errorHtml = '';
+                
+                            $.each(errors, function (field, messages) {
+                                messages.forEach(function (message) {
+                                    errorHtml += `<li>${message}</li>`;
+                                });
+                            });
+                
+                            $('#partyNameError').html(`<ul>${errorHtml}</ul>`).show();
+                        }
+                    }
+                });
+            });
+
+        
+        })
     </script>
+    <script>
+        $(document).ready(function() {
+            $("#jobMasterForm").on('submit', function(e) {
+                e.preventDefault();
+        
+                let form = $(this);
+                let formData = new FormData(this);
+        
+                $.ajax({
+                    url: form.attr('action'),
+                    method: "POST",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+        
+                    beforeSend: function() {
+                        $("#responseMessage").html(
+                            '<div class="alert alert-info">Please wait... Saving data...</div>'
+                        );
+                    },
+        
+                    success: function(response) {
+                        if (response.status === false) {
+                            toastr.error(response.message);
+                        } else {
+                            toastr.success("Job created successfully");
+                        }
+
+                    },
+        
+                    error: function(xhr) {
+                        let errors = xhr.'esponseJSON.errors;
+                        let errorHtml = '<div class="alert alert-danger"><ul>';
+        
+                        $.each(errors, function(key, value) {
+                            errorHtml += '<li>' + value[0] + '</li>';
+                        });
+        
+                        errorHtml += '</ul></div>';
+        
+                        $("#responseMessage").html(errorHtml);
+                    }
+                });
+            });
+            
+            $('select[name="job_activity"]').on('change', function () {
+                let jobActivity = $(this).val();
+                
+                if (jobActivity === 'AIRIMP.FWD' || jobActivity === 'AIREXP.FWD') {
+                    $('input[name="shipment_type"][value="AIR"]').prop('checked', true);
+                } else {
+                    $('input[name="shipment_type"][value="FCL"]').prop('checked', true);
+                }
+            });
+        
+            // Trigger change event on page load (if old value is present)
+            $('select[name="job_activity"]').trigger('change');
+        });
+        
+    </script>
+    <script>
+        $(document).ready(function() {
+            let targetField = null;
+            $('#partyDetailsModal').on('show.bs.modal', function(event) {
+                const button = $(event.relatedTarget);
+                targetField = button.data('target-field');
+            });
+            
+        });
+
+    </script>
+    
 @endpush

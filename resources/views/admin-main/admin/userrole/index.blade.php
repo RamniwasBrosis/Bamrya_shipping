@@ -32,7 +32,6 @@
                                                 <span class="badge badge-success light border-0">{{ $permission->name }}</span>
                                             @endforeach
                                         </td>
-                                      
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/user-role/'.$role->id.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-permission" href="javascript:void(0);" data-id="{{$role->id}}">Delete</a>

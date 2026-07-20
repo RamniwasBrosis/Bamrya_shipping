@@ -13,7 +13,7 @@
         <div class="col-xl-12 col-xxl-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('export-parties.update', $exportParty->id ) }}" method="POST">
+                    <form action="{{ route('export-parties.update', $exportParty->id ) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="company_id" value="{{ $exportParty->company_id }}">
@@ -90,6 +90,18 @@
                                 <input type="text" class="form-control" name="tds_percent" value="{{ old('tds_percent', $exportParty->tds_percent) }}">
                             </div>
                             <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
+                                <label class="form-label">State:</label>
+                                <input type="text" class="form-control" name="state" value="{{ old('state', $exportParty->state) }}">
+                            </div>
+                            <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
+                                <label class="form-label">State Code:</label>
+                                <input type="text" class="form-control" name="state_code" value="{{ old('state_code', $exportParty->state_code) }}">
+                            </div>
+                            <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
+                                <label class="form-label">Documents</label>
+                                <input type="file" class="form-control" name="documents[]" multiple>
+                            </div>
+                            <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
                                 <label class="form-label">Status:</label><span class="text-danger">*</span>
                                 <select class="form-control" name="status" required>
                                     <option value="1" {{ old('status', $exportParty->status) == 1 ? 'selected' : '' }}>Active</option>
@@ -104,6 +116,68 @@
                 </div>
             </div>
         </div>
+    </div>
+    
+    <div class="row">
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+        <div class="col-xl-12 col-xxl-12">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th style="width: 5%">#</th>
+                            <th>Document Name</th>
+                            <th style="width: 15%">Download</th>
+                            <th style="width: 15%">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse(optional($exportParty)->document ?? [] as $index => $doc)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+        
+                                <td class="text-start">
+                                    {{ $doc['name'] ?? 'N/A' }}
+                                </td>
+        
+                                <td>
+                                    <a href="{{ asset('storage/app/public/'.$doc['path']) }}"
+                                       class="btn btn-sm btn-success"
+                                       download>
+                                        <i class="bi bi-download"></i> Download
+                                    </a>
+                                </td>
+        
+                                <td>
+                                    <form action="{{ route('shipper.document.delete', [$exportParty->id, $doc['name']]) }}"
+                                          method="POST"
+                                          onsubmit="return confirm('Are you sure you want to delete this document?');">
+                                        @csrf
+                                        @method('DELETE')
+        
+                                        <button type="submit" class="btn btn-sm btn-danger" {{ $exportParty->approval == 1? 'disabled' : '' }}>
+                                            <i class="bi bi-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-muted">
+                                    No documents found.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 </div>
 

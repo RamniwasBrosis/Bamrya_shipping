@@ -25,6 +25,7 @@ class User extends Authenticatable
         'role',
         'company_id',
         'status',
+        'role','user_id'
     ];
 
     /**
@@ -49,5 +50,17 @@ class User extends Authenticatable
     
     public function company(){
         return $this->belongsTo(Company::class);
+    }
+    
+    // User who created/updated this user
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // All users created by this user
+    public function childUsers()
+    {
+        return $this->hasMany(User::class, 'user_id');
     }
 }

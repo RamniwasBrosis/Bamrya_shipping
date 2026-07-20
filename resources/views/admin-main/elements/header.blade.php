@@ -515,69 +515,69 @@
                     </form>
                 </div>
                 <ul class="navbar-nav header-right">
-                    <li class="nav-item dropdown notification_dropdown">
-                        <a class="nav-link " href="javascript:void(0);" data-bs-toggle="dropdown">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M20.8067 7.62358L20.1842 6.54349C19.6577 5.62957 18.4907 5.31429 17.5755 5.83869V5.83869C17.1399 6.09531 16.6201 6.16812 16.1307 6.04106C15.6413 5.91399 15.2226 5.59749 14.9668 5.16134C14.8023 4.88412 14.7139 4.56836 14.7105 4.24601V4.24601C14.7254 3.72919 14.5304 3.22837 14.17 2.85764C13.8096 2.48691 13.3145 2.27783 12.7975 2.27805H11.5435C11.037 2.27804 10.5513 2.47988 10.194 2.83891C9.83669 3.19795 9.63717 3.68456 9.63961 4.19109V4.19109C9.6246 5.23689 8.77248 6.07678 7.72657 6.07667C7.40421 6.07332 7.08846 5.98491 6.81123 5.82038V5.82038C5.89606 5.29598 4.72911 5.61126 4.20254 6.52519L3.53435 7.62358C3.00841 8.53636 3.3194 9.70258 4.23 10.2323V10.2323C4.8219 10.574 5.18653 11.2056 5.18653 11.889C5.18653 12.5725 4.8219 13.204 4.23 13.5458V13.5458C3.32056 14.0719 3.00923 15.2353 3.53435 16.1453V16.1453L4.16593 17.2346C4.41265 17.6798 4.8266 18.0083 5.31619 18.1474C5.80578 18.2866 6.33064 18.2249 6.77462 17.976V17.976C7.21108 17.7213 7.73119 17.6515 8.21934 17.7822C8.70749 17.9128 9.12324 18.233 9.37416 18.6716C9.5387 18.9489 9.62711 19.2646 9.63046 19.587V19.587C9.63046 20.6435 10.487 21.5 11.5435 21.5H12.7975C13.8505 21.5 14.7055 20.6491 14.7105 19.5961V19.5961C14.7081 19.088 14.9089 18.6 15.2682 18.2407C15.6275 17.8814 16.1155 17.6806 16.6236 17.6831C16.9452 17.6917 17.2596 17.7797 17.5389 17.9394V17.9394C18.4517 18.4653 19.6179 18.1543 20.1476 17.2437V17.2437L20.8067 16.1453C21.0618 15.7075 21.1318 15.186 21.0012 14.6963C20.8706 14.2067 20.5502 13.7893 20.111 13.5366V13.5366C19.6718 13.2839 19.3514 12.8665 19.2208 12.3769C19.0902 11.8873 19.1603 11.3658 19.4154 10.9279C19.5812 10.6383 19.8214 10.3982 20.111 10.2323V10.2323C21.0161 9.70286 21.3264 8.54346 20.8067 7.63274V7.63274V7.62358Z" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="12.1751" cy="11.889" r="2.63616" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                    <!--<li class="nav-item dropdown notification_dropdown">-->
+                    <!--    <a class="nav-link " href="javascript:void(0);" data-bs-toggle="dropdown">-->
+                    <!--    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">-->
+                    <!--    <path fill-rule="evenodd" clip-rule="evenodd" d="M20.8067 7.62358L20.1842 6.54349C19.6577 5.62957 18.4907 5.31429 17.5755 5.83869V5.83869C17.1399 6.09531 16.6201 6.16812 16.1307 6.04106C15.6413 5.91399 15.2226 5.59749 14.9668 5.16134C14.8023 4.88412 14.7139 4.56836 14.7105 4.24601V4.24601C14.7254 3.72919 14.5304 3.22837 14.17 2.85764C13.8096 2.48691 13.3145 2.27783 12.7975 2.27805H11.5435C11.037 2.27804 10.5513 2.47988 10.194 2.83891C9.83669 3.19795 9.63717 3.68456 9.63961 4.19109V4.19109C9.6246 5.23689 8.77248 6.07678 7.72657 6.07667C7.40421 6.07332 7.08846 5.98491 6.81123 5.82038V5.82038C5.89606 5.29598 4.72911 5.61126 4.20254 6.52519L3.53435 7.62358C3.00841 8.53636 3.3194 9.70258 4.23 10.2323V10.2323C4.8219 10.574 5.18653 11.2056 5.18653 11.889C5.18653 12.5725 4.8219 13.204 4.23 13.5458V13.5458C3.32056 14.0719 3.00923 15.2353 3.53435 16.1453V16.1453L4.16593 17.2346C4.41265 17.6798 4.8266 18.0083 5.31619 18.1474C5.80578 18.2866 6.33064 18.2249 6.77462 17.976V17.976C7.21108 17.7213 7.73119 17.6515 8.21934 17.7822C8.70749 17.9128 9.12324 18.233 9.37416 18.6716C9.5387 18.9489 9.62711 19.2646 9.63046 19.587V19.587C9.63046 20.6435 10.487 21.5 11.5435 21.5H12.7975C13.8505 21.5 14.7055 20.6491 14.7105 19.5961V19.5961C14.7081 19.088 14.9089 18.6 15.2682 18.2407C15.6275 17.8814 16.1155 17.6806 16.6236 17.6831C16.9452 17.6917 17.2596 17.7797 17.5389 17.9394V17.9394C18.4517 18.4653 19.6179 18.1543 20.1476 17.2437V17.2437L20.8067 16.1453C21.0618 15.7075 21.1318 15.186 21.0012 14.6963C20.8706 14.2067 20.5502 13.7893 20.111 13.5366V13.5366C19.6718 13.2839 19.3514 12.8665 19.2208 12.3769C19.0902 11.8873 19.1603 11.3658 19.4154 10.9279C19.5812 10.6383 19.8214 10.3982 20.111 10.2323V10.2323C21.0161 9.70286 21.3264 8.54346 20.8067 7.63274V7.63274V7.62358Z" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>-->
+                    <!--    <circle cx="12.1751" cy="11.889" r="2.63616" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>-->
+                    <!--    </svg>-->
 
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end">
-                            <div id="DZ_W_TimeLine02" class="widget-timeline dz-scroll style-1 p-3 height370">
-                                <ul class="timeline">
-                                    <li>
-                                        <div class="timeline-badge primary"></div>
-                                        <a class="timeline-panel text-muted" href="javascript:void(0);">
-                                            <span>10 minutes ago</span>
-                                            <h6 class="mb-0">Youtube, a video-sharing website, goes live <strong class="text-primary">$500</strong>.</h6>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <div class="timeline-badge info">
-                                        </div>
-                                        <a class="timeline-panel text-muted" href="javascript:void(0);">
-                                            <span>20 minutes ago</span>
-                                            <h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>
-                                            <p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <div class="timeline-badge danger">
-                                        </div>
-                                        <a class="timeline-panel text-muted" href="javascript:void(0);">
-                                            <span>30 minutes ago</span>
-                                            <h6 class="mb-0">john just buy your product <strong class="text-warning">Sell $250</strong></h6>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <div class="timeline-badge success">
-                                        </div>
-                                        <a class="timeline-panel text-muted" href="javascript:void(0);">
-                                            <span>15 minutes ago</span>
-                                            <h6 class="mb-0">StumbleUpon is acquired by eBay. </h6>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <div class="timeline-badge warning">
-                                        </div>
-                                        <a class="timeline-panel text-muted" href="javascript:void(0);">
-                                            <span>20 minutes ago</span>
-                                            <h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <div class="timeline-badge dark">
-                                        </div>
-                                        <a class="timeline-panel text-muted" href="javascript:void(0);">
-                                            <span>20 minutes ago</span>
-                                            <h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </li>
+                    <!--    </a>-->
+                    <!--    <div class="dropdown-menu dropdown-menu-end">-->
+                    <!--        <div id="DZ_W_TimeLine02" class="widget-timeline dz-scroll style-1 p-3 height370">-->
+                    <!--            <ul class="timeline">-->
+                    <!--                <li>-->
+                    <!--                    <div class="timeline-badge primary"></div>-->
+                    <!--                    <a class="timeline-panel text-muted" href="javascript:void(0);">-->
+                    <!--                        <span>10 minutes ago</span>-->
+                    <!--                        <h6 class="mb-0">Youtube, a video-sharing website, goes live <strong class="text-primary">$500</strong>.</h6>-->
+                    <!--                    </a>-->
+                    <!--                </li>-->
+                    <!--                <li>-->
+                    <!--                    <div class="timeline-badge info">-->
+                    <!--                    </div>-->
+                    <!--                    <a class="timeline-panel text-muted" href="javascript:void(0);">-->
+                    <!--                        <span>20 minutes ago</span>-->
+                    <!--                        <h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>-->
+                    <!--                        <p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>-->
+                    <!--                    </a>-->
+                    <!--                </li>-->
+                    <!--                <li>-->
+                    <!--                    <div class="timeline-badge danger">-->
+                    <!--                    </div>-->
+                    <!--                    <a class="timeline-panel text-muted" href="javascript:void(0);">-->
+                    <!--                        <span>30 minutes ago</span>-->
+                    <!--                        <h6 class="mb-0">john just buy your product <strong class="text-warning">Sell $250</strong></h6>-->
+                    <!--                    </a>-->
+                    <!--                </li>-->
+                    <!--                <li>-->
+                    <!--                    <div class="timeline-badge success">-->
+                    <!--                    </div>-->
+                    <!--                    <a class="timeline-panel text-muted" href="javascript:void(0);">-->
+                    <!--                        <span>15 minutes ago</span>-->
+                    <!--                        <h6 class="mb-0">StumbleUpon is acquired by eBay. </h6>-->
+                    <!--                    </a>-->
+                    <!--                </li>-->
+                    <!--                <li>-->
+                    <!--                    <div class="timeline-badge warning">-->
+                    <!--                    </div>-->
+                    <!--                    <a class="timeline-panel text-muted" href="javascript:void(0);">-->
+                    <!--                        <span>20 minutes ago</span>-->
+                    <!--                        <h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>-->
+                    <!--                    </a>-->
+                    <!--                </li>-->
+                    <!--                <li>-->
+                    <!--                    <div class="timeline-badge dark">-->
+                    <!--                    </div>-->
+                    <!--                    <a class="timeline-panel text-muted" href="javascript:void(0);">-->
+                    <!--                        <span>20 minutes ago</span>-->
+                    <!--                        <h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>-->
+                    <!--                    </a>-->
+                    <!--                </li>-->
+                    <!--            </ul>-->
+                    <!--        </div>-->
+                    <!--    </div>-->
+                    <!--</li>-->
                     
                     
                     <li class="nav-item dropdown notification_dropdown">
@@ -598,65 +598,55 @@
                         </a>
 
                         {{-- Dropdown --}}
-                        <div class="dropdown-menu dropdown-menu-end p-0" style="width: 300px;">
-                            <div class="bg-light p-3 border-bottom">
-                                <strong>Notifications</strong>
-                            </div>
-                            <div class="widget-media dz-scroll" style="max-height: 300px; overflow-y: auto;">
-                                <ul class="list-group list-group-flush">
-                                    @forelse(auth()->user()->notifications->take(10) as $notification)
+                       
+                        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notificationDropdown" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                            <li class="dropdown-header fw-bold">Notifications</li>
+                            @forelse(auth()->user()->unreadNotifications as $notification)
+                                <li>
+                                    @if(isset($notification->data['job_no']))
+                                        <a href="{{ route('jobStatus.notification.read', $notification->id) }}" class="dropdown-item small">
+                                            <div class="fw-semibold">Job Number: {{ $notification->data['job_no'] ?? 'N/A' }}</div>
+                                            <div class="text-muted small">{{ $notification->data['message'] }}</div>
+                                        </a>
+                                    @endif
+                                </li>
+                                <li>
+                                    @if(isset($notification->data['party_id']))
                                         @php
-                                            $data = $notification->data;
-                                            $isUnread = $notification->unread();
+                                            $route = ($notification->data['party_type'] ?? null) == 2
+                                                ? route('shipper.verification.party')
+                                                : route('other.verification.party');
                                         @endphp
-                                        <li class="list-group-item {{ $isUnread ? 'bg-light' : 'bg-white' }}">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <div>
-                                                    @if(isset($data['link']))
-                                                        <a href="{{ route('notifications.read', $notification->id) }}" class="text-dark d-block">
-                                                            <small>{{ $data['message'] ?? 'Notification' }}</small><br>
-                                                            <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
-                                                        </a>
-                                                    @else
-                                                        <div>
-                                                            <small>{{ $data['message'] ?? 'Notification' }}</small><br>
-                                                            <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
-                                                        </div>
-                                                    @endif
+                                        <li>
+                                            <a href="{{ $route }}" class="dropdown-item small">
+                                                <div class="fw-semibold">
+                                                    Party Name: {{ $notification->data['party_name'] ?? 'N/A' }}
                                                 </div>
-
-                                                {{-- Remove Button (for read notifications only) --}}
-                                                @if(!$isUnread)
-                                                    <form method="POST" action="{{ route('notifications.destroy', $notification->id) }}">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0" title="Remove">
-                                                            &times;
-                                                        </button>
-                                                    </form>
-                                                @endif
-                                            </div>
+                                                <div class="text-muted small text-wrap">
+                                                    {{ $notification->data['message'] ?? '' }}
+                                                </div>
+                                            </a>
                                         </li>
-                                    @empty
-                                        <li class="list-group-item text-center text-muted">
-                                            No notifications
-                                        </li>
-                                    @endforelse
-                                </ul>
-                            </div>
-                        </div>
+                                    @endif
+                                </li>
+                            @empty
+                                <li><span class="dropdown-item text-muted small">No new notifications</span></li>
+                            @endforelse
+                            <li><hr class="dropdown-divider"></li>
+                            <!--<li><a href="{{ route('admin.notification.all') }}" class="dropdown-item text-center text-primary small">View All</a></li>-->
+                        </ul>
                     </li>
                     
                     
-                    <li class="nav-item dropdown notification_dropdown">
-                        <a class="nav-link bell-link" href="javascript:void(0);">
-                        <svg width="20" height="22" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M16.9026 6.85114L12.4593 10.4642C11.6198 11.1302 10.4387 11.1302 9.59922 10.4642L5.11844 6.85114" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15.9089 19C18.9502 19.0084 21 16.5095 21 13.4384V6.57001C21 3.49883 18.9502 1 15.9089 1H6.09114C3.04979 1 1 3.49883 1 6.57001V13.4384C1 16.5095 3.04979 19.0084 6.09114 19H15.9089Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
+                    <!--<li class="nav-item dropdown notification_dropdown">-->
+                    <!--    <a class="nav-link bell-link" href="javascript:void(0);">-->
+                    <!--    <svg width="20" height="22" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">-->
+                    <!--    <path d="M16.9026 6.85114L12.4593 10.4642C11.6198 11.1302 10.4387 11.1302 9.59922 10.4642L5.11844 6.85114" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>-->
+                    <!--    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.9089 19C18.9502 19.0084 21 16.5095 21 13.4384V6.57001C21 3.49883 18.9502 1 15.9089 1H6.09114C3.04979 1 1 3.49883 1 6.57001V13.4384C1 16.5095 3.04979 19.0084 6.09114 19H15.9089Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>-->
+                    <!--    </svg>-->
 
-                        </a>
-                    </li>
+                    <!--    </a>-->
+                    <!--</li>-->
                     <li class="nav-item dropdown notification_dropdown">
                           <a class="nav-link bell dz-fullscreen"  href="javascript:void(0);">
                              <svg id="icon-full" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" style="stroke-dasharray: 37, 57; stroke-dashoffset: 0;"></path></svg>
@@ -671,18 +661,24 @@
                                         <img src="{{asset('images/tab/1.jpg')}}" alt="">
                                     </div>
                                     <div class="header-info d-flex">
-                                        <h6 class="w-50 mx-5">
+                                        <h6 class="mx-2">
                                             @if($admin)
-                                                <p>Welcome,</p> 
+                                                <p>CompanyName,</p> 
                                                 <small>{{ $admin->company->company_name ?? '' }}</small>
                                             @endif
                                         </h6>
-                                        <h6>
+                                        <h6 class="pb-2 mx-2">
                                             @if($admin)
-                                               <p>Email,</p> 
-                                                <small>{{ $admin->company->company_email ?? '' }}</small>
+                                               <p>UserName,</p> 
+                                                <small>{{ $admin->name ?? '' }}</small>
                                             @endif
                                         </h6>
+                                        <!--<h6>-->
+                                        <!--    @if($admin)-->
+                                        <!--       <p>Email,</p> -->
+                                        <!--        <small>{{ $admin->email ?? '' }}</small>-->
+                                        <!--    @endif-->
+                                        <!--</h6>-->
                                     </div>
 
                                 </div>
@@ -693,13 +689,16 @@
                                         <div class="products">
                                             <img src="{{asset('public/images/tab/1.jpg')}}" class="avatar avatar-md" alt="">
                                             <div>
-                                                <h6>Thomas Fleming</h6>
-                                                <span>Web Designer</span>
+                                                <h6>{{ $admin->name ?? '' }}</h6>
+                                                <small>Email : {{ $admin->email ?? '' }}</small><br>
+                                                <small>Designation : {{ $admin->role ?? '' }}</small>
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    @if($admin->role == 'super-admin')
                                     <div class="card-body px-0 py-2">
-                                        <a href="{{ url('app-profile') }}" class="dropdown-item ai-icon ">
+                                        <a href="{{ url('profile-edit') }}" class="dropdown-item ai-icon ">
                                             <svg  width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path fill-rule="evenodd" clip-rule="evenodd" d="M11.9848 15.3462C8.11714 15.3462 4.81429 15.931 4.81429 18.2729C4.81429 20.6148 8.09619 21.2205 11.9848 21.2205C15.8524 21.2205 19.1543 20.6348 19.1543 18.2938C19.1543 15.9529 15.8733 15.3462 11.9848 15.3462Z" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                             <path fill-rule="evenodd" clip-rule="evenodd" d="M11.9848 12.0059C14.5229 12.0059 16.58 9.94779 16.58 7.40969C16.58 4.8716 14.5229 2.81445 11.9848 2.81445C9.44667 2.81445 7.38857 4.8716 7.38857 7.40969C7.38 9.93922 9.42381 11.9973 11.9524 12.0059H11.9848Z" stroke="var(--primary)" stroke-width="1.42857" stroke-linecap="round" stroke-linejoin="round"/>
@@ -707,11 +706,11 @@
 
                                             <span class="ms-2">Profile </span>
                                         </a>
-                                        <a href="{{ url('app-profile') }}" class="dropdown-item ai-icon ">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-pie-chart"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                                        <!--<a href="{{ url('app-profile') }}" class="dropdown-item ai-icon ">-->
+                                        <!--    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-pie-chart"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>-->
 
-                                            <span class="ms-2">My Project</span><span class="badge badge-sm badge-secondary light rounded-circle text-white ms-2">4</span>
-                                        </a>
+                                        <!--    <span class="ms-2">My Project</span><span class="badge badge-sm badge-secondary light rounded-circle text-white ms-2">4</span>-->
+                                        <!--</a>-->
                                         <a href="javascript:void(0);" class="dropdown-item ai-icon ">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M17.9026 8.85114L13.4593 12.4642C12.6198 13.1302 11.4387 13.1302 10.5992 12.4642L6.11844 8.85114" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -729,6 +728,8 @@
                                             <span class="ms-2">Notification </span>
                                         </a>
                                     </div>
+                                    @endif
+                                    
                                     <div class="card-footer px-0 py-2">
                                         <a href="javascript:void(0);" class="dropdown-item ai-icon ">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

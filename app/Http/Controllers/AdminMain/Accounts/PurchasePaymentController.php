@@ -18,6 +18,7 @@ class PurchasePaymentController extends Controller
     public function __construct(){
         $this->middleware(function ($request, $next) {
             $this->company_id = Auth::user()->company_id;
+            $this->user_id = auth()->user()->id;
             return $next($request);
         });
     }
@@ -55,8 +56,8 @@ class PurchasePaymentController extends Controller
     public function create()
     {
         $parties = MasterImportParty::where('company_id', $this->company_id)->get();
-        $partyNames = MasterParty::all();
-        return view('admin-main.admin.purchasePayment.create', compact('parties', 'partyNames'));
+        $party_lists = MasterParty::all();
+        return view('admin-main.admin.purchasePayment.create', compact('parties', 'party_lists'));
     }
 
     /**
@@ -65,41 +66,31 @@ class PurchasePaymentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'neft_details' => 'nullable|string|max:255',
-            'neft_date' => 'nullable|date',
-            'bank_name' => 'nullable|string|max:255',
-            'total_amount_payable' => 'nullable|numeric|min:0',
-            'billing_party' => 'nullable|string|max:255',
             'billing_party_id' => 'required|exists:master_import_parties,id',
-            'invoice_f_year' => 'required|string|max:9',
-            'pp_date' => 'required|date',
-            'inv_type' => 'nullable',
-            'inv_no' => 'nullable',
+            'purchase_date'     => 'required|date',
+            'invoice_type'     => 'required|string|max:50',
+            'invoice_no'       => 'required|string|max:255',
+            'amount'           => 'required|numeric|min:0',
         ]);
-
+    
         $receipt = new AccountPurchasePayment();
-
         $receipt->company_id = $this->company_id;
+        $receipt->user_id = $this->user_id;
         $receipt->uuid = Str::uuid();
-
-        $receipt->billing_party_id = $request->billing_party_id ;  
-        $receipt->invoice_f_year = $request->invoice_f_year ;  
-        $receipt->pp_date = $request->pp_date ;  
-        $receipt->radio_type = $request->radio_type ;
-
-        if($request->radio_type == 'neft_cash'){
-
-            $receipt->neft_details = $request->neft_details;
-            $receipt->neft_date = $request->neft_date;
-            $receipt->bank_name = $request->bank_name;
-            $receipt->total_amount_payable = $request->total_amount_payable;
-            $receipt->billing_party = $request->billing_party;
-
-        }
+        $receipt->billing_party_id = $request->billing_party_id;
+        $receipt->purchase_date = $request->purchase_date; // fixed: matches form name
+        $receipt->invoice_type = $request->invoice_type;
+        $receipt->invoice_no = $request->invoice_no;
+        $receipt->amount = $request->amount;
         $receipt->save();
-
-        return redirect()->back()->with('success', 'Entry Insert Successfully. !');
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase payment added successfully!'
+        ]);
     }
+
+
 
     /**
      * Display the specified resource.
@@ -116,52 +107,46 @@ class PurchasePaymentController extends Controller
     {
         $purchase_payment = AccountPurchasePayment::where('uuid', $uuid)->firstOrFail();
         $parties = MasterImportParty::where('company_id', $this->company_id)->get();
-
+        $party_lists = MasterParty::all();
         $purchase_payment_detail = AccountPurchasePaymentDetail::where('purchase_id', $purchase_payment->id)->first();
 
-        return view('admin-main.admin.purchasePayment.edit', compact('purchase_payment', 'parties', 'purchase_payment_detail'));
+        return view('admin-main.admin.purchasePayment.edit', compact('purchase_payment', 'parties', 'purchase_payment_detail', 'party_lists'));
     }
-
+    
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'billing_party_id'      => 'required|exists:master_import_parties,id',
-            'invoice_f_year'        => 'required',
-            'pp_date'          => 'required|date',
-            'radio_type'            => 'required|in:onaccount,neft_cash',
-            'neft_details'          => 'nullable|string|max:255',
-            'neft_date'             => 'nullable|date',
-            'percentage'            => 'nullable',
-            'bank_name'             => 'nullable|string|max:255',
-            'total_amount_payable' => 'required|numeric|min:0',
-            'billing_party'   => 'required|string|max:255',
+            'billing_party_id' => 'required|exists:master_import_parties,id',
+            'purchase_date'    => 'required|date',
+            'invoice_type'     => 'required|string|max:50',
+            'invoice_no'       => 'required|string|max:255',
+            'amount'           => 'required|numeric|min:0',
         ]);
-
-        $receipt = AccountPurchasePayment::findOrFail($id);
-
-        $receipt->update($validated);
-
-        return back()->with('success', 'Receipt details updated successfully.');
+        $validated['user_id'] = $this->user_id;
+    
+        $purchasePayment = AccountPurchasePayment::findOrFail($id);
+        $purchasePayment->update($validated);
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase details updated successfully!',
+        ]);
     }
+
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
         $delete = AccountPurchasePayment::findOrFail($id);
         $delete->delete();
 
-        $delete_pay_details = AccountPurchasePaymentDetail::where('purchase_id', $id)->get();
-        foreach ($delete_pay_details as $detail) {
-            $detail->delete();
-        }
-
-
-        return response()->json(['success' => 'Receipt Deleted Successfully. !']);
+        return redirect()->route('purchase-payment.index')->with('success', 'Purchase Payment deleted successfully!');
     }
 
 

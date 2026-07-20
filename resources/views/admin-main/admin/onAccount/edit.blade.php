@@ -43,7 +43,7 @@
                                                 <div class="mb-3 row">
                                                     <label class="col-sm-3 col-form-label">Date:<span class="text-danger">*</span></label>
                                                     <div class="col-sm-9">
-                                                        <input type="date" class="form-control" name="sales_date" required value="{{$on_account->sales_date}}">
+                                                        <input type="date" class="form-control" name="sales_date"  value="{{$on_account->sales_date}}">
                                                     </div>
                                                 </div>
                                             </div>
@@ -52,7 +52,7 @@
                                                 <div class="mb-3 row">
                                                     <label class="col-sm-3 col-form-label">Party Name:<span class="text-danger">*</span></label>
                                                     <div class="col-sm-9">
-                                                        <select class="default-select form-control wide" name="party_id" required>
+                                                        <select class="default-select form-control wide" name="party_id" readonly>
                                                             <option value="">Select</option>
                                                             @foreach ($parties as $party)
                                                                 <option value="{{$party->id}}" {{$on_account->party_id == $party->id? 'selected' : ''}}>{{$party->party_name}}</option>
@@ -73,9 +73,23 @@
 
                                             <div class="col-xl-6 col-xxl-12">
                                                 <div class="mb-3 row">
-                                                    <label class="col-sm-3 col-form-label">Balance Amount:</label>
+                                                    <label class="col-sm-3 col-form-label">Round Of Amount:</label>
                                                     <div class="col-sm-9">
-                                                        <input type="text" class="form-control" name="balance_amout" value="{{$on_account->balance_amout}}">
+                                                        <input type="number" step="0.01" class="form-control" name="round_of_amount" value="{{$on_account->round_of_amount}}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-xl-6 col-xxl-12">
+                                                <div class="mb-3 row">
+                                                    <label class="col-sm-3 col-form-label">Bank Account:<span class="text-danger">*</span></label>
+                                                    <div class="col-sm-9">
+                                                        <select class="form-control wide" name="bank_id">
+                                                            <option value="">Select</option>
+                                                            @foreach ($bankDetails as $bankDetail)
+                                                                <option value="{{$bankDetail->id}}" {{ $bankDetail->id == $on_account->bank_id ? 'selected' : '' }}>{{$bankDetail->bank_name}}</option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
@@ -100,6 +114,15 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            
+            flatpickr("input[type='date']", {
+                altInput: true,
+                altFormat: "d/m/Y",   // what user sees
+                dateFormat: "Y-m-d",  // what is submitted
+                allowInput: true
+            });
+            
+            
             $('#smartwizard').smartWizard();
         });
     </script>

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
 {
@@ -16,7 +17,7 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
+        return view('profile.edit-profile', [
             'user' => $request->user(),
         ]);
     }
@@ -24,18 +25,34 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request)
     {
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $user = auth()->user();
+    
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:50',
+            'email' => 'required|email',
+            'password' => 'nullable|min:6|confirmed',
+        ]);
+    
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput();
         }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    
+        $user->name = $request->name;
+        $user->email = $request->email;
+    
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+    
+        $user->save();
+    
+        return back()->with('success', 'Profile updated successfully.');
     }
+
 
     /**
      * Delete the user's account.

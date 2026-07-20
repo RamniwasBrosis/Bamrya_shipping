@@ -10,6 +10,15 @@ use Illuminate\Support\Str;
 
 class MasterContainerController extends Controller
 {
+    public $company_id ;
+
+    public function __construct(){
+        $this->middleware(function ($request, $next) {
+            $this->company_id = Auth::user()->company_id;
+            $this->user_id = auth()->user()->id;
+            return $next($request);
+        });
+    }
     /**
      * Display a listing of the resource.
      */
@@ -26,7 +35,7 @@ class MasterContainerController extends Controller
         if($request->filled('category')){
             $query->where('category', 'LIKE', '%'.$request->category.'%');
         }
-        $containers = $query->orderBy('created_at', 'desc')->paginate(10);
+        $containers = $query->where('company_id', $this->company_id)->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin-main.admin.container.index', compact('containers'));
 
@@ -60,6 +69,7 @@ class MasterContainerController extends Controller
         $container->size  = $request->size;
         $container->category  = $request->category;
         $container->status  = $request->status;
+        $container->user_id  = $this->user_id;
 
         $container->save();
 
@@ -95,7 +105,7 @@ class MasterContainerController extends Controller
             'category' => 'nullable|string|max:255',
             'status' => 'required|boolean',
         ]);
-
+        $validation['user_id'] = $this->user_id;
         $container = MasterContainer::findOrFail($id);
         $container->update($validation);
 

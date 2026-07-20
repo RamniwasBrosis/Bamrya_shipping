@@ -3,10 +3,10 @@
     <div class="page-titles">
         <ol class="breadcrumb">
             <li>
-                <h5 class="bc-title">Sales TDS Report</h5>
+                <h5 class="bc-title">Sales Report</h5>
             </li>
         </ol>
-        <!--<a class="text-primary fs-13" href="{{ url('admin/SalesTDSReport/index') }}">Go List -></a>-->
+        <!--<a class="text-primary fs-13" href="{{ url('admin/PurchaseTDSReport/index') }}">Go List -></a>-->
     </div>
     <div class="container-fluid p-2">
         <div class="row">
@@ -14,98 +14,94 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="form-validation">
-                            <form class="needs-validation" novalidate>
+                            @php
+                                $fromDate = \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d'); // 01-06-2025
+                                $toDate = \Carbon\Carbon::now()->format('Y-m-d'); // 26-06-2025
+                            @endphp
+                            <form class="needs-validation" method="POST" id="loadingList" novalidate>
+                                @csrf
                                 <div class="row">
+                                    {{-- From Date --}}
                                     <div class="col-xl-6">
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">From Date:</label>
                                             <div class="col-sm-9 d-flex align-items-center">
-                                                <input type="date" class="form-control">
+                                                <input type="date" name="from_date" class="form-control"  value="{{ $fromDate }}" required>
                                             </div>
                                         </div>
                                     </div>
+
+                                    {{-- To Date --}}
                                     <div class="col-xl-6">
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">To Date:</label>
                                             <div class="col-sm-9 d-flex align-items-center">
-                                                <input type="date" class="form-control">
+                                                <input type="date" name="to_date" class="form-control"  value="{{ $toDate }}" required>
                                             </div>
                                         </div>
                                     </div>
+
+                                    {{-- Party Wise --}}
                                     <div class="col-xl-6">
                                         <div class="mb-3 row">
-                                            
                                             <div class="form-check col-sm-3 d-flex align-items-center">
-                                            <input class="form-check-input" type="checkbox">
-                                            <label class="form-check-label" for="fcl20">
-                                                Party Wise:
-                                            </label>
+                                                <input class="form-check-input" type="checkbox" id="partyWiseCheckbox">
+                                                <label class="form-check-label" for="partyWiseCheckbox">
+                                                    Party Wise:
+                                                </label>
                                             </div>
-                                            
                                             <div class="col-sm-9 d-flex align-items-center">
-                                               
-                                                <select class="default-select form-control wide me-2" placeholder="Select">
-                                                    
-                                                    <option value="vessel1">1/S.A.R.L.ART ET ANTIQUITIES</option>
-                                                    <option value="vessel2">3PEX EXPRESS PVT LTD</option>
-                                                    </select>
+                                                <select name="party_id" class="form-control wide me-2" id="partySelect" disabled>
+                                                    <option value="">-- Select Party --</option>
+                                                    @foreach ($parties as $party)
+                                                        <option value="{{$party->id}}">{{$party->party_name}}</option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                        <button class="btn btn-primary" type="button">Preview</button>
+                                    <!--job no wise-->
+                                    <div class="col-xl-6">
+                                        <div class="mb-3 row">
+                                            <div class="form-check col-sm-3 d-flex align-items-center">
+                                                    Job No:
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-9 d-flex align-items-center">
+                                                <select name="full_job_no" class="form-control select2" id="">
+                                                    <option value="">-- Select Job No --</option>
+                                                    @foreach ($sales_invoices as $sales_inv)
+                                                        <option value="{{$sales_inv->full_job_no}}">{{$sales_inv->full_job_no}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Submit Button --}}
+                                    <div class="">
+                                        <button class="btn btn-primary" type="submit">PREVIEW</button>
                                     </div>
                                 </div>
                             </form>
                         </div>
-                        
-                        <div class="col-xl-12 col-lg-12 col-sm-12 active-p">
-                        <div class="card">
-                            <div class="card-body p-0">
-                                <div class="table-responsive active-projects shorting">
-            
-                                    <div class="tbl-caption">
-                                        <h4 class="heading mb-0">SALES TDS REPORT</h4>
-                                    </div>
-                                    <table id="projects-tblss" class="table ItemsCheckboxSec">
-                                        <thead>
-                                            <tr>
-                                                <th>Party Name</th>
-                                                <th>INVOICE NO</th>
-                                                <th>RECEIPT DATE</th>
-                                                <th>RECEIPT NO</th>
-                                                <th>AMOUNT</th>
-                                                <th>TDS AMT</th>
-                                                <th>TDS %</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                            </tr>
-            
-                                        </tbody>
-            
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                        
+                        <div id="reportPreview" class="mt-5 border border-dark p-4" style="display: none;">
+                      
+                        </div> 
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
+
+
 @endsection
 @push('scripts')
     <script>
+        $(document).ready(function() {
+            $('.select2').select2({ width: '100%' });
+        });
         (function() {
             'use strict'
 
@@ -126,4 +122,78 @@
                 })
         })()
     </script>
+
+
+<script>
+        document.getElementById('partyWiseCheckbox').addEventListener('change', function () {
+            document.getElementById('partySelect').disabled = !this.checked;
+        });
+
+        $(document).ready(function(){
+
+            function fetchPage(page = 1) {
+                var data = $('#loadingList').serialize();
+
+                $.ajax({
+                    url: '{{ route("sales-tds-report.preview") }}?page=' + page,
+                    type: 'POST',
+                    data: data,
+                    success: function(res) {
+                        $('#reportPreview').css('display', 'block').html(res.html);
+                    },
+                    error: function(xhr) {
+                        alert('An error occurred while fetching data.');
+                        console.log(xhr.responseText);
+                    }
+                });
+            }
+
+            // Form submit
+            $('#loadingList').on('submit', function(e){
+                e.preventDefault();
+                fetchPage(1); // Always go to first page on new search
+            });
+
+            // Pagination click (dynamically bind using .on)
+            $(document).on('click', '.pagination a', function(e){
+                e.preventDefault();
+                var page = $(this).attr('href').split('page=')[1];
+                fetchPage(page);
+            });
+            
+            
+            
+            
+            // Handle form submission
+            $('#modelPartyDetails').on('submit', function (e) {
+                e.preventDefault();
+            
+                $.ajax({
+                    url: "{{ route('new-party.store') }}",
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+         
+                            $('select[name="party_id"]').each(function() {
+                                $(this).append(`<option value="${response.party.id}" selected>${response.party.name}</option>`);
+                            });
+            
+                            $('#modelPartyDetails')[0].reset();
+                            $('#partyDetailsModal').modal('hide');
+                            toastr.success('Party added successfully!');
+                        } else {
+                            toastr.error(response.message || 'Something went wrong.');
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Failed to add party details.');
+                        console.error('Error:', xhr.responseText);
+                    }
+                });
+            });
+
+        });
+
+</script>
 @endpush

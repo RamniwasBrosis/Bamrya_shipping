@@ -33,6 +33,7 @@
     
 	<!-- FAVICONS ICON -->
 	<link rel="shortcut icon" type="image/png" href="{{ asset('public/images/favicon.png')}}">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 	
 	@if(!empty(config('dz.public.pagelevel.css.'.$action)))
 		@foreach(config('dz.public.pagelevel.css.'.$action) as $style)
@@ -46,6 +47,84 @@
 			<link href="{{ asset('public/'.$style) }}" rel="stylesheet" type="text/css"/>
 		@endforeach
 	@endif
+	
+	<style>
+	    #preloader {
+          background: #fff;
+          height: 100%;
+          width: 100%;
+          position: fixed;
+          top: 0;
+          left: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 99999;
+        }
+        
+        /* Loader container */
+        .loader-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 15px;
+        }
+        
+        /* Simple rotating circle */
+        .loader-circle {
+          width: 60px;
+          height: 60px;
+          border: 4px solid #ddd;
+          border-top-color: var(--primary);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+        
+        /* Professional text */
+        .loader-text {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #333;
+          letter-spacing: 1px;
+          font-family: "Segoe UI", sans-serif;
+        }
+        
+        /* Animation */
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        /* Dark mode */
+        [data-theme-version="dark"] #preloader {
+          background: #1E1E1E;
+        }
+        [data-theme-version="dark"] .loader-text {
+          color: #f0f0f0;
+        }
+    
+        .dsr-table thead th {
+            background-color: #d2ebf9;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-weight: bold;
+        }
+        
+        .dsr-table th,
+        .dsr-table td {
+            max-width: 250px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal !important;
+            line-height: 1.4;
+            padding: 8px 6px;
+            vertical-align: top;
+        }
+
+
+
+	</style>
 
 </head>
 <body data-typography="poppins" data-theme-version="light" data-layout="vertical" data-nav-headerbg="black" data-headerbg="color_1">
@@ -53,12 +132,20 @@
     <!--*******************
         Preloader start
     ********************-->
+  <!--  <div id="preloader">-->
+		<!--<div class="lds-ripple">-->
+		<!--	<div></div>-->
+		<!--	<div></div>-->
+		<!--</div>-->
+  <!--  </div>-->
     <div id="preloader">
-		<div class="lds-ripple">
-			<div></div>
-			<div></div>
-		</div>
+      <div class="loader-container">
+        <div class="loader-circle"></div>
+        <div class="loader-text">{{ $companyDetails?->companySetting->company_code ?? '' }}</div>
+      </div>
     </div>
+
+
     <!--*******************
         Preloader end
     ********************-->
@@ -69,7 +156,7 @@
     <div id="main-wrapper">
 
         <div class="nav-header">
-            <a href="{{ url('index') }}" class="brand-logo">
+            <a href="{{ url('admin/dashboard') }}" class="brand-logo">
 				<svg class="logo-abbr" width="39" height="23" viewBox="0 0 39 23" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path class="w3" d="M32.0362 22H19.0466L20.7071 18.7372C20.9559 18.2484 21.455 17.9378 22.0034 17.9305L31.1036 17.8093C33.0753 17.6497 33.6571 15.9246 33.7015 15.0821C33.7015 13.2196 32.1916 12.5765 31.4367 12.4878H23.7095L25.9744 8.49673H30.4375C31.8763 8.3903 32.236 7.03332 32.236 6.36814C32.3426 4.93133 30.9482 4.61648 30.2376 4.63865H28.6955C28.2646 4.63865 27.9788 4.19212 28.1592 3.8008L29.7047 0.44798C31.0903 0.394765 32.8577 0.780573 33.5683 0.980129C38.6309 3.42801 37.0988 7.98676 35.6999 9.96014C38.1513 11.9291 38.4976 14.3282 38.3644 15.2816C38.098 20.1774 34.0346 21.8005 32.0362 22Z" fill="var(--primary)"/>
 					<path class="react-w" d="M9.89261 21.4094L0 2.80536H4.86354C5.41354 2.80536 5.91795 3.11106 6.17246 3.59864L12.4032 15.5355C12.6333 15.9762 12.6261 16.5031 12.3842 16.9374L9.89261 21.4094Z" fill="white"/>
@@ -134,10 +221,49 @@
             <script src="{{ asset('public/'.$script) }}" type="text/javascript"></script>
         @endforeach
     @endif
+    <script>
+        $(document).ready(function () {
+            flatpickr("input[type='date']", {
+                altInput: true,
+                altFormat: "d/m/Y",   
+                dateFormat: "Y-m-d", 
+                allowInput: true,
+                onReady: function(selectedDates, dateStr, instance) {
+                    instance.altInput.placeholder = "dd/mm/yy"; 
+                }
+            });
+        });
+        
+        $('select[name="party_type"]').on('change', function(){
+            var val = $(this).val();
+            
+            if(val == 1 || val == 2){
+               $('#party_mode').removeClass('d-none') 
+            }else{
+                $('#party_mode').addClass('d-none') 
+            }
+        })
+        
+        $('select[name="party_mode"]').on('change', function(){
+            var val = $(this).val();
+            if(val == 'local'){
+               $('#document').removeClass('d-none') 
+            }else{
+                $('#document').addClass('d-none') 
+            }
+            
+        });
+    </script>
     
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
+    
+    <!--select2-->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!--sweatalert-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   
     @stack('scripts')
 
 </body>

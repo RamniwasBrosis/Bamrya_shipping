@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class MasterPort extends Model
 {
@@ -20,6 +21,11 @@ class MasterPort extends Model
         'gti_group_code',
         'nsi_gt_code',
         'status',
+        'user_id'
     ];
+    
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 
 }

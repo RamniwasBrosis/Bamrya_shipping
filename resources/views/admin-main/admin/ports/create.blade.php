@@ -18,7 +18,6 @@
                             <div class="row form-material">
                                 <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
                                     <label class="form-label">Port Code:</label>
-                                    <span class="text-danger">*</span>
                                     <input type="text" class="form-control" name="port_code">
                                 </div>
                                 <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">

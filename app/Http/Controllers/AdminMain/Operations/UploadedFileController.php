@@ -16,6 +16,7 @@ class UploadedFileController extends Controller
     public function __construct(){
         $this->middleware(function ($request, $next) {
             $this->company_id = Auth::user()->company_id;
+            $this->user_id = auth()->user()->id;
             return $next($request);
         });
     }
@@ -50,6 +51,7 @@ class UploadedFileController extends Controller
             'uuid'  => Str::uuid(),
             'file_name' => $filename,
             'file_path' => $path,
+            'user_id' => $this->user_id,
         ]);
 
         return back()->with('success', 'File uploaded successfully!');

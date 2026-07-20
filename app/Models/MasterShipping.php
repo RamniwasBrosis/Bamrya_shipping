@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class MasterShipping extends Model
 {
     use HasFactory;
+    
+    protected $table = 'master_shippings';
 
     protected $fillable = [
         'company_id',
@@ -18,6 +21,11 @@ class MasterShipping extends Model
         'agent_code',
         'line_code',
         'shipping_line_type',
-        'status',
+        'status','user_id'
     ];
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

@@ -10,6 +10,15 @@ use Illuminate\Support\Str;
 
 class MasterPortController extends Controller
 {
+    public $company_id ;
+
+    public function __construct(){
+        $this->middleware(function ($request, $next) {
+            $this->company_id = Auth::user()->company_id;
+            return $next($request);
+        });
+    }
+    
     /**
      * Display a listing of the resource.
      */
@@ -41,7 +50,7 @@ class MasterPortController extends Controller
             $query->where('gti_code', 'like', '%' . $request->gti_code . '%');
         }
 
-        $ports = $query->orderBy('created_at', 'desc')->paginate(10);
+        $ports = $query->where('company_id', $this->company_id)->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin-main.admin.ports.index', compact('ports'));
     }
@@ -59,8 +68,9 @@ class MasterPortController extends Controller
      */
     public function store(Request $request)
     {        
+        $userId = auth()->user()->id;
         $validated = $request->validate([
-            'port_code' => 'required|string|max:255',
+            'port_code' => 'nullable|string|max:255',
             'port_name' => 'required|string|max:255',
 
             'edi_code' => 'nullable|string|max:255',
@@ -88,6 +98,7 @@ class MasterPortController extends Controller
         $port->gti_group_code = $request->gti_group_code;
         $port->nsi_gt_code = $request->nsi_gt_code;
         $port->status = $request->status;
+        $port->user_id = $userId;
 
         $port->save();       
 
@@ -121,8 +132,9 @@ class MasterPortController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $userId = auth()->user()->id;
         $validated = $request->validate([
-            'port_code' => 'required|string|max:255',
+            'port_code' => 'nullable|string|max:255',
             'port_name' => 'required|string|max:255',
 
             'edi_code' => 'nullable|string|max:255',
@@ -149,6 +161,7 @@ class MasterPortController extends Controller
         $port->gti_group_code = $request->gti_group_code;
         $port->nsi_gt_code = $request->nsi_gt_code;
         $port->status = $request->status;
+        $port->user_id = $userId;
 
         $port->save(); 
 

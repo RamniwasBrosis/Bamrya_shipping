@@ -59,9 +59,9 @@
                 </ul>
             </div>
 
-            <p class="text-center">Not registered?
-                <a class="btn-link text-primary" href="{{ url('register') }}">Register</a>
-            </p>
+            <!--<p class="text-center">Not registered?-->
+            <!--    <a class="btn-link text-primary" href="{{ route('register') }}">Register</a>-->
+            <!--</p>-->
         </form>
     </div>
 </div>

@@ -2,7 +2,7 @@
 @section('content')
 <div class="page-titles">
     <ol class="breadcrumb">
-        <li><h5 class="bc-title">MANAGE Import BL</h5></li>
+        <li><h5 class="bc-title">Manage Sea Import Data Entry BL</h5></li>
     </ol>
     <a class="text-primary fs-13" href="{{url('admin/sea-import-data-entry/create')}}">+ Add Import BL</a>
 </div>

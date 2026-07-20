@@ -192,7 +192,9 @@ class ExportBlEntryController extends Controller
 
         $booking_nums = OperationExportBl::select('booking_no')->where('company_id', $this->company_id)->get();
 
-        $exportBlEntry = OperationExportBl::where('uuid', $uuid)->firstOrFail();
+        $exportBlEntry = OperationExportBl::where('uuid', $uuid)
+                                            ->where('company_id', $this->company_id)
+                                            ->firstOrFail();
         // $exportBlContainer = OperationExportBlContainer::where('company_id', $this->company_id)->where('booking_no', $exportBlEntry->booking_no)->first();
 
         return view('admin-main.admin.exportBLDataEntry.edit', compact('exportBlEntry','job_masters','vessels','parties','ports','booking_nums'));

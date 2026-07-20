@@ -18,42 +18,61 @@ class PurchaseTDSReportExport implements FromCollection, WithHeadings, WithStyle
 
     public function collection()
     {
-        
-
-        return $this->data->map(function ($item) {
-
-            // Totals
-            $totalBill = 0;
-            $totalBasic = 0;
-            $totalTds = 0;
-            $totalPayable = 0;
-
-            $billAmount = $item->amount ?? 0;
-            $basicAmount = $item->basic_amount ?? 0;
-            $tdsAmt = $item->tds_amount ?? 0;
-            $tdsPercent = $item->tds ?? 0;
-            $payableAmt = $billAmount - $tdsAmt;
-            $panNo = $item->partyName->pan_no ?? '--';
-
-            $totalBill += $billAmount;
-            $totalBasic += $basicAmount;
-            $totalTds += $tdsAmt;
+        $rows = collect();
+    
+        $totalTaxableAmount = 0;
+        $totalGstAmount = 0;
+        $totalPayable = 0;
+    
+        foreach ($this->data as $item) {
+    
+            $charges = $item['chargesContainer'] ?? collect();
+    
+            if ($charges->isEmpty()) {
+                continue;
+            }
+    
+            $cgstAmount = $charges->sum('cgst');
+            $sgstAmount = $charges->sum('sgst');
+            $igstAmount = $charges->sum('igst');
+    
+            $gstAmount = $cgstAmount + $sgstAmount + $igstAmount;
+    
+            $taxableAmount = $charges->sum('freight');
+    
+            $payableAmt = $taxableAmount + $gstAmount;
+    
+            $totalTaxableAmount += $taxableAmount;
+            $totalGstAmount += $gstAmount;
             $totalPayable += $payableAmt;
-
-            
-            return [
-                'Party Name'        => $item->partyName->party_name ?? '--',
-                'Job No'            => $item->job_no ?? '--',
-                'Invoice No'         => $item->invoice_no ?? '--',
-                'INV DT'            => $item->invoice_date ?? '--',
-                'Bill Amount'          => $item->amount ?? '--',
-                'Basic Amount'            => $item->basic_amount ?? '--',
-                'TDS AMT'          => $tdsAmt,
-                'TDS %'    => number_format($tdsPercent ?? 0, 2),
-                'Payable Amt'   => $payableAmt,
-                'PAN No'=> $panNo,
-            ];
-        });
+    
+            $rows->push([
+                'Party Name'      => optional($item->partyName)->party_name ?? '--',
+                'Job No'          => optional($item->operationJob)->job_no ?? '--',
+                'Invoice No'      => $item->invoice_no ?? '--',
+                'INV DT'          => $item->invoice_date
+                                        ? \Carbon\Carbon::parse($item->invoice_date)->format('d-m-Y')
+                                        : '',
+                'GSTIN No'        => optional($item->partyName)->gstin ?? '--',
+                'Taxable Amount'  => number_format($taxableAmount, 2),
+                'GST Amount'      => number_format($gstAmount, 2),
+                'Total Amount'    => number_format($payableAmt, 2),
+            ]);
+        }
+    
+        // Grand Total Row
+        $rows->push([
+            'Party Name'      => '',
+            'Job No'          => '',
+            'Invoice No'      => '',
+            'INV DT'          => '',
+            'GSTIN No'        => 'GRAND TOTAL :',
+            'Taxable Amount'  => number_format($totalTaxableAmount, 2),
+            'GST Amount'      => number_format($totalGstAmount, 2),
+            'Total Amount'    => number_format(round($totalPayable), 2),
+        ]);
+    
+        return $rows;
     }
 
     public function headings(): array
@@ -63,12 +82,10 @@ class PurchaseTDSReportExport implements FromCollection, WithHeadings, WithStyle
             'Job No',
             'Invoice No',
             'INV DT',
-            'Bill Amount',
-            'Basic Amount',
-            'TDS AMT',
-            'TDS %',
-            'Payable Amt',
-            'PAN No',
+            'GSTIN No',
+            'Taxable Amount',
+            'GST Amount',
+            'Total Amount',
         ];
     }
 

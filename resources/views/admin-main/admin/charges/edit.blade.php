@@ -21,7 +21,7 @@
                             <div class="row form-material">
 
                                 <div class="col-xl-3 col-md-6 mb-3">
-                                    <label class="form-label">Charge Code: <span class="text-danger">*</span></label>
+                                    <label class="form-label">HSN/SAC CODE: <span class="text-danger">*</span></label>
                                     <input type="text" name="charge_code" class="form-control" value="{{ old('charge_code', $charge->charge_code) }}">
                                     @error('charge_code') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
@@ -33,7 +33,7 @@
                                 </div>
 
                                 <div class="col-xl-3 col-md-6 mb-3">
-                                    <label class="form-label">Tally Ledger (Name): <span class="text-danger">*</span></label>
+                                    <label class="form-label">Tally Ledger (Name):</label>
                                     <input type="text" name="tally_ledger_name" class="form-control" value="{{ old('tally_ledger_name', $charge->tally_ledger_name) }}">
                                     @error('tally_ledger_name') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
@@ -77,6 +77,12 @@
                                     </select>
                                     @error('gst_percentage') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
+                                
+                                <div class="col-xl-3 col-md-6 mb-3">
+                                    <label class="form-label">TDS%: </label>
+                                    <input type="number" name="tds_percentage" class="form-control" value="{{ old('tds_percentage', $charge->tds_percentage) }}">
+                                    @error('tds_percentage') <small class="text-danger">{{ $message }}</small> @enderror
+                                </div>
 
                                 <div class="col-xl-3 col-md-6 mb-3">
                                     <label class="form-label">Formula (Y/N):</label>
@@ -99,11 +105,11 @@
                                     @error('percentage') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
 
-                                <div class="col-xl-3 col-md-6 mb-3">
-                                    <label class="form-label">SAC Code: <span class="text-danger">*</span></label>
-                                    <input type="text" name="sac_code" class="form-control" value="{{ old('sac_code', $charge->sac_code) }}">
-                                    @error('sac_code') <small class="text-danger">{{ $message }}</small> @enderror
-                                </div>
+                                <!--<div class="col-xl-3 col-md-6 mb-3">-->
+                                <!--    <label class="form-label">SAC Code: <span class="text-danger">*</span></label>-->
+                                <!--    <input type="text" name="sac_code" class="form-control" value="{{ old('sac_code', $charge->sac_code) }}">-->
+                                <!--    @error('sac_code') <small class="text-danger">{{ $message }}</small> @enderror-->
+                                <!--</div>-->
 
                                 <div class="col-xl-3 col-md-6 mb-3">
                                     <label class="form-label">Status: <span class="text-danger">*</span></label>

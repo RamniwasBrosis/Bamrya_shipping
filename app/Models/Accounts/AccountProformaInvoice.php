@@ -3,9 +3,13 @@
 namespace App\Models\Accounts;
 
 use App\Models\MasterBank;
-use App\Models\MasterImportParty;
+use App\Models\MasterCharge;
+use App\Models\User;
+use App\Models\MasterBillingParty;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Operations\OperationJobMaster;
+use App\Models\Operations\OperationSalesPerson;
 
 class AccountProformaInvoice extends Model
 {
@@ -30,6 +34,13 @@ class AccountProformaInvoice extends Model
         'bank_id',
         'gst_type',
         'invoice_date',
+        'full_job_no',
+        'doe_date',
+        
+        'vessel_name',
+        'awb_bl_no',
+        'sale_purchase',
+        'sales_person_id',
 
         'charge_name',
         'gst',
@@ -41,7 +52,7 @@ class AccountProformaInvoice extends Model
         'exchange_rate',
         'rate_per_unit',
         'freight',
-        'amount',
+        'amount','bl_no',
 
         'caf_percent',
         'caf_amount',
@@ -60,13 +71,43 @@ class AccountProformaInvoice extends Model
         'sgst',
         'igst',
         'total',
+        'vessel_name',
+        'awb_bl_no',
+        'sale_purchase',
+        'pol',
+        'pkgType',
+        'packages',
+        'shipping_no',
+        'shipping_bill_date',
+        'shipper_invoice_no','user_id'
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+    
     public function partyName(){
-        return $this->belongsTo(MasterImportParty::class, 'billing_party_id');
+        return $this->belongsTo(MasterBillingParty::class, 'billing_party_id');
     }
 
     public function accountNumber(){
         return $this->belongsTo(MasterBank::class, 'bank_id');
+    }
+    
+    public function salesPerson(){
+        return $this->belongsTo(OperationSalesPerson::class, 'sales_person_id');
+    }
+    
+    public function operationJob(){
+        return $this->belongsTo(OperationJobMaster::class, 'job_no', 'id');
+    }
+    
+    public function chargeName(){
+        return $this->belongsTo(MasterCharge::class, 'charge_name', 'id');
+    }
+    
+    public function chargesContainer(){
+        return $this->hasMany(AccountProformaInvoiceContainer::class, 'proforma_invoice_id');
     }
 }

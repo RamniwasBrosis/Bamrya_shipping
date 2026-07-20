@@ -362,197 +362,328 @@
 	 
 	}
 	
-	var overiewChart = function(){
-		 var options = {
-          series: [{
-          name: 'Number of Projects',
-          type: 'column',
-          data: [75, 85, 72, 100, 50, 100, 80, 75, 95, 35, 75,100]
-        }, {
-          name: 'Revenue',
-          type: 'area',
-          data: [44, 65, 55, 75, 45, 55, 40, 60, 75, 45, 50,42]
-        }, {
-          name: 'Active Projects',
-          type: 'line',
-          data: [30, 25, 45, 30, 25, 35, 20, 45, 35, 20, 35,20]
-        }],
-          chart: {
-          height: 300,
-          type: 'line',
-          stacked: false,
-		  toolbar: {
-				show: false,
-			},
-        },
-        stroke: {
-          width: [0, 1, 1],
-          curve: 'straight',
-		  dashArray: [0, 0, 5]
-        },
-		legend: {
-			fontSize: '13px',
-			fontFamily: 'poppins',
-			 labels: {
-				  colors:'#888888', 
-			 }
-		},
-        plotOptions: {
-          bar: {
-            columnWidth: '18%',
-			 borderRadius:6	,
-          }
-        },
-        
-        fill: {
-          //opacity: [0.1, 0.1, 1],
-		  type : 'gradient',
-          gradient: {
-            inverseColors: false,
-            shade: 'light',
-            type: "vertical",
-            /* opacityFrom: 0.85,
-            opacityTo: 0.55, */
-			colorStops : [
-				[
-					{
-					  offset: 0,
-					  color: 'var(--primary)',
-					  opacity: 1
-					},
-					{
-					  offset: 100,
-					  color: 'var(--primary)',
-					  opacity: 1
-					}
-				],
-				[
-					{
-					  offset: 0,
-					  color: '#3AC977',
-					  opacity: 1
-					},
-					{
-					  offset: 0.4,
-					  color: '#3AC977',
-					  opacity: .15
-					},
-					{
-					  offset: 100,
-					  color: '#3AC977',
-					  opacity: 0
-					}
-				],
-				[
-					{
-					  offset: 0,
-					  color: '#FF5E5E',
-					  opacity: 1
-					},
-					{
-					  offset: 100,
-					  color: '#FF5E5E',
-					  opacity: 1
-					}
-				],
-			],
-            stops: [0, 100, 100, 100]
-          }
-        },
-		colors:["var(--primary)","#3AC977","#FF5E5E"],
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
-          'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-        ],
-        markers: {
-          size: 0
-        },
-        xaxis: {
-          type: 'month',
-		  labels: {
-			   style: {
-				   fontSize: '13px',
-				   colors:'#888888',
-			   },
-		  },
-        },
-        yaxis: {
-          min: 0,
-		  tickAmount: 4,
-		  labels: {
-			   style: {
-				   fontSize: '13px',
-				   colors:'#888888',
-			   },
-		  },
-        },
-        tooltip: {
-          shared: true,
-          intersect: false,
-          y: {
-            formatter: function (y) {
-              if (typeof y !== "undefined") {
-                return y.toFixed(0) + " points";
-              }
-              return y;
-        
-            }
-          }
-        }
-        };
+	var overviewChartInstance = null;
+	function overiewChart(salesData, purchaseData, labels, jobsOfMonth) {
 
-        var chart = new ApexCharts(document.querySelector("#overiewChart"), options);
-        chart.render();
-		
-		$(".mix-chart-tab .nav-link").on('click',function(){
-			var seriesType = $(this).attr('data-series');
-			var columnData = [];
-			var areaData = [];
-			var lineData = [];
-			switch(seriesType) {
-				case "week":
-					columnData = [75, 85, 72, 100, 50, 100, 80, 75, 95, 35, 75,100];
-					areaData = [44, 65, 55, 75, 45, 55, 40, 60, 75, 45, 50,42];
-					lineData = [30, 25, 45, 30, 25, 35, 20, 45, 35, 20, 35,20];
-					break;
-				case "month":
-					columnData = [20, 50, 80, 52, 10, 80, 50, 30, 95, 10, 60,85];
-					areaData = [40, 25, 85, 45, 85, 25, 95, 65, 45, 45, 20,12];
-					lineData = [65, 45, 25, 65, 45, 25, 75, 35, 65, 75, 15,65];
-					
-					break;
-				case "year":
-					columnData = [30, 20, 80, 52, 10, 90, 50, 30, 95, 20, 60,85];
-					areaData = [40, 25, 40, 45, 85, 25, 50, 65, 45, 60, 20,12];
-					lineData = [65, 45, 30, 65, 45, 25, 75, 40, 65, 50, 15,65];
-					break;
-				case "all":
-					columnData = [20, 50, 80, 60, 10, 80, 50, 40, 95, 20, 60,85];
-					areaData = [40, 25, 30, 45, 85, 25, 95, 65, 50, 45, 20,12];
-					lineData = [65, 45, 25, 65, 45, 25, 30, 35, 65, 75, 15,65];
-					break;
-				default:
-					columnData = [75, 80, 72, 100, 50, 100, 80, 30, 95, 35, 75,100];
-					areaData = [44, 65, 55, 75, 45, 55, 40, 60, 75, 45, 50,42];
-					lineData = [30, 25, 45, 30, 25, 35, 20, 45, 35, 30, 35,20];
-			}
-			chart.updateSeries([
-				{
-					name: "Number of Projects",
-					type: 'column',
-					data: columnData
-				},{
-					name: 'Revenue',
-					type: 'area',
-					data: areaData
-				},{
-					name: 'Active Projects',
-					type: 'line',
-					data: lineData
-				}
-			]);
-		})
-	 
-	}
+        // OLD CHART DESTROY
+        if (overviewChartInstance !== null && typeof overviewChartInstance.destroy === "function") {
+            overviewChartInstance.destroy();
+        }
+    
+        var options = {
+            series: [
+                {
+                    name: 'Total Sale of This Month',
+                    type: 'column',
+                    data: salesData
+                }, 
+                {
+                    name: 'Total Purchase of This Month',
+                    type: 'area',
+                    data: purchaseData
+                },
+                {
+                    name: 'Total Jobs of This Month',
+                     type: 'line',
+                    data: jobsOfMonth
+                }
+            ],
+            chart: {
+                height: 350,
+                type: 'line',
+                stacked: false,
+                toolbar: { show: false },
+            },
+            stroke: {
+                width: [0, 2, 3],
+                curve: 'smooth'
+            },
+            legend: {
+                fontSize: '13px',
+                fontFamily: 'poppins',
+                labels: { colors:'#888888' }
+            },
+            plotOptions: {
+                bar: {
+                    columnWidth: '40%',
+                    borderRadius: 6,
+                }
+            },
+            fill: {
+                type: ['solid', 'gradient', 'solid'],
+                gradient: {
+                    inverseColors: false,
+                    shade: 'light',
+                    type: "vertical",
+                    colorStops : [
+                        [
+                            { offset: 0, color: 'var(--primary)', opacity: 1 },
+                            { offset: 100, color: 'var(--primary)', opacity: 1 }
+                        ],
+                        [
+                            { offset: 0, color: '#3AC977', opacity: 1 },
+                            { offset: 40, color: '#3AC977', opacity: .15 },
+                            { offset: 100, color: '#3AC977', opacity: 0 }
+                        ]
+                    ],
+                    stops: [0, 100, 100, 100]
+                }
+            },
+            colors:["var(--primary)", "#3AC977", "#FF9800"],
+            labels: labels,
+            markers: { size: 4 },
+            xaxis: {
+                categories: labels,
+                labels: {
+                    style: { fontSize: '13px', colors:'#888888' }
+                },
+            },
+            yaxis: [
+                {
+                    title: { text: 'Sales', style: { color: "#1E88E5" } },
+                    labels: { formatter: function(val){ return val; } }
+                },
+                {
+                    opposite: true,
+                    title: { text: 'Purchases', style: { color: "#3AC977" } },
+                    labels: { formatter: function(val){ return val; } }
+                },
+                {
+                    opposite: true,
+                    title: { text: 'Jobs', style: { color: "#FF9800" } },
+                    labels: { formatter: function(val){ return val; } }
+                }
+            ],
+            tooltip: {
+                shared: true,
+                intersect: false,
+                y: {
+                    formatter: function (y) {
+                        return y;
+                    }
+                }
+            }
+        };
+        // STORE INSTANCE GLOBAL
+        overviewChartInstance = new ApexCharts(document.querySelector("#overiewChart"), options);
+        overviewChartInstance.render();
+    }
+
+	// Function to load chart data from server
+    function loadChartData(period, fy = '') {
+        let url = '/dashboard/chart-data/' + period;
+    
+        if (fy !== '') {
+            url += '?fy=' + fy;
+        }
+    
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (response) {
+        
+                if (response.success) {
+                    
+                    const jobsArray = response.labels.map((month, idx) => {
+                        // FY months start from April → March
+                        let year = (idx < 9) ? response.fyStartYear : response.fyEndYear; // optional, or hardcode
+                        let monthNum = String(idx + 4 <= 12 ? idx + 4 : idx - 8).padStart(2, '0');
+                        let key = `${year}-${monthNum}`;
+                        return response.jobsOfMonth[key] ?? 0;
+                    });
+    
+                    overiewChart(response.sales, response.purchases, response.labels, jobsArray);
+                    
+                    document.getElementById('totalJobs').innerText = response.jobs;
+                    
+                    let ts = '₹ ' + Math.round(response.totalSales).toLocaleString('en-IN');
+                    document.getElementById('totalSales').innerText = ts;
+                    
+                    let tp = '₹ ' + Math.round(response.totalPurchases).toLocaleString('en-IN');
+                    document.getElementById('totalPurchases').innerText = tp;
+                }
+            }
+        });
+    }
+
+    // Tab click event handler
+    $("#financial-year").on("change", function () {
+        var fy = $(this).val();   // e.g. "2024-25"
+        if (fy !== "") {
+            loadChartData("year", fy);   // Load FY specific chart
+        } else {
+            loadChartData("all");        // If no FY selected show "All"
+        }
+    });
+    
+    
+
+   // MONTH WISE JOBS CHARTS
+    var monthWiseChartInstance = null;
+	function monthWiseOveriewChart(airImports, airExports, seaImports, seaExports, labels) {
+
+        // OLD CHART DESTROY
+        if (monthWiseChartInstance !== null && typeof monthWiseChartInstance.destroy === "function") {
+            monthWiseChartInstance.destroy();
+        }
+    
+        var mwOptions = {
+            series: [
+                {
+                    name: 'Total AirImport Jobs of This Month',
+                    type: 'column',
+                    data: airImports
+                }, 
+                {
+                    name: 'Total AirExport Jobs of This Month',
+                    type: 'area',
+                    data: airExports
+                },
+                {
+                    name: 'Total SeaImport Jobs of This Month',
+                     type: 'line',
+                    data: seaImports
+                },
+                {
+                    name: 'Total SeaExport Jobs of This Month',
+                     type: 'line',
+                    data: seaExports
+                }
+            ],
+            chart: {
+                height: 350,
+                type: 'line',
+                stacked: false,
+                toolbar: { show: false },
+            },
+            stroke: {
+                width: [0, 2, 3],
+                curve: 'smooth'
+            },
+            legend: {
+                fontSize: '13px',
+                fontFamily: 'poppins',
+                labels: { colors:'#888888' }
+            },
+            legend: {
+                fontSize: '13px',
+                fontFamily: 'poppins',
+                labels: { colors:'#000' }
+            },
+            plotOptions: {
+                bar: {
+                    columnWidth: '40%',
+                    borderRadius: 6,
+                }
+            },
+            fill: {
+                type: ['solid', 'gradient', 'solid'],
+                gradient: {
+                    inverseColors: false,
+                    shade: 'light',
+                    type: "vertical",
+                    colorStops : [
+                        [
+                            { offset: 0, color: 'var(--primary)', opacity: 1 },
+                            { offset: 100, color: 'var(--primary)', opacity: 1 }
+                        ],
+                        [
+                            { offset: 0, color: '#3AC977', opacity: 1 },
+                            { offset: 40, color: '#3AC977', opacity: .15 },
+                            { offset: 100, color: '#3AC977', opacity: 0 }
+                        ]
+                    ],
+                    stops: [0, 100, 100, 100]
+                }
+            },
+            colors:["var(--primary)", "#3AC977", "#FF9800", "#ef0aea"],
+            labels: labels,
+            markers: { size: 4 },
+            xaxis: {
+                categories: labels,
+                labels: {
+                    style: { fontSize: '13px', colors:'#888888' }
+                },
+            },
+            yaxis: [
+                {
+                    title: { text: 'AIRIMP', style: { color: "#1E88E5" } },
+                    labels: { formatter: function(val){ return val; } }
+                },
+                {
+                    title: { text: 'AIREXP', style: { color: "#3AC977" } },
+                    labels: { formatter: function(val){ return val; } }
+                },
+                {
+                    opposite: true,
+                    title: { text: 'SEAIMP', style: { color: "#FF9800" } },
+                    labels: { formatter: function(val){ return val; } }
+                },
+                {
+                    opposite: true,
+                    title: { text: 'SEAEXP', style: { color: "#ef0aea" } },
+                    labels: { formatter: function(val){ return val; } }
+                }
+            ],
+            tooltip: {
+                shared: true,
+                intersect: false,
+                y: {
+                    formatter: function (y) {
+                        return y;
+                    }
+                }
+            }
+        };
+        
+        // STORE INSTANCE GLOBAL
+        monthWiseChartInstance = new ApexCharts(document.querySelector("#monthWise_overiewChart"), mwOptions);
+        monthWiseChartInstance.render();
+    }
+    
+    function monthWiseJobs(period, fy = '') {
+        let url = '/dashboard/month-wise/chart-data/' + period;
+    
+        if (fy !== '') {
+            url += '?fy=' + fy;
+        }
+    
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (response) {
+                console.log('response 000111222YY.', response)
+                if (response.success) {
+                    const airImports  = mapMonthlyData(response.airImports, response.fyStartYear, response.fyEndYear);
+                    const airExports  = mapMonthlyData(response.airExports, response.fyStartYear, response.fyEndYear);
+                    const seaImports  = mapMonthlyData(response.seaImports, response.fyStartYear, response.fyEndYear);
+                    const seaExports  = mapMonthlyData(response.seaExports, response.fyStartYear, response.fyEndYear);
+        
+                    monthWiseOveriewChart( airImports, airExports, seaImports, seaExports, response.labels);
+                }
+            }
+        });
+    }
+    
+    function mapMonthlyData(dataObj, fyStartYear, fyEndYear) {
+        const months = [
+            '04','05','06','07','08','09',
+            '10','11','12','01','02','03'
+        ];
+    
+        return months.map(month => {
+            let year = (month >= '04') ? fyStartYear : fyEndYear;
+            let key = `${year}-${month}`;
+            return dataObj[key] ?? 0;
+        });
+    }
+
+	
+	
+	
+	
+	
+	
 	var earningChart = function(){
 		
 		var chartWidth = $("#earningChart").width();
@@ -808,7 +939,18 @@
 	
 	
 	
-	
+	// Get current month
+    let month = new Date().getMonth() + 1; // JavaScript months are 0-indexed (0 = January, 11 = December)
+    
+    // Calculate the financial year
+    let year = new Date().getFullYear();
+    let financialYear;
+    
+    if (month >= 4) {
+        financialYear = year + '-' + (year + 1);
+    } else {
+        financialYear = (year - 1) + '-' + year;
+    }
 	
 	
  
@@ -822,7 +964,9 @@
 				NewCustomers();
 				NewExperience();
 				AllProject();
-				overiewChart();
+				// overiewChart();
+				loadChartData(seriesType = 'year', fy = financialYear);
+				monthWiseJobs(seriesType = 'year', fy = financialYear);
 				earningChart();
 				projectChart();
 				handleWorldMap();

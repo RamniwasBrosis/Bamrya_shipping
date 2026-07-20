@@ -41,6 +41,7 @@
                                     <th>Account No</th>
                                     <th>IFSC Code</th>
                                     <th>Account Type</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -59,6 +60,7 @@
                                                 Current
                                             @endif                                           
                                         </td>
+                                        <td>{{$bank->user->name??''}}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/banks/'.$bank->id.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-bank" href="javascript:void(0);" data-id="{{$bank->id}}">Delete</a>

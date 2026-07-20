@@ -20,7 +20,8 @@ class PermissionSeeder extends Seeder
             'members',
             'reports',
             'company-settings',
-            'accounts'
+            'accounts',
+            'job-card'
         ];
 
 

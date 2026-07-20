@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Operations\OperationTransport;
 use App\Models\Operations\OperationAllFileUpload;
+use App\Models\Operations\OperationSalesPerson;
+use App\Models\Operations\TransportContainer;
 
 class TransportController extends Controller
 {
@@ -22,6 +24,7 @@ class TransportController extends Controller
     public function __construct(){
         $this->middleware(function ($request, $next) {
             $this->company_id = Auth::user()->company_id;
+            $this->user_id = auth()->user()->id;
             return $next($request);
         });
     }
@@ -64,11 +67,12 @@ class TransportController extends Controller
         $packages = MasterPackage::where('company_id', $this->company_id)->get();
         $con_sizes = MasterContainer::where('company_id', $this->company_id)->get();
         $party_lists  = MasterParty::all();
+        $salePersons  = OperationSalesPerson::where('company_id', $this->company_id)->get();
 
         $files = OperationAllFileUpload::where('company_id', $this->company_id)->where('file_related', 'transport')->orderBy('created_at', 'desc')->get();
         $transports = OperationTransport::select('id')->where('company_id', $this->company_id)->orderBy('created_at', 'desc')->get();
 
-        return view('admin-main.admin.transport.create', compact('parties', 'ports', 'con_sizes', 'files', 'transports', 'party_lists', 'packages'));
+        return view('admin-main.admin.transport.create', compact('salePersons', 'parties', 'ports', 'con_sizes', 'files', 'transports', 'party_lists', 'packages'));
     }
 
     /**
@@ -97,15 +101,22 @@ class TransportController extends Controller
             'description' => 'nullable|string|max:500',
             'package_id' => 'nullable',
             'remarks' => 'nullable|string|max:500',
+            'job_no' => 'nullable|string',
+            'full_job_no' => 'nullable|string',
         ]);
-
+    
         $transport = new OperationTransport($validated);
         $transport->company_id = $this->company_id; 
+        $transport->user_id = $this->user_id; 
         $transport->uuid = Str::uuid(); 
         $transport->save();
-
-        return redirect()->route('transports.index')->with('success', 'Booking created successfully.');     
+    
+        return response()->json([
+            'success' => true,
+            'transport_id' => $transport->id
+        ]);
     }
+
 
     /**
      * Display the specified resource.
@@ -125,8 +136,15 @@ class TransportController extends Controller
         $parties = MasterImportParty::where('company_id', $this->company_id)->get();
         $ports = MasterPort::where('company_id', $this->company_id)->get();
         $con_sizes = MasterContainer::where('company_id', $this->company_id)->get();
-
-        return view('admin-main.admin.transport.edit', compact('trasportDetail', 'parties', 'ports', 'con_sizes', 'packages'));
+        $salePersons  = OperationSalesPerson::where('company_id', $this->company_id)->get();
+        $files = OperationAllFileUpload::where('company_id', $this->company_id)->where('file_related', 'transport')->orderBy('created_at', 'desc')->get();
+        $party_lists  = MasterParty::all();
+        
+        $containerDetails = TransportContainer::where('company_id', $this->company_id)
+                                            ->where('transport_id', $trasportDetail->id)
+                                            ->get();
+    
+        return view('admin-main.admin.transport.edit', compact('containerDetails', 'party_lists', 'files', 'salePersons', 'trasportDetail', 'parties', 'ports', 'con_sizes', 'packages'));
     }
 
     /**
@@ -135,8 +153,6 @@ class TransportController extends Controller
     public function update(Request $request, string $id)
     {
         $transport = OperationTransport::findOrFail($id);
-
-        // dd($request->all());
 
         $validated = $request->validate([
             'from_party_id' => 'required|exists:master_import_parties,id',
@@ -160,6 +176,7 @@ class TransportController extends Controller
             'package_id' => 'nullable',
             'remarks' => 'nullable|string|max:500',
         ]);
+        $validated['user_id'] = $this->user_id;
 
         $transport->update($validated);
 
@@ -178,64 +195,119 @@ class TransportController extends Controller
     }
 
 
-    public function addContainer(Request $request){
-
-        if(!$request->filled('transport_id')){
-            return redirect()->back()->with('error', 'Please Select "Full Job No" Field First. !');
+    public function addContainer(Request $request)
+    {
+        if (!$request->filled('transport_id')) {
+            return response()->json(['success' => false, 'message' => 'Transport ID missing']);
         }
-
-        $getTransport =  OperationTransport::findOrFail($request->transport_id);
-
+    
         $validated = $request->validate([
-            'container_no'        => 'required|string|max:100',
-            'size'                => 'required|string|max:50',
-            'vehicle_no'          => 'nullable|string|max:40',
-            'lr_no'               => 'nullable|string|max:100',
-            'tare_weight'         => 'nullable|numeric|min:0',
-            'cont_gross_weight'        => 'nullable|numeric|min:0',
-            'cvc_plate'           => 'nullable|string|max:255',
-            'stuffing_point'      => 'nullable|string|max:50',
-            'customer_seal_no'    => 'nullable|string|max:100',
-            'agent_seal_no'       => 'nullable|string|max:50',
-            'net_weight'          => 'nullable|numeric|min:0',
-            'cargo'               => 'nullable|string|max:50',
-            'container_job_no'    => 'nullable|string|max:50',
-            'cont_transporter_id'      => 'nullable|exists:master_import_parties,id',
+            'transport_id'         => 'required|exists:operation_transports,id',
+            'transporter'         => 'nullable|exists:master_import_parties,id',
+            'container_no'         => 'required|string|max:100',
+            'size'                 => 'required|string|max:50',
+            'vehicle_no'           => 'nullable|string|max:40',
+            'lr_no'                => 'nullable|string|max:100',
+            'tare_weight'          => 'nullable|numeric|min:0',
+            'cont_gross_weight'    => 'nullable|numeric|min:0',
+            'cvc_plate'            => 'nullable|string|max:255',
+            'stuffing_point'       => 'nullable|string|max:50',
+            'customer_seal_no'     => 'nullable|string|max:100',
+            'agent_seal_no'        => 'nullable|string|max:50',
+            'net_weight'           => 'nullable|numeric|min:0',
+            'cargo'                => 'nullable|string|max:50',
+            'container_job_no'     => 'nullable|string|max:50',
         ]);
-
-
-        $getTransport->update($validated);
-
-        return redirect()->back()->with('success', 'Container Details added successfully. !');
-
-
+    
+        $container = new TransportContainer($validated);
+        $container->company_id = $this->company_id; 
+        $container->uuid = Str::uuid(); 
+        $container->save();
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'Container saved successfully',
+            'container_no' => $container->container_no,
+            'container' => $container
+        ]);
     }
 
-    public function updateContainer(Request $request, int $id){
 
-        $sea_export_cont = OperationTransport::findOrFail($id);
-        
+    public function saveContainer(Request $request)
+    {
         $validated = $request->validate([
-            'container_no'        => 'required|string|max:100',
-            'size'                => 'required|string|max:50',
-            'vehicle_no'          => 'nullable|string|max:40',
-            'lr_no'               => 'nullable|string|max:100',
-            'tare_weight'         => 'nullable|numeric|min:0',
-            'cont_gross_weight'        => 'nullable|numeric|min:0',
-            'cvc_plate'           => 'nullable|string|max:255',
-            'stuffing_point'      => 'nullable|string|max:50',
-            'customer_seal_no'    => 'nullable|string|max:100',
-            'agent_seal_no'       => 'nullable|string|max:50',
-            'net_weight'          => 'nullable|numeric|min:0',
-            'cargo'               => 'nullable|string|max:50',
-            'container_job_no'    => 'nullable|string|max:50',
-            'cont_transporter_id'      => 'nullable|exists:master_import_parties,id',
+            'transport_id'       => 'required|exists:operation_transports,id',
+            'transporter'        => 'nullable|exists:master_import_parties,id',
+            'container_no'       => 'required|string|max:100',
+            'size'               => 'required|string|max:50',
+            'vehicle_no'         => 'nullable|string|max:40',
+            'lr_no'              => 'nullable|string|max:100',
+            'tare_weight'        => 'nullable|numeric',
+            'cont_gross_weight'  => 'nullable|numeric',
+            'cvc_plate'          => 'nullable|string',
+            'stuffing_point'     => 'nullable|string',
+            'customer_seal_no'   => 'nullable|string',
+            'agent_seal_no'      => 'nullable|string',
+            'net_weight'         => 'nullable|numeric',
+            'cargo'              => 'nullable|string',
+            'container_job_no'   => 'nullable|string',
         ]);
-
-
-        $sea_export_cont->update($validated);
-
-        return redirect()->back()->with('success', 'Container Details Updated successfully. !');
+    
+        $data = $validated;
+        $data['company_id'] = $this->company_id;
+    
+        // Prevent overwriting uuid on update
+        if (!$request->container_id) {
+            $data['uuid'] = Str::uuid();
+        }
+    
+        $container = TransportContainer::updateOrCreate(
+            ['id' => $request->container_id],
+            $data
+        );
+    
+        // Reload updated list
+        $containerDetails = TransportContainer::where('transport_id', $request->transport_id)->get();
+    
+        $html = view('admin-main.admin.transport.container_table', compact('containerDetails'))->render();
+    
+        return response()->json([
+            'success' => true,
+            'message' => $request->container_id ? 'Container Updated' : 'Container Added',
+            'html' => $html
+        ]);
     }
+
+    public function deleteContainer($id)
+    {
+        $container = TransportContainer::find($id);
+    
+        if (!$container) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Container not found'
+            ]);
+        }
+    
+        $container->delete();
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'Container deleted successfully'
+        ]);
+    }
+
+
+    // mourya    
+    public function getContainer($id)
+    {
+        $container = TransportContainer::findOrFail($id);
+    
+        return response()->json([
+            'success' => true,
+            'container' => $container
+        ]);
+    }
+
 
 }

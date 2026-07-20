@@ -38,6 +38,7 @@
                                     <th>User Name</th>
                                     <th>Email ID</th>
                                     <th>Role Name</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -47,6 +48,7 @@
                                         <td>{{$user->name}}</td>
                                         <td>{{$user->email}}</td>
                                         <td>{{$user->role}}</td>
+                                        <td>{{$user->user->name??''}}</td>
                                         
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/users/'.$user->id.'/edit')}}">Edit</a>

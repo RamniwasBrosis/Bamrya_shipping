@@ -15,8 +15,10 @@ class MembersUserRoleController extends Controller
     {
 
        $roles = Role::with('permissions')
+       ->where('company_id', Auth::user()->company_id)
         ->whereNotIn('name', ['super-admin'])
         ->paginate(10);
+        
         return view('admin-main.admin.userrole.index', compact('roles'));
     }
 
@@ -35,8 +37,10 @@ class MembersUserRoleController extends Controller
             'name' => 'required|unique:roles,name',
             'permissions' => 'nullable|array',
         ]);
+        
+        $company_id = Auth::user()->company_id;
 
-        $role = Role::create(['name' => $request->name]);
+        $role = Role::create(['name' => $request->name, 'company_id' => $company_id]);
 
         if ($request->has('permissions')) {
             $role->syncPermissions($request->permissions);

@@ -10,6 +10,15 @@ use Illuminate\Support\Str;
 
 class VesselController extends Controller
 {
+    public $company_id ;
+
+    public function __construct(){
+        $this->middleware(function ($request, $next) {
+            $this->company_id = Auth::user()->company_id;
+            return $next($request);
+        });
+    }
+    
     /**
      * Display a listing of the resource.
      */
@@ -25,7 +34,7 @@ class VesselController extends Controller
             $query->where('call_sign', 'like', '%' . $request->call_sign . '%');
         }
 
-        $vesselDatas = $query->orderBy('created_at', 'desc')->paginate(10);
+        $vesselDatas = $query->where('company_id', $this->company_id)->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin-main.admin.vessels.index', compact('vesselDatas'));
         
@@ -44,6 +53,7 @@ class VesselController extends Controller
      */
     public function store(Request $request)
     {
+        $userId = auth()->user()->id;
         $request->validate([
             'vessel_name' => 'required|string|max:255',
             'call_sign' => 'nullable|string|max:255',
@@ -59,6 +69,7 @@ class VesselController extends Controller
         $vessel->call_sign = $request->call_sign;
         $vessel->imo_code = $request->imo_code;
         $vessel->status = $request->status;
+        $vessel->user_id = $userId;
 
         $vessel->save();
 
@@ -91,6 +102,7 @@ class VesselController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $userId = auth()->user()->id;
         $validated = $request->validate([
             'vessel_name' => 'required|string|max:255',
             'call_sign' => 'nullable|string|max:255',
@@ -105,6 +117,7 @@ class VesselController extends Controller
             'call_sign' => $validated['call_sign'],
             'imo_code' => $validated['imo_code'],
             'status' => $validated['vessel_status'],
+            'user_id' => $userId
         ]);
 
         return redirect()->route('vessels.index')->with('success', 'Vessel updated successfully.');

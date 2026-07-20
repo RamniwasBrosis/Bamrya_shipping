@@ -6,6 +6,17 @@
     </ol>
     <a class="text-primary fs-13" href="{{url('admin/purchase-payment/create')}}">+ Add Purchase Payment</a>
 </div>
+@if (session('success'))
+    <div class="alert alert-success">
+        {{session('success')}}
+    </div>
+@endif
+
+@if (session('error'))
+    <div class="alert alert-danger">
+        {{session('error')}}
+    </div>
+@endif
 <div class="container-fluid p-2">
     <div class="row">
         <div class="col-xl-12">
@@ -62,41 +73,59 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive active-projects style-1">
-                        <table id="empoloyees-tblwrapper" class="table">
+                        <<table id="employees-tblwrapper" class="table">
                             <thead>
                                 <tr>
-                                    <th>Pur.R.No</th>
+                                    <th>Purchase No</th>
                                     <th>Billing Party</th>
-                                    <th>FY Year</th>
-                                    <th>Cash/Cheque No.</th>
-                                    <th>OnAccount/Neft</th>
-                                    <th>Country Name</th>
-                                    <th>Branch Name</th>
-                                    <th>Neft/Chq Date</th>
-                                    <th>Full Job No</th>
-                                    <th>OnAccount/Neft</th>
+                                    <th>Invoice Type</th>
+                                    <th>Invoice No</th>
+                                    <th>Purchase Date</th>
+                                    <th>Debit</th>
+                                    <th>Credit</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($purchase_payments as $purchase_payment)
                                     <tr>
-                                        <td></td>
-                                        <td>{{$purchase_payment->partyName->party_name}}</td>
-                                        <td>{{$purchase_payment->invoice_f_year}}</td>
-                                        <td></td>
-                                        <td>{{$purchase_payment->radio_type}}</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>{{$purchase_payment->neft_date}}</td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{$purchase_payment->partyName->party_name??''}}</td>
+                                        <td>{{ $purchase_payment->invoice_type ?? '' }}</td>
+                                        <td>{{ $purchase_payment->invoice_no ?? '' }}</td>
+                                        <td>{{ $purchase_payment->purchase_date ? \Carbon\Carbon::parse($purchase_payment->purchase_date)->format('d-F-Y') : '' }}</td>
+                        
+                                        {{-- Conditional Debit / Credit --}}
+                                        <td>
+                                            @if ($purchase_payment->invoice_type === 'Journal')
+                                                {{ number_format($purchase_payment->amount, 2) }}
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($purchase_payment->invoice_type === 'Purchase')
+                                                {{ number_format($purchase_payment->amount, 2) }}
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td>{{ $purchase_payment->user->name ?? '' }}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/purchase-payment/'.$purchase_payment->uuid.'/edit')}}">Edit</a>
-                                            <a class="badge badge-danger light border-0 delete-purchase_payment" href="javascript:void(0);" data-id="{{$purchase_payment->id}}">Delete</a>
+                        
+                                            <form action="{{ route('purchase-payment.destroy', $purchase_payment->id) }}" method="POST" style="display:inline-block;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="badge badge-danger light border-0"
+                                                        onclick="return confirm('Are you sure you want to delete this payment?')">
+                                                    Delete
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
-                                @endforeach                                
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

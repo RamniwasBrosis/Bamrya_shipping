@@ -10,6 +10,16 @@ use Illuminate\Support\Str;
 
 class MasterShippingController extends Controller
 {
+    public $company_id ;
+
+    public function __construct(){
+        $this->middleware(function ($request, $next) {
+            $this->company_id = Auth::user()->company_id;
+            $this->user_id = auth()->user()->id;
+            return $next($request);
+        });
+    }
+    
     public function index(Request $request)
     {
         $query = MasterShipping::query();
@@ -26,7 +36,7 @@ class MasterShippingController extends Controller
             $query->where('shipping_line_type', 'like', '%' . $request->shipping_line_type . '%');
         }
 
-        $MasterShippings = $query->orderBy('created_at', 'desc')->paginate(10);
+        $MasterShippings = $query->where('company_id', $this->company_id)->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin-main.admin.shipping.index', compact('MasterShippings'));
     }
@@ -45,12 +55,12 @@ class MasterShippingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'shipping_line_code' => 'required|string|max:10',
-            'shipping_line_name' => 'required|string|max:100',
+            'shipping_line_code' => 'required|string|max:25',
+            'shipping_line_name' => 'required|string|max:50',
             'address_line_1'     => 'required|string|max:100',
             'address_line_2'     => 'nullable|string|max:100',
-            'agent_code'         => 'nullable|string|max:10',
-            'line_code'          => 'nullable|string|max:10',
+            'agent_code'         => 'nullable|string|max:25',
+            'line_code'          => 'nullable|string|max:25',
             'shipping_line_type' => 'required|in:1,2', // 1: Indian, 2: Overseas
             'status'             => 'required|in:1,0',
         ]);
@@ -67,6 +77,7 @@ class MasterShippingController extends Controller
         $shipping->line_code = $request->line_code;
         $shipping->shipping_line_type = $request->shipping_line_type;
         $shipping->status = $request->status;
+        $shipping->user_id = $this->user_id;
 
         $shipping->save();
 
@@ -90,12 +101,12 @@ class MasterShippingController extends Controller
     {
         $validated = $request->validate([
             'company_id' => 'required',
-            'shipping_line_code' => 'required|string|max:10',
-            'shipping_line_name' => 'required|string|max:100',
+            'shipping_line_code' => 'required|string|max:25',
+            'shipping_line_name' => 'required|string|max:50',
             'address_line_1'     => 'required|string|max:100',
             'address_line_2'     => 'nullable|string|max:100',
-            'agent_code'         => 'nullable|string|max:10',
-            'line_code'          => 'nullable|string|max:10',
+            'agent_code'         => 'nullable|string|max:25',
+            'line_code'          => 'nullable|string|max:25',
             'shipping_line_type' => 'required|in:1,2',
             'status'             => 'required|in:1,0',
         ]);
@@ -111,6 +122,7 @@ class MasterShippingController extends Controller
         $MasterShipping->line_code = $validated['line_code'];
         $MasterShipping->shipping_line_type = $validated['shipping_line_type'];
         $MasterShipping->status = $validated['status'];
+        $MasterShipping->user_id = $this->user_id;
 
         $MasterShipping->save();
 

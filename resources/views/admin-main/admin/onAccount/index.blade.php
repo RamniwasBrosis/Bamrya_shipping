@@ -35,8 +35,10 @@
                                     <th>ID</th>
                                     <th>Date</th>
                                     <th>Party Name</th>
-                                    <th>Amount</th>
-                                    <th>Balance Amt</th>
+                                    <th>Bank Name</th>
+                                    <th>Received Amount</th>
+                                    <th>Round of Amt</th>
+                                    
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -44,13 +46,22 @@
                                 @foreach ($on_accounts as $on_account)
                                     <tr>
                                         <td>{{$on_account->id}}</td>
-                                        <td>{{$on_account->sales_date}}</td>
-                                        <td>{{$on_account->partyName->party_name}}</td>
-                                        <td>{{$on_account->amount}}</td>
-                                        <td>{{$on_account->balance_amout}}</td>
+                                        <td>{{ \Carbon\Carbon::parse($on_account->sales_date)->format('d-m-Y')}}</td>
+                                        <td>{{$on_account->partyName->party_name ?? ''}}</td>
+                                        <td>{{$on_account->bankDetail->bank_name ?? ''}}</td>
+                                        <td>{{$on_account->amount ?? ''}}</td>
+                                        <td>{{$on_account->round_of_amount ?? ''}}</td>
+                                        
                                         <td>
-                                            <a class="badge badge-info light border-0" href="{{url('admin/on-accounts/'.$on_account->uuid.'/edit')}}">Edit</a>
-                                            <a class="badge badge-danger light border-0 delete-onAccount" href="javascript:void(0);" data-id="{{$on_account->id}}">Delete</a>
+                                            <div class="d-flex justify-content-end">
+                                                <!--<a class="badge badge-info light border-0" href="{{url('admin/on-accounts/'.$on_account->uuid.'/edit')}}">Edit</a>-->
+                                               
+                                                <form action="{{ route('on-accounts.destroy', $on_account->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this record?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="badge badge-danger light border-0">Delete</button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach                                

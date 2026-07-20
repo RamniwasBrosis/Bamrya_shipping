@@ -17,16 +17,16 @@
                     <form class="row align-items-end" method="get" action="{{route('proforma-invoices.index')}}">                   
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Job No.</label>
-                            <select id="statusFilter" class="form-control default-select" name="job_no">
+                            <select id="statusFilter" class="form-control select2" name="job_no">
                                 <option value="">select</option>
                                 @foreach ($proforma_invoices as $proforma_invoice)
-                                    <option value="{{$proforma_invoice->job_no}}">{{$proforma_invoice->job_no}}</option>
+                                    <option value="{{$proforma_invoice->job_no}}">{{$proforma_invoice->operationJob->full_job_no ?? ''}}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Invoice No.</label>
-                            <select id="departmentFilter" class="form-control default-select" name="invoice_no">
+                            <select id="departmentFilter" class="form-control select2" name="invoice_no">
                                 <option value="">select</option>
                                 @foreach ($proforma_invoices as $proforma_invoice)
                                     <option value="{{$proforma_invoice->invoice_no}}">{{$proforma_invoice->invoice_no}}</option>
@@ -35,13 +35,22 @@
                         </div>
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Party Name</label>
-                            <select id="genderFilter" class="form-control default-select" name="billing_party_id">
+                            <select id="genderFilter" class="form-control select2" name="billing_party_id">
                                 <option value="">select</option>
                                 @foreach ($proforma_invoices as $proforma_invoice)
-                                    <option value="{{$proforma_invoice->billing_party_id}}">{{$proforma_invoice->partyName->party_name}}</option>
+                                    <option value="{{$proforma_invoice->billing_party_id}}">{{$proforma_invoice->partyName->party_name ?? ''}}</option>
                                 @endforeach
                             </select>
-                        </div>                       
+                        </div>           
+                        <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
+                        <!--    <label class="form-label">Start Date</label>-->
+                        <!--    <input type="date" placeholder="dd/mm/yy" class="form-control" name="start_date" value="{{ request('start_date') }}">-->
+                        <!--</div>-->
+                        
+                        <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
+                        <!--    <label class="form-label">End Date</label>-->
+                        <!--    <input type="date" placeholder="dd/mm/yy" class="form-control" name="end_date" value="{{ request('end_date') }}">-->
+                        <!--</div>-->
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <button id="applyFilter" class="btn btn-primary" type="submit">Apply</button>
                             <a href="{{route('proforma-invoices.index')}}" class="btn btn-danger light ms-2" type="button">Reset</a>
@@ -53,14 +62,19 @@
                         <table id="empoloyees-tblwrapper" class="table">
                             <thead>
                                 <tr>
+                                    <tr>
                                     <th>#</th>
+                                    <th>Party Name</th>
                                     <th>Job NO</th>
                                     <th>Invoice NO</th>
-                                    <th>Party Type</th>
-                                    <th>Party Name</th>
-                                    <th>FinYear</th>
+                                    <th>INV_DT</th>
+                                    <th>Inv Type</th>
                                     <th>Inv Cat</th>
+                                    <th>FinYear</th>
+                                    <th>Inv Amt</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
+                                </tr>
                                 </tr>
                             </thead>
                             <tbody>
@@ -107,20 +121,37 @@
                                                 break;
                                         }
                                     @endphp
-
+                                    @php
+                                        $latestCharge = $proforma_invoice->chargesContainer
+                                            ->sortByDesc('updated_at')
+                                            ->first();
+                                    
+                                        if (
+                                            $latestCharge &&
+                                            $latestCharge->updated_at > $proforma_invoice->updated_at
+                                        ) {
+                                            $userName = optional($latestCharge->user)->name;
+                                        } else {
+                                            $userName = optional($proforma_invoice->user)->name;
+                                        }
+                                    @endphp
+                                    
                                     <tr>
-                                        <td>{{$proforma_invoice->id}}</td>
-                                        <td>{{$proforma_invoice->job_no}}</td>
-                                        <td>{{$proforma_invoice->invoice_no}}</td>
-                                        <td>{{$party_type}}</td>
-                                        <td>{{$proforma_invoice->partyName->party_name}}</td>
-                                        <td>{{$fy}}</td>
-                                        <td>{{$Inv_cat}}</td>
+                                        <td>{{$proforma_invoice->id ?? '--'}}</td>
+                                        <td>{{$proforma_invoice->partyName->party_name ?? '--'}}</td>
+                                        <td>{{$proforma_invoice->inv_cat}}/{{$proforma_invoice->operationJob->job_no ?? '--'}}/{{$fy}}</td>  
+                                        <td>{{$proforma_invoice->invoice_no ?? '--'}}</td>
+                                        <td>{{$proforma_invoice->invoice_date ? \Carbon\Carbon::parse($proforma_invoice->invoice_date)->format('d-m-Y') :'--'}}</td>
+                                        <td>{{ $proforma_invoice->invoice_type ?? '--'}}</td>
+                                        <td>{{ $Inv_cat ?? '--'}}</td>
+                                        <td>{{$fy ?? '--'}}</td>
+                                        <td style="color: red;">{{$proforma_invoice->chargesContainer->sum('total') ?? '--'}}</td>
+                                        <td>{{ $userName ?? '-' }}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/proforma-invoices/'.$proforma_invoice->uuid.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-proformaInvoice" href="javascript:void(0);" data-id="{{$proforma_invoice->id}}">Delete</a>
                                         </td>
-                                    </tr>                                  
+                                    </tr>     
                                 @endforeach                                
                             </tbody>
                         </table>
@@ -136,6 +167,12 @@
 
 @push('scripts')
     <script>
+        $(document).ready(function(){
+            $('.select2').select2({
+                width: '100%'
+            })
+        })
+    
         $(document).on('click', '.delete-proformaInvoice', function(e) {
             e.preventDefault();
             if (!confirm('Are you sure you want to delete this Proforma Invoice record?')) return;

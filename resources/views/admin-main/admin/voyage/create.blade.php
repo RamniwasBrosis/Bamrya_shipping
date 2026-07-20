@@ -21,7 +21,7 @@
                                 <label for="voyage_code" class="form-label">Voyage Code: <span class="text-danger">*</span></label>
                                 <input type="text" id="voyage_code" name="voyage_code" 
                                     class="form-control @error('voyage_code') is-invalid @enderror"
-                                    value="{{ old('voyage_code') }}" maxlength="10" required>
+                                    value="{{ old('voyage_code') }}" required>
                                 @error('voyage_code')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -31,7 +31,7 @@
                                 <label for="voyage_number" class="form-label">Voyage Number: <span class="text-danger">*</span></label>
                                 <input type="text" id="voyage_number" name="voyage_number"
                                     class="form-control @error('voyage_number') is-invalid @enderror"
-                                    value="{{ old('voyage_number') }}" maxlength="10" required>
+                                    value="{{ old('voyage_number') }}" required>
                                 @error('voyage_number')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -68,7 +68,7 @@
                                 <label for="igm_number" class="form-label">IGM Number:</label>
                                 <input type="text" id="igm_number" name="igm_number"
                                     class="form-control @error('igm_number') is-invalid @enderror"
-                                    value="{{ old('igm_number') }}" maxlength="10">
+                                    value="{{ old('igm_number') }}">
                                 @error('igm_number')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -85,9 +85,9 @@
                             </div>
 
                             <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
-                                <label for="shipping_line_id" class="form-label">Shipping Line: <span class="text-danger">*</span></label>
+                                <label for="shipping_line_id" class="form-label">Shipping Line:</label>
                                 <select id="shipping_line_id" name="shipping_line_id" 
-                                    class="default-select form-control wide @error('shipping_line_id') is-invalid @enderror" required>
+                                    class="default-select form-control wide @error('shipping_line_id') is-invalid @enderror">
                                     <option value="">-- Select Shipping Line --</option>
                                     @foreach ($shippings as $shipping)
                                         <option value="{{ $shipping->id }}" 
@@ -149,10 +149,10 @@
                             </div>
 
                             <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
-                                <label for="overseas_agent_id" class="form-label">Overseas Agent: <span class="text-danger">*</span></label>
-                                <input type="number" id="overseas_agent_id" name="overseas_agent_id"
-                                    class="form-control @error('overseas_agent_id') is-invalid @enderror"
-                                    value="{{ old('overseas_agent_id') }}" required>
+                                <label for="overseas_agent" class="form-label">Overseas Agent:</label>
+                                <input type="text" id="overseas_agent" name="overseas_agent"
+                                    class="form-control @error('overseas_agent') is-invalid @enderror"
+                                    value="{{ old('overseas_agent') }}">
                                 @error('overseas_agent_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

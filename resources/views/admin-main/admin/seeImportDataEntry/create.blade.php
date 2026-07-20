@@ -2,7 +2,7 @@
 @section('content')
     <div class="page-titles">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item active"><a href="#">Import BL</a></li>
+            <li class="breadcrumb-item active"><a href="#">Sea Import Data Entry BL</a></li>
         </ol>
         <a href="{{ url('admin/sea-import-data-entry') }}" class="text-primary"><- Go Back</a>
     </div>

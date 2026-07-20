@@ -4,70 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Purcahse Report</title>
+    
+     <style>
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+            font-size: 12px;
+            color: #000;
+            margin: 25px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 0;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        .sub-header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #555;
+            padding: 6px 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #e2f0fb;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tfoot tr {
+            font-weight: bold;
+            background-color: #e8e8e8;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .left {
+            text-align: left;
+        }
+
+        .no-border {
+            border: none !important;
+        }
+    </style>
+    
+    
 </head>
 <body>
-          <h4 style="text-align:center; font-weight:bold;">
-    PURCHASE TDS REPORT <span style="font-size:14px;">(Dated - {{ now()->format('d/m/Y') }})</span>
-</h4>
+    <h4 class="text-center">
+        Purchase Invoice
+    </h4>
 
-<table border="1" width="100%" cellspacing="0" cellpadding="5" style="border-collapse: collapse;" class="table">
-    <thead>
-        <tr style="background-color: #f4e9d8; text-align: center; font-weight: bold;">
-            <th>Party Name</th>
-            <th>Job No</th>
-            <th>Invoice No</th>
-            <th>INV DT</th>
-            <th>Bill Amount</th>
-            <th>Basic Amount</th>
-            <th>TDS AMT</th>
-            <th>TDS %</th>
-            <th>Payable Amt</th>
-            <th>PAN No</th>
-        </tr>
-    </thead>
-    <tbody>
-        @php
-            $totalBill = $totalBasic = $totalTds = $totalPayable = 0;
-        @endphp
 
-        @foreach ($query as $item)
-            @php
-                $billAmount = $item->amount ?? 0;
-                $basicAmount = $item->basic_amount ?? 0;
-                $tdsAmt = $item->tds_amount ?? 0;
-                $tdsPercent = $item->tds ?? 0;
-                $payableAmt = $billAmount - $tdsAmt;
-                $totalBill += $billAmount;
-                $totalBasic += $basicAmount;
-                $totalTds += $tdsAmt;
-                $totalPayable += $payableAmt;
-            @endphp
-            <tr style="text-align: center;">
-                <td>{{ $item->partyName->party_name ?? '--' }}</td>
-                <td>{{ $item->job_no ?? '--' }}</td>
-                <td>{{ $item->invoice_no ?? '--' }}</td>
-                <td>{{ optional($item->invoice_date)->format('d-m-Y') }}</td>
-                <td align="right">{{ number_format($billAmount, 2) }}</td>
-                <td align="right">{{ number_format($basicAmount, 2) }}</td>
-                <td align="right">{{ number_format($tdsAmt, 2) }}</td>
-                <td>{{ number_format($tdsPercent, 2) }}%</td>
-                <td align="right">{{ number_format($payableAmt, 2) }}</td>
-                <td>{{ $item->partyName->pan_no ?? '--' }}</td>
+    <table>
+        <thead>
+            <tr>
+                <th>Party Name</th>
+                <th>Job No</th>
+                <th>Invoice No</th>
+                <th>INV DT</th>
+                <th>GSTIN No</th>
+                <th>Taxable Amount</th>
+                <th>GST Amount</th>
+                <th>Total Amount</th>
+                
             </tr>
-        @endforeach
+        </thead>
+        <tbody>
+            @php
+                $totalBill = 0;
+                $totalBasic = 0;
+                $totalTds = 0;
+                $totalPayable = 0;
+                $totalTaxableAmount = 0;
+                $totalGstAmount = 0;
+            @endphp
 
-        <tr style="font-weight: bold; background-color: #f9f9f9; text-align: center;">
-            <td colspan="4">GRAND TOTAL :</td>
-            <td align="right">{{ number_format($totalBill, 2) }}</td>
-            <td align="right">{{ number_format($totalBasic, 2) }}</td>
-            <td align="right">{{ number_format($totalTds, 2) }}</td>
-            <td></td>
-            <td align="right">{{ number_format($totalPayable, 2) }}</td>
-            <td></td>
-        </tr>
-    </tbody>
-</table>
+            @foreach ($query as $item)
+                @php
+                    $charges = $item['chargesContainer'];
+                    if ($charges->isEmpty()) continue;
+                    
+                    $cgstAmount  = $charges->sum('cgst');
+                    $sgstAmount  = $charges->sum('sgst');
+                    $igstAmount  = $charges->sum('igst');
+                    $gstAmount = $igstAmount + $sgstAmount + $cgstAmount;
+                    
+                    $taxableAmount  = $charges->sum('freight');
+                    $payableAmt  = $taxableAmount + $gstAmount;
+
+                    $billAmount  = $charges->sum('amount');
+                    $basicAmount = $charges->sum('basic_amount') ?? 0;
+                    $tdsAmt      = $charges->sum('tds_amount');
+                    $tdsPercent  = $charges->avg('tds');
+                    $payableAmt  = $billAmount - $tdsAmt;
+                    $panNo       = optional($item->partyName)->gstin ?? '--';
+
+                    $totalPayable  += $payableAmt;
+                    $totalTaxableAmount += $taxableAmount;
+                    $totalGstAmount += $gstAmount;
+                @endphp
+                <tr>
+                    <td class="left">{{ optional($item->partyName)->party_name ?? '--' }}</td>
+                    <td>{{ optional($item->operationJob)->job_no ?? '--' }}</td>
+                    <td>{{ $item->invoice_no ?? '--' }}</td>
+                    <td>{{ $item->invoice_date ? \Carbon\Carbon::parse($item->invoice_date)->format('d-m-Y') : ''  }}</td>
+                    <td>{{ $panNo }}</td>
+                    <td class="right">{{ number_format($taxableAmount, 2) }}</td>
+                    <td class="right">{{ number_format($gstAmount, 2) }}</td>
+                    <td class="right">{{ number_format($payableAmt, 2) }}</td>
+                    
+                </tr>
+            @endforeach
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td class="right" colspan="5" class="right">GRAND TOTAL :</td>
+                <td>{{ number_format($totalTaxableAmount, 2) }}</td>
+                <td>{{ number_format($totalGstAmount, 2) }}</td>
+                <td>{{ number_format(round($totalPayable), 2) }}</td>
+            </tr>
+        </tfoot>
+    </table>
 
 
 </body>

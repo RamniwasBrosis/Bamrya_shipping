@@ -10,6 +10,15 @@ use Illuminate\Support\Str;
 
 class MasterChargeController extends Controller
 {
+    public $company_id ;
+
+    public function __construct(){
+        $this->middleware(function ($request, $next) {
+            $this->company_id = Auth::user()->company_id;
+            $this->user_id = auth()->user()->id;
+            return $next($request);
+        });
+    }
     /**
      * Display a listing of the resource.
      */
@@ -49,7 +58,7 @@ class MasterChargeController extends Controller
             $query->where('currency', 'LIKE', '%'.$request->currency.'%');
         }
         
-        $charges = $query->orderBy('created_at', 'desc')->paginate(10);
+        $charges = $query->where('company_id', $this->company_id)->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin-main.admin.charges.index', compact('charges'));
     }
@@ -70,7 +79,7 @@ class MasterChargeController extends Controller
          $validated = $request->validate([
             'charge_code' => 'required',
             'charge_name' => 'required',
-            'tally_ledger_name' => 'required',
+            'tally_ledger_name' => 'nullable',
             'currency' => 'required',
             'charge_type' => 'required',
             'gst_applicable' => 'required|boolean',
@@ -78,7 +87,8 @@ class MasterChargeController extends Controller
             'has_formula' => 'required|boolean',
             'limit' => 'nullable|numeric',
             'percentage' => 'nullable|numeric',
-            'sac_code' => 'required',
+            'tds_percentage' => 'nullable|numeric',
+            'sac_code' => 'nullable',
             'status' => 'required|boolean',
         ]);
 
@@ -96,12 +106,24 @@ class MasterChargeController extends Controller
         $charge->has_formula = $request->has_formula;
         $charge->limit = $request->limit;
         $charge->percentage = $request->percentage;
+        $charge->tds_percentage = $request->tds_percentage;
         $charge->sac_code = $request->sac_code;
         $charge->status = $request->status;
+        $charge->user_id = $this->user_id;
 
         $charge->save();
         
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Charge created successfully.',
+                'charge'  => $charge
+            ]);
+        }
+        
         return redirect()->route('charges.index')->with('success', 'Charge created successfully.');
+        
+        
     }
 
     /**
@@ -131,22 +153,23 @@ class MasterChargeController extends Controller
             'company_id' => 'required',
             'charge_code' => 'required',
             'charge_name' => 'required',
-            'tally_ledger_name' => 'required',
+            'tally_ledger_name' => 'nullable',
             'currency' => 'required',
             'charge_type' => 'required',
             'gst_applicable' => 'required|boolean',
             'gst_percentage' => 'required|integer',
             'has_formula' => 'required|boolean',
             'limit' => 'nullable|numeric',
-            'percentage' => 'nullable|numeric',
-            'sac_code' => 'required',
+            'percentage' => 'nullable|string',
+            'tds_percentage' => 'nullable|numeric',
+            'sac_code' => 'nullable',
             'status' => 'required|boolean',
         ]);
-
+        $validated['user_id'] = $this->user_id;
         $charge->update($validated);
         return redirect()->route('charges.index')->with('success', 'Charge updated successfully.');
     }
-
+    
     /**
      * Remove the specified resource from storage.
      */

@@ -5,28 +5,85 @@ namespace App\Models\Operations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\Operations\OperationSalesPerson;
+
+use App\Models\MasterPort;
+use App\Models\MasterImportParty;
+use App\Models\MasterExportParty;
+use App\Models\MasterForwarder;
+use App\Models\MasterPackage;
+use App\Models\User;
+
 class OperationAirImport extends Model
 {
     use HasFactory;
 
-     protected $fillable = [
-        'company_id', 'uuid',
-        
-        'mawb_no','mawb_date','flight_no','flight_date','igm_no',
-        'igm_date','origin_port','dest_port', 'shipment','package',
-        'weight','username','description','remark','full_job_no',
-        'eta_date','etd_date',
-
-        'job_no','hbl_no','hbl_date','hawb_package', 'hawb_shipment', 'hawb_dest_port', 'hawb_origin_port',
-        'enquiry_reference_no','descriptions','hawb_weight',
-
-        'freight','currency','exchange_rate','cc_perc','cc_currency',
-        'cc_exch_rate','caf_perc','chg_weight',
-
-        'consignee_id','shipper_id','billing_party_id','sales_person_id',
-
-        'fpa_amount','bill_of_entry','insurance','transportation','transportation_details','clearance',
-
-        'file_name', 'file_path',
-    ];
+     protected $guarded = [];
+    
+    public function salesPerson(){
+        return $this->belongsTo(OperationSalesPerson::class, 'sales_person_id', 'id');
+    }
+    
+    public function ChaName(){
+        return $this->belongsTo(MasterImportParty::class, 'cha_party_id');
+    }
+    
+    public function shipperName(){
+        return $this->belongsTo(MasterExportParty::class, 'shipper_id');
+    }
+    
+    public function ConsigneeName(){
+        return $this->belongsTo(MasterImportParty::class, 'consignee_id');
+    }
+    
+    // ports
+    public function loadingPortName(){
+        return $this->belongsTo(MasterPort::class, 'loading_port_id');
+    }
+    public function destinationPortName(){
+        return $this->belongsTo(MasterPort::class, 'destination_port_id', 'id');
+    }
+    
+    public function packageName()
+    {
+        return $this->belongsTo(MasterPackage::class, 'package_id', 'id');
+    }
+    
+    public function dischargePortName(){
+        return $this->belongsTo(MasterPort::class, 'discharge_port_id', 'id');
+    }
+    public function deliveryPortName(){
+        return $this->belongsTo(MasterPort::class, 'delivery_port_id', 'id');
+    }
+    
+    // public function shippingLine(){
+    //     return $this->belongsTo(shipping_line_id::class, 'sales_person_id');
+    // }
+    
+    public function partyName()
+    {
+        return $this->belongsTo(MasterImportParty::class, 'billing_party_id');
+    }
+    
+    public function NotifyParty()
+    {
+        return $this->belongsTo(MasterImportParty::class, 'notify_id');
+    }
+    
+    public function iataAgent()
+    {
+        return $this->belongsTo(MasterImportParty::class, 'agent_id');
+    }
+    
+    public function jobMaster()
+    {
+        return $this->belongsTo(OperationJobMaster::class, 'job_no', 'id');
+    }
+    public function Forwarder(){
+        return $this->belongsTo(MasterForwarder::class, 'forwarder_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

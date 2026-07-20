@@ -19,14 +19,14 @@
                             <label class="form-label">Search by container no.</label>
                             <input type="text" class="form-control" placeholder="search.." id="container_no" name="container_no" value="{{request('container_no')}}">
                         </div>
-                        <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
-                            <label class="form-label">Search by size.</label>
-                            <input type="text" class="form-control"  placeholder="search.." id="size" name="size" value="{{request('size')}}">
-                        </div>
-                        <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
-                            <label class="form-label">Search by container type</label>
-                            <input type="text" class="form-control" placeholder="search.." id="category" name="category" value="{{request('category')}}">
-                        </div>
+                        <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
+                        <!--    <label class="form-label">Search by size.</label>-->
+                        <!--    <input type="text" class="form-control"  placeholder="search.." id="size" name="size" value="{{request('size')}}">-->
+                        <!--</div>-->
+                        <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
+                        <!--    <label class="form-label">Search by container type</label>-->
+                        <!--    <input type="text" class="form-control" placeholder="search.." id="category" name="category" value="{{request('category')}}">-->
+                        <!--</div>-->
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <button id="applyFilter" class="btn btn-primary" type="submit">Apply</button>
                             <a href="{{route('containers.index')}}" id="resetFilter" class="btn btn-danger light ms-2">Reset</a>
@@ -42,6 +42,7 @@
                                     <th>Container Size</th>
                                     <th>Container Type</th>
                                     <th>Status</th>
+                                    <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -58,6 +59,7 @@
                                                 <span class="badge badge-danger light border-0">Deactive</span>
                                             @endif
                                         </td>
+                                        <td>{{$container->user->name??''}}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/containers/'.$container->id.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-container" href="javascript:void(0);" data-id="{{$container->id}}">Delete</a>
@@ -67,7 +69,9 @@
                             </tbody>
                         </table>
                     </div>
-                    {{ $containers->appends(request()->query())->links() }}
+                    <div class="d-flex justify-content-center mt-3">
+                        {!! $containers->links('pagination::bootstrap-5') !!}
+                    </div>
                 </div>
             </div>
         </div>

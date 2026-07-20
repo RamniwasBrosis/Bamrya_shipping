@@ -10,6 +10,15 @@ use Illuminate\Support\Str;
 
 class MasterContainerSizeController extends Controller
 {
+    public $company_id ;
+
+    public function __construct(){
+        $this->middleware(function ($request, $next) {
+            $this->company_id = Auth::user()->company_id;
+            $this->user_id = auth()->user()->id;
+            return $next($request);
+        });
+    }
     /**
      * Display a listing of the resource.
      */
@@ -24,7 +33,7 @@ class MasterContainerSizeController extends Controller
             $query->orWhere('iso_code', 'LIKE', '%'.$request->iso_code.'%');
         }
       
-        $containerSizes = $query->orderBy('created_at', 'desc')->paginate(10);
+        $containerSizes = $query->where('company_id', $this->company_id)->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin-main.admin.containersize.index', compact('containerSizes'));
     }
@@ -57,6 +66,7 @@ class MasterContainerSizeController extends Controller
         $containerSize->description = $request->description;
         $containerSize->iso_code = $request->iso_code;
         $containerSize->status = $request->status;
+        $containerSize->user_id = $this->user_id;
 
         $containerSize->save();
 
@@ -91,7 +101,7 @@ class MasterContainerSizeController extends Controller
             'iso_code' => 'nullable|max:50',
             'status' => 'required|boolean',
         ]);
-
+        $validation['user_id'] = $this->user_id;
         $size = MasterContainerSize::findOrFail($id);
         $size->update($validation);
 

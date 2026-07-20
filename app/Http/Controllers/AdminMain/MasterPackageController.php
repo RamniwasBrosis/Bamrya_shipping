@@ -10,6 +10,15 @@ use Illuminate\Support\Str;
 
 class MasterPackageController extends Controller
 {
+    public $company_id ;
+
+    public function __construct(){
+        $this->middleware(function ($request, $next) {
+            $this->company_id = Auth::user()->company_id;
+            return $next($request);
+        });
+    }
+    
     /**
      * Display a listing of the resource.
      */
@@ -20,7 +29,7 @@ class MasterPackageController extends Controller
         if($request->filled('package_code')){
             $query->where('package_code', 'LIKE', '%'.$request->package_code.'%');
         }
-        $packages = $query->orderBy('created_at', 'desc')->paginate(10);
+        $packages = $query->where('company_id', $this->company_id)->orderBy('created_at', 'desc')->paginate(10);
         return view('admin-main.admin.package.index', compact('packages'));
     }
 
@@ -37,8 +46,9 @@ class MasterPackageController extends Controller
      */
     public function store(Request $request)
     {
+        $userId = auth()->user()->id;
         $request->validate([
-            'package_code' => 'required|max:6|',
+            'package_code' => 'required|max:255',
             'description' => 'nullable|string',
             'status' => 'required|boolean',
         ]);
@@ -50,6 +60,7 @@ class MasterPackageController extends Controller
         $package->package_code = $request->package_code;
         $package->description = $request->description;
         $package->status = $request->status;
+        $package->user_id = $userId;
 
         $package->save();
 
@@ -78,13 +89,15 @@ class MasterPackageController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $userId = auth()->user()->id;
         $package = MasterPackage::findOrFail($id);
 
         $request->validate([
-            'package_code' => 'required|max:6|unique:master_packages,package_code,' . $package->id,
+            'package_code' => 'required|unique:master_packages,package_code,' . $package->id,
             'description' => 'nullable|string',
             'status' => 'required|boolean',
         ]);
+        $package->user_id = $userId;
 
         $package->update($request->all());
 

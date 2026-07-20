@@ -3,7 +3,7 @@
     <div class="page-titles">
         <ol class="breadcrumb">
             <li>
-                <h5 class="bc-title">Purchase TDS Report</h5>
+                <h5 class="bc-title">Purchase Report</h5>
             </li>
         </ol>
         <!--<a class="text-primary fs-13" href="{{ url('admin/PurchaseTDSReport/index') }}">Go List -></a>-->
@@ -60,6 +60,24 @@
                                             </div>
                                         </div>
                                     </div>
+                                    {{-- Job no wise --}}
+                                    <div class="col-xl-6">
+                                        <div class="mb-3 row">
+                                            <div class="form-check col-sm-3 d-flex align-items-center">
+                                                <label class="form-check-label" for="">
+                                                    Job No:
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-9 d-flex align-items-center">
+                                                <select name="full_job_no" class="form-control wide me-2" id="">
+                                                    <option value="">-- Select Job No --</option>
+                                                    @foreach ($invoices as $inv)
+                                                        <option value="{{$inv->full_job_no}}">{{$inv->full_job_no}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     {{-- Submit Button --}}
                                     <div class="">
@@ -76,6 +94,11 @@
             </div>
         </div>
     </div>
+    
+    <!--party model-->
+    @include('admin-main.admin.commonModelForms.modelPartyDetails')
+
+
 @endsection
 @push('scripts')
     <script>
@@ -136,6 +159,38 @@
                 e.preventDefault();
                 var page = $(this).attr('href').split('page=')[1];
                 fetchPage(page);
+            });
+            
+            
+            
+            
+            // Handle form submission
+            $('#modelPartyDetails').on('submit', function (e) {
+                e.preventDefault();
+            
+                $.ajax({
+                    url: "{{ route('new-party.store') }}",
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+         
+                            $('select[name="party_id"]').each(function() {
+                                $(this).append(`<option value="${response.party.id}" selected>${response.party.name}</option>`);
+                            });
+            
+                            $('#modelPartyDetails')[0].reset();
+                            $('#partyDetailsModal').modal('hide');
+                            toastr.success('Party added successfully!');
+                        } else {
+                            toastr.error(response.message || 'Something went wrong.');
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Failed to add party details.');
+                        console.error('Error:', xhr.responseText);
+                    }
+                });
             });
 
         });

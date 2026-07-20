@@ -3,944 +3,1337 @@
 
 
  <!-- row -->
-			<div class="page-titles">
-				<ol class="breadcrumb">
-					<li><h5 class="bc-title">Dashboard</h5></li>
-					<li class="breadcrumb-item"><a href="javascript:void(0)">
-						<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path d="M2.125 6.375L8.5 1.41667L14.875 6.375V14.1667C14.875 14.5424 14.7257 14.9027 14.4601 15.1684C14.1944 15.4341 13.8341 15.5833 13.4583 15.5833H3.54167C3.16594 15.5833 2.80561 15.4341 2.53993 15.1684C2.27426 14.9027 2.125 14.5424 2.125 14.1667V6.375Z" stroke="#2C2C2C" stroke-linecap="round" stroke-linejoin="round"/>
-							<path d="M6.375 15.5833V8.5H10.625V15.5833" stroke="#2C2C2C" stroke-linecap="round" stroke-linejoin="round"/>
-						</svg>
-						Home </a>
-					</li>
-					<li class="breadcrumb-item active"><a href="javascript:void(0)">Dashboard</a></li>
-				</ol>
-				<!--<a class="text-primary fs-13" data-bs-toggle="offcanvas" href="#offcanvasExample1" role="button" aria-controls="offcanvasExample1">+ Add Task</a>-->
+	<div class="page-titles">
+		<ol class="breadcrumb">
+			<li><h5 class="bc-title">Dashboard</h5></li>
+			<li class="breadcrumb-item"><a href="javascript:void(0)">
+				<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M2.125 6.375L8.5 1.41667L14.875 6.375V14.1667C14.875 14.5424 14.7257 14.9027 14.4601 15.1684C14.1944 15.4341 13.8341 15.5833 13.4583 15.5833H3.54167C3.16594 15.5833 2.80561 15.4341 2.53993 15.1684C2.27426 14.9027 2.125 14.5424 2.125 14.1667V6.375Z" stroke="#2C2C2C" stroke-linecap="round" stroke-linejoin="round"/>
+					<path d="M6.375 15.5833V8.5H10.625V15.5833" stroke="#2C2C2C" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+				Home </a>
+			</li>
+			<li class="breadcrumb-item active"><a href="javascript:void(0)">Dashboard</a></li>
+		</ol>
+		<!--<a class="text-primary fs-13" data-bs-toggle="offcanvas" href="#offcanvasExample1" role="button" aria-controls="offcanvasExample1">+ Add Task</a>-->
+	</div>
+			
+	{{-- Display success message --}}
+    @if (session('success'))
+        <div class="alert alert-success mt-2">
+            {{ session('success') }}
+        </div>
+    @endif
+	<div class="container-fluid p-2">
+		<div class="row">
+			<div class="col-xl-9 wid-100">
+				<div class="row">
+					<div class="col-xl-3 mb-0 col-sm-6 mb-0">
+						<div class="card box-hover">
+							<div class="card-body">
+								<div class="d-flex align-items-center">
+									<div class="icon-box icon-box-lg bg-success-light rounded-circle">
+										<svg width="46" height="46" viewBox="0 0 46 46" fill="none"
+											xmlns="http://www.w3.org/2000/svg">
+											<path fill-rule="evenodd" clip-rule="evenodd"
+												d="M22.9715 29.3168C15.7197 29.3168 9.52686 30.4132 9.52686 34.8043C9.52686 39.1953 15.6804 40.331 22.9715 40.331C30.2233 40.331 36.4144 39.2328 36.4144 34.8435C36.4144 30.4543 30.2626 29.3168 22.9715 29.3168Z"
+												stroke="#3AC977" stroke-width="2" stroke-linecap="round"
+												stroke-linejoin="round" />
+											<path fill-rule="evenodd" clip-rule="evenodd"
+												d="M22.9714 23.0537C27.7304 23.0537 31.5875 19.1948 31.5875 14.4359C31.5875 9.67694 27.7304 5.81979 22.9714 5.81979C18.2125 5.81979 14.3536 9.67694 14.3536 14.4359C14.3375 19.1787 18.1696 23.0377 22.9107 23.0537H22.9714Z"
+												stroke="#3AC977" stroke-width="2" stroke-linecap="round"
+												stroke-linejoin="round" />
+										</svg>
+									</div>
+									<div class="total-projects ms-3">
+										<h3 class="text-success count">{{ $seaExport  ?? 0 }}</h3>
+										<span>Sea Export <br><small class="text-warning">Month Wise</small> </span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="col-xl-3 mb-0 col-sm-6 mb-0">
+                        <div class="card box-hover ">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box icon-box-lg bg-purple-light rounded-circle">
+                                        <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M22.9717 41.0539C22.9717 41.0539 37.3567 36.6983 37.3567 24.6908C37.3567 12.6814 37.878 11.7439 36.723 10.5889C35.5699 9.43391 24.858 5.69891 22.9717 5.69891C21.0855 5.69891 10.3736 9.43391 9.21863 10.5889C8.0655 11.7439 8.58675 12.6814 8.58675 24.6908C8.58675 36.6983 22.9717 41.0539 22.9717 41.0539Z"
+                                                stroke="#BB6BD9" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path d="M26.4945 26.4642L19.4482 19.4179" stroke="#BB6BD9" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M19.4487 26.4642L26.495 19.4179" stroke="#BB6BD9" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="total-projects ms-3">
+                                        <h3 class="text-purple count">{{ $seaImport  ?? 0}}</h3>
+                                        <span>Sea Import <br><small class="text-warning">Month Wise</small></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 mb-0 col-sm-6 mb-0">
+                        <div class="card box-hover ">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box icon-box-lg bg-danger-light rounded-circle">
+                                        <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M34.0396 20.974C36.6552 20.6065 38.6689 18.364 38.6746 15.6471C38.6746 12.9696 36.7227 10.7496 34.1633 10.3296"
+                                                stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M37.4912 27.262C40.0243 27.6407 41.7925 28.5276 41.7925 30.3557C41.7925 31.6139 40.96 32.4314 39.6137 32.9451"
+                                                stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M22.7879 28.0373C16.7616 28.0373 11.6147 28.9504 11.6147 32.5973C11.6147 36.2423 16.7297 37.1817 22.7879 37.1817C28.8141 37.1817 33.9591 36.2779 33.9591 32.6292C33.9591 28.9804 28.846 28.0373 22.7879 28.0373Z"
+                                                stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M22.7876 22.8325C26.742 22.8325 29.9483 19.6281 29.9483 15.6719C29.9483 11.7175 26.742 8.51123 22.7876 8.51123C18.8333 8.51123 15.627 11.7175 15.627 15.6719C15.612 19.6131 18.7939 22.8194 22.7351 22.8325H22.7876Z"
+                                                stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M11.5344 20.974C8.91691 20.6065 6.90504 18.364 6.89941 15.6471C6.89941 12.9696 8.85129 10.7496 11.4107 10.3296"
+                                                stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M8.0825 27.262C5.54937 27.6407 3.78125 28.5276 3.78125 30.3557C3.78125 31.6139 4.61375 32.4314 5.96 32.9451"
+                                                stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="total-projects ms-3">
+                                        <h3 class="text-danger count">{{ $airExport  ?? 0}}</h3>
+                                        <span>Air Export <br><small class="text-warning">Month Wise</small></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+					<div class="col-xl-3 mb-0 col-sm-6 mb-0">
+                        <div class="card box-hover ">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box icon-box-lg bg-primary-light rounded-circle">
+                                        <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M32.8961 26.5849C34.1612 26.5849 35.223 27.629 35.0296 28.8783C33.8947 36.2283 27.6026 41.6855 20.0138 41.6855C11.6178 41.6855 4.8125 34.8803 4.8125 26.4862C4.8125 19.5704 10.0664 13.1283 15.9816 11.6717C17.2526 11.3579 18.5553 12.252 18.5553 13.5605C18.5553 22.4263 18.8533 24.7197 20.5368 25.9671C22.2204 27.2145 24.2 26.5849 32.8961 26.5849Z"
+                                                stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M41.1733 19.2019C41.2739 13.5059 34.2772 4.32428 25.7509 4.48217C25.0877 4.49402 24.5568 5.04665 24.5272 5.70783C24.3121 10.3914 24.6022 16.4605 24.764 19.2118C24.8134 20.0684 25.4864 20.7414 26.341 20.7907C29.1693 20.9526 35.4594 21.1736 40.0759 20.4749C40.7035 20.3802 41.1634 19.8355 41.1733 19.2019Z"
+                                                stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+    
+                                    </div>
+                                    <div class="total-projects ms-3">
+                                        <h3 class="text-primary count">{{ $airImport  ?? 0}}</h3>
+                                        <span>Air Import <br><small class="text-warning">Month Wise</small></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="col-xl-3 m-0 col-sm-6 m-0">
+                        <div class="card box-hover">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box icon-box-lg bg-primary-light rounded-circle">
+                                        <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M32.8961 26.5849C34.1612 26.5849 35.223 27.629 35.0296 28.8783C33.8947 36.2283 27.6026 41.6855 20.0138 41.6855C11.6178 41.6855 4.8125 34.8803 4.8125 26.4862C4.8125 19.5704 10.0664 13.1283 15.9816 11.6717C17.2526 11.3579 18.5553 12.252 18.5553 13.5605C18.5553 22.4263 18.8533 24.7197 20.5368 25.9671C22.2204 27.2145 24.2 26.5849 32.8961 26.5849Z"
+                                                stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M41.1733 19.2019C41.2739 13.5059 34.2772 4.32428 25.7509 4.48217C25.0877 4.49402 24.5568 5.04665 24.5272 5.70783C24.3121 10.3914 24.6022 16.4605 24.764 19.2118C24.8134 20.0684 25.4864 20.7414 26.341 20.7907C29.1693 20.9526 35.4594 21.1736 40.0759 20.4749C40.7035 20.3802 41.1634 19.8355 41.1733 19.2019Z"
+                                                stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+            
+                                    </div>
+                                    <div class="total-projects ms-3">
+                                        <h3 class="text-primary count">{{ $totalJobs  ?? 0}}</h3>
+                                        <span>Total Jobs <br><small class="text-warning">Month Wise</small></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 m-0 col-sm-6 m-0">
+                        <div class="card box-hover" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#pendingJobsModal" id="pendingJobsCard">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box icon-box-lg bg-danger-light rounded-circle">
+                                        <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M34.0396 20.974C36.6552 20.6065 38.6689 18.364 38.6746 15.6471C38.6746 12.9696 36.7227 10.7496 34.1633 10.3296"
+                                                stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M37.4912 27.262C40.0243 27.6407 41.7925 28.5276 41.7925 30.3557C41.7925 31.6139 40.96 32.4314 39.6137 32.9451"
+                                                stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M22.7879 28.0373C16.7616 28.0373 11.6147 28.9504 11.6147 32.5973C11.6147 36.2423 16.7297 37.1817 22.7879 37.1817C28.8141 37.1817 33.9591 36.2779 33.9591 32.6292C33.9591 28.9804 28.846 28.0373 22.7879 28.0373Z"
+                                                stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M22.7876 22.8325C26.742 22.8325 29.9483 19.6281 29.9483 15.6719C29.9483 11.7175 26.742 8.51123 22.7876 8.51123C18.8333 8.51123 15.627 11.7175 15.627 15.6719C15.612 19.6131 18.7939 22.8194 22.7351 22.8325H22.7876Z"
+                                                stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M11.5344 20.974C8.91691 20.6065 6.90504 18.364 6.89941 15.6471C6.89941 12.9696 8.85129 10.7496 11.4107 10.3296"
+                                                stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path
+                                                d="M8.0825 27.262C5.54937 27.6407 3.78125 28.5276 3.78125 30.3557C3.78125 31.6139 4.61375 32.4314 5.96 32.9451"
+                                                stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="total-projects ms-3">
+                                        <h3 class="text-danger count">{{ $pendingJobs ?? 0 }}</h3>
+                                        <span>Pre Shipment <br><small class="text-warning">Pending Jobs Year  Wise</small></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--//pop model-->
+                    <!-- Pending Jobs Modal -->
+                    <div class="modal fade" id="pendingJobsModal" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-scrollable" style="max-width:70%;">
+                        <div class="modal-content" style="min-height:60vh;">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Pending Jobs</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body" id="pendingJobsContent">
+                            <p class="text-center">Loading...</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+        
+                    <div class="col-xl-3 m-0 col-sm-6 m-0">
+                        <div class="card box-hover" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#closeJobsModal" id="closeJobsCard">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box icon-box-lg bg-success-light rounded-circle">
+                                        <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M22.9715 29.3168C15.7197 29.3168 9.52686 30.4132 9.52686 34.8043C9.52686 39.1953 15.6804 40.331 22.9715 40.331C30.2233 40.331 36.4144 39.2328 36.4144 34.8435C36.4144 30.4543 30.2626 29.3168 22.9715 29.3168Z"
+                                                stroke="#3AC977" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M22.9714 23.0537C27.7304 23.0537 31.5875 19.1948 31.5875 14.4359C31.5875 9.67694 27.7304 5.81979 22.9714 5.81979C18.2125 5.81979 14.3536 9.67694 14.3536 14.4359C14.3375 19.1787 18.1696 23.0377 22.9107 23.0537H22.9714Z"
+                                                stroke="#3AC977" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="total-projects ms-3">
+                                        <h3 class="text-success count">{{ $closeJobs ?? 0}}</h3>
+                                       
+                                        <span>Closed Jobs <br><small class="text-warning">Year Wise</small></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--pending bills month wise-->
+                    <div class="col-xl-3 m-0 col-sm-6 m-0">
+                        <div class="card box-hover" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#pendingBillsModel" id="closeJobsCard">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box icon-box-lg bg-success-light rounded-circle">
+                                        <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M22.9717 41.0539C22.9717 41.0539 37.3567 36.6983 37.3567 24.6908C37.3567 12.6814 37.878 11.7439 36.723 10.5889C35.5699 9.43391 24.858 5.69891 22.9717 5.69891C21.0855 5.69891 10.3736 9.43391 9.21863 10.5889C8.0655 11.7439 8.58675 12.6814 8.58675 24.6908C8.58675 36.6983 22.9717 41.0539 22.9717 41.0539Z"
+                                                stroke="#BB6BD9" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path d="M26.4945 26.4642L19.4482 19.4179" stroke="#BB6BD9" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M19.4487 26.4642L26.495 19.4179" stroke="#BB6BD9" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="total-projects ms-3">
+                                        <h3 class="text-success count">{{ $pendingBillsCount }}</h3>
+                                       
+                                        <span>Pending Bills<br><small class="text-warning">Month Wise</small></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--pending bills previous month-->
+                    <div class="col-xl-3 m-0 col-sm-6 m-0">
+                        <div class="card box-hover" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#pendingPreviousMonthBillsModel" id="closeJobsCard">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box icon-box-lg bg-success-light rounded-circle">
+                                        <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M22.9717 41.0539C22.9717 41.0539 37.3567 36.6983 37.3567 24.6908C37.3567 12.6814 37.878 11.7439 36.723 10.5889C35.5699 9.43391 24.858 5.69891 22.9717 5.69891C21.0855 5.69891 10.3736 9.43391 9.21863 10.5889C8.0655 11.7439 8.58675 12.6814 8.58675 24.6908C8.58675 36.6983 22.9717 41.0539 22.9717 41.0539Z"
+                                                stroke="#BB6BD9" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path d="M26.4945 26.4642L19.4482 19.4179" stroke="#BB6BD9" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M19.4487 26.4642L26.495 19.4179" stroke="#BB6BD9" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="total-projects ms-3">
+                                        <h3 class="text-success count">{{ $previousMonthPendingBillsCount }}</h3>
+                                        
+                                        <span>Pending Bills<br><small class="text-warning">Previous Month</small></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--pending bills month Total-->
+                    <div class="col-xl-3 m-0 col-sm-6 m-0">
+                        <div class="card box-hover" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#pendingBillsTotalModel" id="closeJobsCard">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box icon-box-lg bg-success-light rounded-circle">
+                                        <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M22.9717 41.0539C22.9717 41.0539 37.3567 36.6983 37.3567 24.6908C37.3567 12.6814 37.878 11.7439 36.723 10.5889C35.5699 9.43391 24.858 5.69891 22.9717 5.69891C21.0855 5.69891 10.3736 9.43391 9.21863 10.5889C8.0655 11.7439 8.58675 12.6814 8.58675 24.6908C8.58675 36.6983 22.9717 41.0539 22.9717 41.0539Z"
+                                                stroke="#BB6BD9" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path d="M26.4945 26.4642L19.4482 19.4179" stroke="#BB6BD9" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M19.4487 26.4642L26.495 19.4179" stroke="#BB6BD9" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="total-projects ms-3">
+                                        <h3 class="text-success count">{{ $pendingBillsCountTotal }}</h3>
+                                       
+                                        <span>Pending Bills<br><small class="text-warning">Total</small></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6">
+                        <div class="card box-hover"
+                             style="cursor:pointer;"
+                             data-bs-toggle="modal"
+                             data-bs-target="#needToCloseJobModal">
+                    
+                            <div class="card-body">
+                    
+                                <div class="d-flex align-items-center">
+                    
+                                    <div class="icon-box icon-box-lg bg-danger-light rounded-circle">
+                    
+                                        <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
+                                            <path d="M12 8V12L15 15"
+                                                stroke="#dc3545"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"/>
+                                            <circle cx="12" cy="12" r="9"
+                                                stroke="#dc3545"
+                                                stroke-width="2"/>
+                                        </svg>
+                    
+                                    </div>
+                    
+                                    <div class="total-projects ms-3">
+                    
+                                        <h3 class="text-danger">
+                                            {{ $needToCloseJobsCount }}
+                                        </h3>
+                    
+                                        <span>
+                                            Need To Close Job
+                                            <br>
+                                            <small class="text-warning">
+                                                FY 2026-27 Onwards
+                                            </small>
+                                        </span>
+                    
+                                    </div>
+                    
+                                </div>
+                    
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Close Jobs Modal -->
+                    <div class="modal fade" id="closeJobsModal" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-scrollable" style="max-width:70%;">
+                        <div class="modal-content" style="min-height:60vh;">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Close Jobs</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body" id="closeJobsContent">
+                            <p class="text-center">Loading...</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!--pending bills month wise pop up model-->
+                    <div class="modal fade" id="pendingBillsModel" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-scrollable" style="max-width:70%;">
+                        <div class="modal-content" style="min-height:60vh;">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Pending Bills</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th width="5%">#</th>
+                                        <th>Job No</th>
+                                        <th>Job Date</th>
+                                        <th>Customer</th>
+                                    </tr>
+                                </thead>
+                        
+                                <tbody>
+                                    @forelse($pendingBillsJobs as $job)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>
+                                                <strong>{{ $job->full_job_no }}</strong>
+                                            </td>
+                                            <td>
+                                                {{ date('d-m-Y', strtotime($job->job_date)) }}
+                                            </td>
+                                            <td>
+                                                @if(str_contains($job->job_activity, 'EXP'))
+                                                    {{ $job->shipperName->party_name ?? '-' }}
+                                                @else
+                                                    {{ $job->consigneeName->party_name ?? '-' }}
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="text-center text-success">
+                                                No Pending Bills Found
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        
+                        </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!--pending bills previous month pop up model-->
+                    <div class="modal fade" id="pendingPreviousMonthBillsModel" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-scrollable" style="max-width:70%;">
+                        <div class="modal-content" style="min-height:60vh;">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Pending Bills Of Previous Month</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th width="5%">#</th>
+                                        <th>Job No</th>
+                                        <th>Job Date</th>
+                                        <th>Customer</th>
+                                    </tr>
+                                </thead>
+                        
+                                <tbody>
+                                    @forelse($previousMonthPendingBills as $job)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>
+                                                <strong>{{ $job->full_job_no }}</strong>
+                                            </td>
+                                            <td>
+                                                {{ date('d-m-Y', strtotime($job->job_date)) }}
+                                            </td>
+                                            <td>
+                                                @if(str_contains($job->job_activity, 'EXP'))
+                                                    {{ $job->shipperName->party_name ?? '-' }}
+                                                @else
+                                                    {{ $job->consigneeName->party_name ?? '-' }}
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="text-center text-success">
+                                                No Pending Bills Found
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        
+                        </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!--total pending total bills pop up model-->
+                    <div class="modal fade" id="pendingBillsTotalModel" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-scrollable" style="max-width:70%;">
+                            <div class="modal-content" style="min-height:60vh;">
+                    
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Financial Year Wise Pending Bills</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                    
+                                <div class="modal-body">
+                    
+                                    @forelse($pendingBillsFY as $fy => $jobs)
+                    
+                                        <div class="card mb-4 shadow-sm">
+                                            <div class="card-header bg-primary text-white d-flex justify-content-between">
+                                                <strong>Financial Year : {{ $fy }}</strong>
+                                                <strong>Total Bills : {{ $jobs->count() }}</strong>
+                                            </div>
+                    
+                                            <div class="card-body p-0">
+                    
+                                                <table class="table table-bordered table-hover mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th width="5%">#</th>
+                                                            <th>Job No</th>
+                                                            <th>Job Date</th>
+                                                            <th>Customer</th>
+                                                        </tr>
+                                                    </thead>
+                    
+                                                    <tbody>
+                                                        @foreach($jobs as $job)
+                                                            <tr>
+                                                                <td>{{ $loop->iteration }}</td>
+                    
+                                                                <td>
+                                                                    <strong>{{ $job->full_job_no }}</strong>
+                                                                </td>
+                    
+                                                                <td>
+                                                                    {{ date('d-m-Y', strtotime($job->job_date)) }}
+                                                                </td>
+                    
+                                                                <td>
+                                                                    @if(str_contains($job->job_activity, 'EXP'))
+                                                                        {{ $job->shipperName->party_name ?? '-' }}
+                                                                    @else
+                                                                        {{ $job->consigneeName->party_name ?? '-' }}
+                                                                    @endif
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                    
+                                            </div>
+                                        </div>
+                    
+                                    @empty
+                    
+                                        <div class="alert alert-success text-center">
+                                            No Pending Bills Found
+                                        </div>
+                    
+                                    @endforelse
+                    
+                                </div>
+                    
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal fade" id="needToCloseJobModal" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-scrollable" style="max-width:70%;">
+                            <div class="modal-content" style="min-height:60vh;">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        Need To Close Job
+                                    </h5>
+                                    <button type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal">
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Job No</th>
+                                                <th>Job Date</th>
+                                                <th>Customer</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse($needToCloseJobs as $job)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>
+                                                        <strong>{{ $job->full_job_no }}</strong>
+                                                    </td>
+                                                    <td>
+                                                        {{ date('d-m-Y', strtotime($job->job_date)) }}
+                                                    </td>
+                                                    <td>
+                                                        @if(str_contains($job->job_activity,'EXP'))
+                                                            {{ $job->shipperName->party_name ?? '-' }}
+                                                        @else
+                                                            {{ $job->consigneeName->party_name ?? '-' }}
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <button
+                                                            class="btn btn-sm btn-danger closeJobBtn"
+                                                            data-id="{{ $job->id }}">
+                                                            Open
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-success">
+                                                        No Open Jobs Found
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 m-0 col-sm-6 m-0">
+                        <div class="card box-hover" data-bs-toggle="modal" data-bs-target="#leoDateModal" style="cursor:pointer;">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box icon-box-lg bg-purple-light rounded-circle">
+                                        <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M22.9717 41.0539C22.9717 41.0539 37.3567 36.6983 37.3567 24.6908C37.3567 12.6814 37.878 11.7439 36.723 10.5889C35.5699 9.43391 24.858 5.69891 22.9717 5.69891C21.0855 5.69891 10.3736 9.43391 9.21863 10.5889C8.0655 11.7439 8.58675 12.6814 8.58675 24.6908C8.58675 36.6983 22.9717 41.0539 22.9717 41.0539Z"
+                                                stroke="#BB6BD9" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path d="M26.4945 26.4642L19.4482 19.4179" stroke="#BB6BD9" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M19.4487 26.4642L26.495 19.4179" stroke="#BB6BD9" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="total-projects ms-3">
+                                        <h3 class="text-purple count">{{ $leo_pending ?? 0 }}</h3>
+                                        <span>Leo Date/Out Of Charge Status</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--// leo date status pop model-->
+                    <div class="modal fade" id="leoDateModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-scrollable" style="max-width:70%;">
+                            <div class="modal-content" style="min-height:60vh;">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Pending LEO Date</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                    
+                                <div class="modal-body" id="leoDateContent">
+                                    <p class="text-center">Loading...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!--// Operation Complate-->
+                    <div class="col-xl-3 m-0 col-sm-6 m-0">
+                        <div class="card box-hover" data-bs-toggle="modal" data-bs-target="#ComplateOperationModal" style="cursor:pointer;">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box icon-box-lg bg-purple-light rounded-circle">
+                                        <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M22.9717 41.0539C22.9717 41.0539 37.3567 36.6983 37.3567 24.6908C37.3567 12.6814 37.878 11.7439 36.723 10.5889C35.5699 9.43391 24.858 5.69891 22.9717 5.69891C21.0855 5.69891 10.3736 9.43391 9.21863 10.5889C8.0655 11.7439 8.58675 12.6814 8.58675 24.6908C8.58675 36.6983 22.9717 41.0539 22.9717 41.0539Z"
+                                                stroke="#BB6BD9" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                            <path d="M26.4945 26.4642L19.4482 19.4179" stroke="#BB6BD9" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M19.4487 26.4642L26.495 19.4179" stroke="#BB6BD9" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="total-projects ms-3">
+                                        <h3 class="text-purple count">{{ $complate_operation ?? 0 }}</h3>
+                                        <span>Operation Complate</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--// Operation Complate status pop model-->
+                    <div class="modal fade" id="ComplateOperationModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-scrollable" style="max-width:70%;">
+                            <div class="modal-content" style="min-height:60vh;">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">All Complete Operations</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                    
+                                <div class="modal-body" id="ComplateOperationContent">
+                                    <p class="text-center">Loading...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    
+
+                    @can('accounts')
+					<div class="col-xl-12">
+					    
+					    @php
+                            // Current Financial Year auto detect
+                            $year = date('m') >= 4 ? date('Y') : date('Y') - 1;
+                            $financialYear = $year . '-' . ($year + 1);
+                        @endphp
+					    
+					    
+						<div class="card overflow-hidden">
+							<div class="card-header border-0 pb-0 d-flex align-items-center">
+								<h4 class="heading mb-0 w-50">Recent Earnings</h4>
+                                <select class="form-select form-select-sm px-1 w-25" id="financial-year">
+                                    <option value="">select</option>
+                                    @foreach($financialYears as $fy)
+                                        <option value="{{ $fy }}">FY {{ $fy }}</option>
+                                    @endforeach
+                                </select>
+							</div>
+							<div class="card-body  p-0">
+									<div id="overiewChart"></div>
+								<div class="ttl-project">
+									<div class="pr-data">
+										<h5 id="totalJobs"></h5>
+										<span>Total Jobs (Year Wise)</span>
+									</div>
+									<div class="pr-data">
+										<h5 class="text-primary" id="totalSales">₹</h5>
+										<span>Total sales (Year Wise)</span>
+									</div>
+									<div class="pr-data">
+										<h5 id="totalPurchases">₹</h5>
+										<span>Total Purchase (Year Wise)</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					@endcan
+					<div class="col-xl-12">
+					    
+					    @php
+                            // Current Financial Year auto detect
+                            $year = date('m') >= 4 ? date('Y') : date('Y') - 1;
+                            $financialYear = $year . '-' . ($year + 1);
+                        @endphp
+					    
+					    
+						<div class="card overflow-hidden">
+							<div class="card-header border-0 pb-0 d-flex align-items-center">
+								<h4 class="heading mb-0 w-50">Month Wise Jobs</h4>
+                               
+							</div>
+							<div class="card-body  p-0">
+								<div id="monthWise_overiewChart"></div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="col-xl-12 col-lg-10">
+        				<div class="card">
+        					<div class="card-header  border-0 pb-0">
+        						<h4 class="card-title">Overdue Tasks</h4>
+        					</div>
+        					<div class="card-body p-0">
+        						<div id="DZ_W_Todo1" class="widget-media dz-scroll height600 my-4 px-4">
+        							<ul class="timeline">
+        								@if(isset($pendingBlLists) && $pendingBlLists->count() > 0)
+                                            @foreach($pendingBlLists as $job)
+                                               @php
+                                                if($job->prefix == 'AI'){
+                                                    $url = route('air-imports.edit', $job->uuid);
+                                                }
+                                                if($job->prefix == 'AE'){
+                                                    $url = route('air-exports.edit', $job->uuid);
+                                                }
+                                                if($job->seaImport?->prefix == 'SI'){
+                                                    $url = route('sea-imports.edit', $job->seaImport->uuid);
+                                                }
+                                                if($job->seaExport?->prefix == 'SE'){
+                                                    
+                                                    $url = route('sea-exports.edit', $job->seaExport->uuid);
+                                                }
+                                               @endphp
+                                                <li>
+                                                    <div class="timeline-badge {{ $loop->iteration % 6 == 0 ? 'dark' : ($loop->iteration % 5 == 0 ? 'warning' : ($loop->iteration % 4 == 0 ? 'success' : ($loop->iteration % 3 == 0 ? 'danger' : ($loop->iteration % 2 == 0 ? 'info' : 'primary')))) }}"></div>
+                                                    <a class=" text-muted" href="{{ $url }}" style="padding:1px;">
+                                                        <span class="mb-0">
+                                                            @if($job->prefix == 'AI')
+                                                                FulljobNumber: <strong class="text-primary">{{ $job->jobMaster->full_job_no ?? 'N/A' }} &nbsp;</strong><span style="color:#000;">Consignee: {{ $job->ConsigneeName->party_name ?? '' }} | </span>
+                                                            @elseif($job->prefix == 'AE')
+                                                                FulljobNumber: <strong class="text-primary">{{ $job->jobMaster->full_job_no ?? 'N/A' }} &nbsp;</strong><span style="color:#000;">Shipper: {{ $job->shipperName->party_name ?? '' }} | </span>
+                                                            @elseif($job->seaImport?->prefix == 'SI')
+                                                                FulljobNumber: <strong class="text-primary">{{ $job->seaImport->jobMaster->full_job_no ?? 'N/A' }} &nbsp;</strong><span style="color:#000;">Consignee: {{$job->seaImport->consignee->party_name ?? ''}} |</span>
+                                                            @else
+                                                                FulljobNumber: <strong class="text-primary">{{ $job->seaExport->jobMaster->full_job_no ?? 'N/A' }} &nbsp;</strong><span style="color:#000;">Shipper: {{$job->seaExport->shipperName->party_name}} | </span>
+                                                            @endif
+                                                        </span>
+                                                        @php
+                                                            $missingFields = [];
+                                                            if(isset($job) && $job->prefix == 'AI') {
+                                                                if(empty($job->eta_date)) $missingFields[] = 'ETA Date';
+                                                                if(empty($job->etd_date)) $missingFields[] = 'ETD Date';
+                                                                if(empty($job->out_off_charge_date)) $missingFields[] = 'Out of Charge Date';
+                                                                if(empty($job->check_list_date)) $missingFields[] = 'Check List Date';
+                                                                if(empty($job->bill_of_entry_date)) $missingFields[] = 'Bill of entry Date';
+                                                                if(empty($job->customer_inv_no)) $missingFields[] = 'Cust Inv No/Date';
+                                                                if(empty($job->arrival_date)) $missingFields[] = 'Arriaval Date';
+                                                                
+                                                            } else if(isset($job) && $job->prefix == 'AE') {
+                                                                if(empty($job->eta_date)) $missingFields[] = 'ETA Date';
+                                                                if(empty($job->etd_date)) $missingFields[] = 'ETD Date';
+                                                                if(empty($job->leo_date)) $missingFields[] = 'LEO Date';
+                                                                if(empty($job->check_list_date)) $missingFields[] = 'Check List Date';
+                                                                if(empty($job->cartining_date)) $missingFields[] = 'Cartining Date';
+                                                                if(empty($job->sbill_no)) $missingFields[] = 'Sbill No/Date';
+                                                                if(empty($job->customer_inv_no)) $missingFields[] = 'Cust Inv No/Date';
+                                                                
+                                                            }else if(isset($job) && $job->seaImport?->prefix == 'SI') {
+                                                                if(empty($job->seaImport->eta_date)) $missingFields[] = 'ETA Date';
+                                                                if(empty($job->seaImport->etd_date)) $missingFields[] = 'ETD Date';
+                                                                if(empty($job->out_off_charge_date)) $missingFields[] = 'Out of Charge Date';
+                                                                if(empty($job->check_list_date)) $missingFields[] = 'Check List Date';
+                                                                if(empty($job->bill_of_entry_date)) $missingFields[] = 'Bill of entry Date';
+                                                                if(empty($job->customer_inv_no)) $missingFields[] = 'Cust Inv No/Date';
+                                                                if(empty($job->destuffing_date)) $missingFields[] = 'Destuffing Date';
+                                                              
+                                                            }else if(isset($job) && $job->seaExport?->prefix == 'SE') {
+                                                                if(empty($job->seaExport->eta_date)) $missingFields[] = 'ETA Date';
+                                                                if(empty($job->seaExport->etd_date)) $missingFields[] = 'ETD Date';
+                                                                if(empty($job->leo_date)) $missingFields[] = 'LEO Date';
+                                                                if(empty($job->check_list_date)) $missingFields[] = 'Check List Date';
+                                                                if(empty($job->cartining_date)) $missingFields[] = 'Cartining Date';
+                                                                if(empty($job->sbill_no)) $missingFields[] = 'Sbill No/Date';
+                                                                if(empty($job->customer_inv_no)) $missingFields[] = 'Cust Inv No/Date';
+                                                                
+                                                            }
+                                                        @endphp
+                                                        <span style="color:#000;"> Pending Values :  {{ implode(', ', $missingFields) }} </span>
+        
+                                                        <!--<span>&nbsp;&nbsp; {{ $job->created_at->diffForHumans() }}</span>-->
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        @else
+                                            <li>
+                                                <div class="timeline-badge secondary"></div>
+                                                <a class="timeline-panel text-muted" href="javascript:void(0);">
+                                                    <span>No pending jobs</span>
+                                                    <h6 class="mb-0">All jobs are up to date</h6>
+                                                    <p class="mb-0">There are no jobs with missing dates at the moment.</p>
+                                                </a>
+                                            </li>   
+                                        @endif
+        							</ul>
+        						</div>
+        					</div>
+        				</div>
+        			</div>
+				</div>
 			</div>
 			
-			 {{-- Display success message --}}
-            @if (session('success'))
-                <div class="alert alert-success mt-2">
-                    {{ session('success') }}
-                </div>
-            @endif
-			<div class="container-fluid p-2">
-				<div class="row">
-					<div class="col-xl-9 wid-100">
-						<div class="row">
-							<div class="col-xl-3 mb-0 col-sm-6 mb-0">
-								<div class="card box-hover">
-									<div class="card-body">
-										<div class="d-flex align-items-center">
-											<div class="icon-box icon-box-lg bg-success-light rounded-circle">
-												<svg width="46" height="46" viewBox="0 0 46 46" fill="none"
-													xmlns="http://www.w3.org/2000/svg">
-													<path fill-rule="evenodd" clip-rule="evenodd"
-														d="M22.9715 29.3168C15.7197 29.3168 9.52686 30.4132 9.52686 34.8043C9.52686 39.1953 15.6804 40.331 22.9715 40.331C30.2233 40.331 36.4144 39.2328 36.4144 34.8435C36.4144 30.4543 30.2626 29.3168 22.9715 29.3168Z"
-														stroke="#3AC977" stroke-width="2" stroke-linecap="round"
-														stroke-linejoin="round" />
-													<path fill-rule="evenodd" clip-rule="evenodd"
-														d="M22.9714 23.0537C27.7304 23.0537 31.5875 19.1948 31.5875 14.4359C31.5875 9.67694 27.7304 5.81979 22.9714 5.81979C18.2125 5.81979 14.3536 9.67694 14.3536 14.4359C14.3375 19.1787 18.1696 23.0377 22.9107 23.0537H22.9714Z"
-														stroke="#3AC977" stroke-width="2" stroke-linecap="round"
-														stroke-linejoin="round" />
-												</svg>
-											</div>
-											<div class="total-projects ms-3">
-												<h3 class="text-success count">12</h3>
-												<span>Sea Export</span>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-
-							<div class="col-xl-3 mb-0 col-sm-6 mb-0">
-                    <div class="card box-hover ">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-box icon-box-lg bg-primary-light rounded-circle">
-                                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M32.8961 26.5849C34.1612 26.5849 35.223 27.629 35.0296 28.8783C33.8947 36.2283 27.6026 41.6855 20.0138 41.6855C11.6178 41.6855 4.8125 34.8803 4.8125 26.4862C4.8125 19.5704 10.0664 13.1283 15.9816 11.6717C17.2526 11.3579 18.5553 12.252 18.5553 13.5605C18.5553 22.4263 18.8533 24.7197 20.5368 25.9671C22.2204 27.2145 24.2 26.5849 32.8961 26.5849Z"
-                                            stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M41.1733 19.2019C41.2739 13.5059 34.2772 4.32428 25.7509 4.48217C25.0877 4.49402 24.5568 5.04665 24.5272 5.70783C24.3121 10.3914 24.6022 16.4605 24.764 19.2118C24.8134 20.0684 25.4864 20.7414 26.341 20.7907C29.1693 20.9526 35.4594 21.1736 40.0759 20.4749C40.7035 20.3802 41.1634 19.8355 41.1733 19.2019Z"
-                                            stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                    </svg>
-
-                                </div>
-                                <div class="total-projects ms-3">
-                                    <h3 class="text-primary count">22</h3>
-                                    <span>Air Import</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 mb-0 col-sm-6 mb-0">
-                    <div class="card box-hover ">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-box icon-box-lg bg-purple-light rounded-circle">
-                                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M22.9717 41.0539C22.9717 41.0539 37.3567 36.6983 37.3567 24.6908C37.3567 12.6814 37.878 11.7439 36.723 10.5889C35.5699 9.43391 24.858 5.69891 22.9717 5.69891C21.0855 5.69891 10.3736 9.43391 9.21863 10.5889C8.0655 11.7439 8.58675 12.6814 8.58675 24.6908C8.58675 36.6983 22.9717 41.0539 22.9717 41.0539Z"
-                                            stroke="#BB6BD9" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path d="M26.4945 26.4642L19.4482 19.4179" stroke="#BB6BD9" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" />
-                                        <path d="M19.4487 26.4642L26.495 19.4179" stroke="#BB6BD9" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </div>
-                                <div class="total-projects ms-3">
-                                    <h3 class="text-purple count">69</h3>
-                                    <span>Sea Import</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 mb-0 col-sm-6 mb-0">
-                    <div class="card box-hover ">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-box icon-box-lg bg-danger-light rounded-circle">
-                                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M34.0396 20.974C36.6552 20.6065 38.6689 18.364 38.6746 15.6471C38.6746 12.9696 36.7227 10.7496 34.1633 10.3296"
-                                            stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path
-                                            d="M37.4912 27.262C40.0243 27.6407 41.7925 28.5276 41.7925 30.3557C41.7925 31.6139 40.96 32.4314 39.6137 32.9451"
-                                            stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M22.7879 28.0373C16.7616 28.0373 11.6147 28.9504 11.6147 32.5973C11.6147 36.2423 16.7297 37.1817 22.7879 37.1817C28.8141 37.1817 33.9591 36.2779 33.9591 32.6292C33.9591 28.9804 28.846 28.0373 22.7879 28.0373Z"
-                                            stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M22.7876 22.8325C26.742 22.8325 29.9483 19.6281 29.9483 15.6719C29.9483 11.7175 26.742 8.51123 22.7876 8.51123C18.8333 8.51123 15.627 11.7175 15.627 15.6719C15.612 19.6131 18.7939 22.8194 22.7351 22.8325H22.7876Z"
-                                            stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path
-                                            d="M11.5344 20.974C8.91691 20.6065 6.90504 18.364 6.89941 15.6471C6.89941 12.9696 8.85129 10.7496 11.4107 10.3296"
-                                            stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path
-                                            d="M8.0825 27.262C5.54937 27.6407 3.78125 28.5276 3.78125 30.3557C3.78125 31.6139 4.61375 32.4314 5.96 32.9451"
-                                            stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                    </svg>
-                                </div>
-                                <div class="total-projects ms-3">
-                                    <h3 class="text-danger count">33</h3>
-                                    <span>Air Export</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 m-0 col-sm-6 m-0">
-                    <div class="card box-hover">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-box icon-box-lg bg-danger-light rounded-circle">
-                                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M34.0396 20.974C36.6552 20.6065 38.6689 18.364 38.6746 15.6471C38.6746 12.9696 36.7227 10.7496 34.1633 10.3296"
-                                            stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path
-                                            d="M37.4912 27.262C40.0243 27.6407 41.7925 28.5276 41.7925 30.3557C41.7925 31.6139 40.96 32.4314 39.6137 32.9451"
-                                            stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M22.7879 28.0373C16.7616 28.0373 11.6147 28.9504 11.6147 32.5973C11.6147 36.2423 16.7297 37.1817 22.7879 37.1817C28.8141 37.1817 33.9591 36.2779 33.9591 32.6292C33.9591 28.9804 28.846 28.0373 22.7879 28.0373Z"
-                                            stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M22.7876 22.8325C26.742 22.8325 29.9483 19.6281 29.9483 15.6719C29.9483 11.7175 26.742 8.51123 22.7876 8.51123C18.8333 8.51123 15.627 11.7175 15.627 15.6719C15.612 19.6131 18.7939 22.8194 22.7351 22.8325H22.7876Z"
-                                            stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path
-                                            d="M11.5344 20.974C8.91691 20.6065 6.90504 18.364 6.89941 15.6471C6.89941 12.9696 8.85129 10.7496 11.4107 10.3296"
-                                            stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path
-                                            d="M8.0825 27.262C5.54937 27.6407 3.78125 28.5276 3.78125 30.3557C3.78125 31.6139 4.61375 32.4314 5.96 32.9451"
-                                            stroke="#FF5E5E" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                    </svg>
-                                </div>
-                                <div class="total-projects ms-3">
-                                    <h3 class="text-danger count">66</h3>
-                                    <span>Panding Task</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 m-0 col-sm-6 m-0">
-                    <div class="card box-hover">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-box icon-box-lg bg-purple-light rounded-circle">
-                                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M22.9717 41.0539C22.9717 41.0539 37.3567 36.6983 37.3567 24.6908C37.3567 12.6814 37.878 11.7439 36.723 10.5889C35.5699 9.43391 24.858 5.69891 22.9717 5.69891C21.0855 5.69891 10.3736 9.43391 9.21863 10.5889C8.0655 11.7439 8.58675 12.6814 8.58675 24.6908C8.58675 36.6983 22.9717 41.0539 22.9717 41.0539Z"
-                                            stroke="#BB6BD9" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path d="M26.4945 26.4642L19.4482 19.4179" stroke="#BB6BD9" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" />
-                                        <path d="M19.4487 26.4642L26.495 19.4179" stroke="#BB6BD9" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                </div>
-                                <div class="total-projects ms-3">
-                                    <h3 class="text-purple count">22 hrs</h3>
-                                    <span>Hours Logged</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 m-0 col-sm-6 m-0">
-                    <div class="card box-hover">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-box icon-box-lg bg-primary-light rounded-circle">
-                                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M32.8961 26.5849C34.1612 26.5849 35.223 27.629 35.0296 28.8783C33.8947 36.2283 27.6026 41.6855 20.0138 41.6855C11.6178 41.6855 4.8125 34.8803 4.8125 26.4862C4.8125 19.5704 10.0664 13.1283 15.9816 11.6717C17.2526 11.3579 18.5553 12.252 18.5553 13.5605C18.5553 22.4263 18.8533 24.7197 20.5368 25.9671C22.2204 27.2145 24.2 26.5849 32.8961 26.5849Z"
-                                            stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M41.1733 19.2019C41.2739 13.5059 34.2772 4.32428 25.7509 4.48217C25.0877 4.49402 24.5568 5.04665 24.5272 5.70783C24.3121 10.3914 24.6022 16.4605 24.764 19.2118C24.8134 20.0684 25.4864 20.7414 26.341 20.7907C29.1693 20.9526 35.4594 21.1736 40.0759 20.4749C40.7035 20.3802 41.1634 19.8355 41.1733 19.2019Z"
-                                            stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                    </svg>
-
-                                </div>
-                                <div class="total-projects ms-3">
-                                    <h3 class="text-primary count">1200</h3>
-                                    <span>Completed Tasks</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 m-0 col-sm-6 m-0">
-                    <div class="card box-hover">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-box icon-box-lg bg-success-light rounded-circle">
-                                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M22.9715 29.3168C15.7197 29.3168 9.52686 30.4132 9.52686 34.8043C9.52686 39.1953 15.6804 40.331 22.9715 40.331C30.2233 40.331 36.4144 39.2328 36.4144 34.8435C36.4144 30.4543 30.2626 29.3168 22.9715 29.3168Z"
-                                            stroke="#3AC977" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M22.9714 23.0537C27.7304 23.0537 31.5875 19.1948 31.5875 14.4359C31.5875 9.67694 27.7304 5.81979 22.9714 5.81979C18.2125 5.81979 14.3536 9.67694 14.3536 14.4359C14.3375 19.1787 18.1696 23.0377 22.9107 23.0537H22.9714Z"
-                                            stroke="#3AC977" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                    </svg>
-                                </div>
-                                <div class="total-projects ms-3">
-                                    <h3 class="text-success count">18.80%</h3>
-                                    <span>Today Attandance</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 m-0 col-sm-6 m-0">
-                    <div class="card box-hover">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-box icon-box-lg bg-success-light rounded-circle">
-                                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M22.9715 29.3168C15.7197 29.3168 9.52686 30.4132 9.52686 34.8043C9.52686 39.1953 15.6804 40.331 22.9715 40.331C30.2233 40.331 36.4144 39.2328 36.4144 34.8435C36.4144 30.4543 30.2626 29.3168 22.9715 29.3168Z"
-                                            stroke="#3AC977" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M22.9714 23.0537C27.7304 23.0537 31.5875 19.1948 31.5875 14.4359C31.5875 9.67694 27.7304 5.81979 22.9714 5.81979C18.2125 5.81979 14.3536 9.67694 14.3536 14.4359C14.3375 19.1787 18.1696 23.0377 22.9107 23.0537H22.9714Z"
-                                            stroke="#3AC977" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                    </svg>
-                                </div>
-                                <div class="total-projects ms-3">
-                                    <h3 class="text-success count">0</h3>
-                                    <span>Resolved Tickets</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 m-0 col-sm-6 m-0">
-                    <div class="card box-hover">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="icon-box icon-box-lg bg-primary-light rounded-circle">
-                                    <svg width="46" height="46" viewBox="0 0 46 46" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M32.8961 26.5849C34.1612 26.5849 35.223 27.629 35.0296 28.8783C33.8947 36.2283 27.6026 41.6855 20.0138 41.6855C11.6178 41.6855 4.8125 34.8803 4.8125 26.4862C4.8125 19.5704 10.0664 13.1283 15.9816 11.6717C17.2526 11.3579 18.5553 12.252 18.5553 13.5605C18.5553 22.4263 18.8533 24.7197 20.5368 25.9671C22.2204 27.2145 24.2 26.5849 32.8961 26.5849Z"
-                                            stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path fill-rule="evenodd" clip-rule="evenodd"
-                                            d="M41.1733 19.2019C41.2739 13.5059 34.2772 4.32428 25.7509 4.48217C25.0877 4.49402 24.5568 5.04665 24.5272 5.70783C24.3121 10.3914 24.6022 16.4605 24.764 19.2118C24.8134 20.0684 25.4864 20.7414 26.341 20.7907C29.1693 20.9526 35.4594 21.1736 40.0759 20.4749C40.7035 20.3802 41.1634 19.8355 41.1733 19.2019Z"
-                                            stroke="var(--primary)" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                    </svg>
-
-                                </div>
-                                <div class="total-projects ms-3">
-                                    <h3 class="text-primary count">0</h3>
-                                    <span>Unresolved Tickets</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-							<div class="col-xl-12">
-								<div class="card overflow-hidden">
-									<div class="card-header border-0 pb-0 flex-wrap">
-										<h4 class="heading mb-0">Recent Earnings</h4>
-										<ul class="nav nav-pills mix-chart-tab" id="pills-tab" role="tablist">
-										  <li class="nav-item" role="presentation">
-											<button class="nav-link active" data-series="week" id="pills-week-tab" data-bs-toggle="pill" data-bs-target="#pills-week" type="button" role="tab"  aria-selected="true">Week</button>
-										  </li>
-										  <li class="nav-item" role="presentation">
-											<button class="nav-link" data-series="month" id="pills-month-tab" data-bs-toggle="pill" data-bs-target="#pills-month" type="button" role="tab"  aria-selected="false">Month</button>
-										  </li>
-										  <li class="nav-item" role="presentation">
-											<button class="nav-link" data-series="year" id="pills-year-tab" data-bs-toggle="pill" data-bs-target="#pills-year" type="button" role="tab"  aria-selected="false">Year</button>
-										  </li>
-										   <li class="nav-item" role="presentation">
-											<button class="nav-link" data-series="all" id="pills-all-tab" data-bs-toggle="pill" data-bs-target="#pills-all" type="button" role="tab" aria-selected="false">All</button>
-										  </li>
-										</ul>
-									</div>
-									<div class="card-body  p-0">
-											<div id="overiewChart"></div>
-										<div class="ttl-project">
-											<div class="pr-data">
-												<h5>12,721</h5>
-												<span>Number of Projects</span>
-											</div>
-											<div class="pr-data">
-												<h5 class="text-primary">721</h5>
-												<span>Active Projects</span>
-											</div>
-											<div class="pr-data">
-												<h5>$2,50,523</h5>
-												<span>Revenue</span>
-											</div>
-											<div class="pr-data">
-												<h5 class="text-success">12,275h</h5>
-												<span>Working Hours</span>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
+			<div class="col-xl-3 col-md-6 up-shd">
+				<div class="card">
+					<div class="card-header border-0 pb-1">
+						<h4 class="heading mb-0">Leaves</h4>
 					</div>
-					<div class="col-xl-3 col-md-6 up-shd">
-						<div class="card">
-							<div class="card-header border-0 pb-1">
-								<h4 class="heading mb-0">Leaves</h4>
-							</div>
-							<div class="card-body schedules-cal p-2">
-								<input type="text" class="form-control d-none" id="datetimepicker1">
-								<div class="events">
-									<h6>events</h6>
-									<div class="dz-scroll event-scroll">
-										<div class="event-media">
-											<div class="d-flex align-items-center">
-												<div class="event-box">
-													<h5 class="mb-0">20</h5>
-													<span>Mon</span>
-												</div>
-												<div class="event-data ms-2">
-													<h5 class="mb-0"><a href="javascript:void(0)">Development planning</a></h5>
-													<span>w3it Technologies</span>
-												</div>
-											</div>
-											<span class="text-secondary">12:05 PM</span>
-										</div>
-										<div class="event-media">
-											<div class="d-flex align-items-center">
-												<div class="event-box">
-													<h5 class="mb-0">20</h5>
-													<span>Mon</span>
-												</div>
-												<div class="event-data ms-2">
-													<h5 class="mb-0"><a href="javascript:void(0)">Development planning</a></h5>
-													<span>w3it Technologies</span>
-												</div>
-											</div>
-											<span class="text-secondary">12:05 PM</span>
-										</div>
-										<div class="event-media">
-											<div class="d-flex align-items-center">
-												<div class="event-box">
-													<h5 class="mb-0">20</h5>
-													<span>Mon</span>
-												</div>
-												<div class="event-data ms-2">
-													<h5 class="mb-0"><a href="javascript:void(0)">Development planning</a></h5>
-													<span>w3it Technologies</span>
-												</div>
-											</div>
-											<span class="text-secondary">12:05 PM</span>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-xl-3 col-md-6 up-shd">
-						<div class="card">
-							<div class="card-header pb-0 border-0">
-								<h4 class="heading mb-0">New Tickets</h4>
-							</div>
-							<div class="card-body">
-								<div id="" class="project-chart">No ticket found.</div>
-								<div class="project-date">
-									
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-xl-6 col-lg-6">
-						<div class="card">
-							<div class="card-header  border-0 pb-0">
-								<h4 class="card-title">Overdue Tasks</h4>
-							</div>
-							<div class="card-body p-0">
-								<div id="DZ_W_Todo1" class="widget-media dz-scroll height600 my-4 px-4">
-									<ul class="timeline">
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2">
-													<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Dr sultads Send you Photo</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-info">
-													KG
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Resport created successfully</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-success">
-													<i class="fa fa-home"></i>
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Reminder : Treatment Time!</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-info">
-													KG
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Resport created successfully</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2">
-													<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Dr sultads Send you Photo</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-danger">
-													KG
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Resport created successfully</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-info">
-													KG
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Resport created successfully</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-primary">
-													<i class="fa fa-home"></i>
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Reminder : Treatment Time!</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2">
-													<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Dr sultads Send you Photo</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-info">
-													KG
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Resport created successfully</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2">
-													<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Dr sultads Send you Photo</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-info">
-													KG
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Resport created successfully</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
-			
-					<div class="col-xl-6 col-lg-6">
-						<div class="card">
-							<div class="card-header  border-0 pb-0">
-								<h4 class="card-title">Pending FollowUp</h4>
-							</div>
-							<div class="card-body p-0">
-								<div id="DZ_W_Todo1" class="widget-media dz-scroll height600 my-4 px-4">
-									<ul class="timeline">
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2">
-													<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Dr sultads Send you Photo</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-info">
-													KG
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Resport created successfully</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-success">
-													<i class="fa fa-home"></i>
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Reminder : Treatment Time!</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2">
-													<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Dr sultads Send you Photo</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-info">
-													KG
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Resport created successfully</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2">
-													<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Dr sultads Send you Photo</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-info">
-													KG
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Resport created successfully</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2">
-													<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Dr sultads Send you Photo</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-danger">
-													KG
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Resport created successfully</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-primary">
-													<i class="fa fa-home"></i>
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Reminder : Treatment Time!</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2">
-													<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Dr sultads Send you Photo</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-info">
-													KG
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Resport created successfully</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2">
-													<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Dr sultads Send you Photo</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-										<li>
-											<div class="timeline-panel">
-												<div class="media me-2 media-info">
-													KG
-												</div>
-												<div class="media-body">
-													<h5 class="mb-1">Resport created successfully</h5>
-												</div>
-												<small class="d-block">29 July 2020 - 02:26 PM</small>
-											</div>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
-			
-					<div class="col-xl-6  col-lg-6">
-						<div class="card">
-							<div class="card-header border-0 pb-0">
-								<h4 class="card-title">Project Activity Timeline</h4>
-							</div>
-							<div class="card-body p-0">
-								<div id="DZ_W_TimeLine" class="widget-timeline dz-scroll height600 my-4 px-4">
-									<ul class="timeline">
-										<li>
-											<div class="timeline-badge primary"></div>
-											<a class="timeline-panel " href="#">
-												<span>10 minutes ago</span>
-												<h6 class="mb-0">Youtube, a video-sharing website, goes live <strong
-														class="text-primary">$500</strong>.</h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge info">
-											</div>
-											<a class="timeline-panel " href="#">
-												<span>20 minutes ago</span>
-												<h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>
-												<p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge danger">
-											</div>
-											<a class="timeline-panel " href="#">
-												<span>30 minutes ago</span>
-												<h6 class="mb-0">john just buy your product <strong class="text-warning">Sell
-														$250</strong></h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge success">
-											</div>
-											<a class="timeline-panel" href="#">
-												<span>15 minutes ago</span>
-												<h6 class="mb-0">StumbleUpon is acquired by eBay. </h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge primary"></div>
-											<a class="timeline-panel " href="#">
-												<span>10 minutes ago</span>
-												<h6 class="mb-0">Youtube, a video-sharing website, goes live <strong
-														class="text-primary">$500</strong>.</h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge info">
-											</div>
-											<a class="timeline-panel " href="#">
-												<span>20 minutes ago</span>
-												<h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>
-												<p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge warning">
-											</div>
-											<a class="timeline-panel" href="#">
-												<span>20 minutes ago</span>
-												<h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge dark">
-											</div>
-											<a class="timeline-panel" href="#">
-												<span>20 minutes ago</span>
-												<h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge primary"></div>
-											<a class="timeline-panel " href="#">
-												<span>10 minutes ago</span>
-												<h6 class="mb-0">Youtube, a video-sharing website, goes live <strong
-														class="text-primary">$500</strong>.</h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge info">
-											</div>
-											<a class="timeline-panel " href="#">
-												<span>20 minutes ago</span>
-												<h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>
-												<p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>
-											</a>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
-			
-					<div class="col-xl-6 col-lg-6">
-						<div class="card">
-							<div class="card-header border-0 pb-0">
-								<h4 class="card-title">User Activity Timeline</h4>
-							</div>
-							<div class="card-body p-0">
-								<div id="DZ_W_TimeLine11" class="widget-timeline dz-scroll style-1 height600 my-4 px-4">
-									<ul class="timeline">
-										<li>
-											<div class="timeline-badge primary"></div>
-											<a class="timeline-panel" href="#">
-												<span>10 minutes ago</span>
-												<h6 class="mb-0">Youtube, a video-sharing website, goes live <strong
-														class="text-primary">$500</strong>.</h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge info">
-											</div>
-											<a class="timeline-panel" href="#">
-												<span>20 minutes ago</span>
-												<h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>
-												<p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge danger">
-											</div>
-											<a class="timeline-panel" href="#">
-												<span>30 minutes ago</span>
-												<h6 class="mb-0">john just buy your product <strong class="text-warning">Sell
-														$250</strong></h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge success">
-											</div>
-											<a class="timeline-panel " href="#">
-												<span>15 minutes ago</span>
-												<h6 class="mb-0">StumbleUpon is acquired by eBay. </h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge info">
-											</div>
-											<a class="timeline-panel" href="#">
-												<span>20 minutes ago</span>
-												<h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>
-												<p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge danger">
-											</div>
-											<a class="timeline-panel" href="#">
-												<span>30 minutes ago</span>
-												<h6 class="mb-0">john just buy your product <strong class="text-warning">Sell
-														$250</strong></h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge warning">
-											</div>
-											<a class="timeline-panel " href="#">
-												<span>20 minutes ago</span>
-												<h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge dark">
-											</div>
-											<a class="timeline-panel " href="#">
-												<span>20 minutes ago</span>
-												<h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge info">
-											</div>
-											<a class="timeline-panel" href="#">
-												<span>20 minutes ago</span>
-												<h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>
-												<p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>
-											</a>
-										</li>
-										<li>
-											<div class="timeline-badge danger">
-											</div>
-											<a class="timeline-panel" href="#">
-												<span>30 minutes ago</span>
-												<h6 class="mb-0">john just buy your product <strong class="text-warning">Sell
-														$250</strong></h6>
-											</a>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div>
+					<div class="card-body schedules-cal p-2">
+						<input type="text" class="form-control d-none" id="datetimepicker1">
+						<!--<div class="events">-->
+						<!--	<h6>events</h6>-->
+						<!--	<div class="dz-scroll event-scroll">-->
+						<!--		<div class="event-media">-->
+						<!--			<div class="d-flex align-items-center">-->
+						<!--				<div class="event-box">-->
+						<!--					<h5 class="mb-0">20</h5>-->
+						<!--					<span>Mon</span>-->
+						<!--				</div>-->
+						<!--				<div class="event-data ms-2">-->
+						<!--					<h5 class="mb-0"><a href="javascript:void(0)">Development planning</a></h5>-->
+						<!--					<span>w3it Technologies</span>-->
+						<!--				</div>-->
+						<!--			</div>-->
+						<!--			<span class="text-secondary">12:05 PM</span>-->
+						<!--		</div>-->
+						<!--		<div class="event-media">-->
+						<!--			<div class="d-flex align-items-center">-->
+						<!--				<div class="event-box">-->
+						<!--					<h5 class="mb-0">20</h5>-->
+						<!--					<span>Mon</span>-->
+						<!--				</div>-->
+						<!--				<div class="event-data ms-2">-->
+						<!--					<h5 class="mb-0"><a href="javascript:void(0)">Development planning</a></h5>-->
+						<!--					<span>w3it Technologies</span>-->
+						<!--				</div>-->
+						<!--			</div>-->
+						<!--			<span class="text-secondary">12:05 PM</span>-->
+						<!--		</div>-->
+						<!--		<div class="event-media">-->
+						<!--			<div class="d-flex align-items-center">-->
+						<!--				<div class="event-box">-->
+						<!--					<h5 class="mb-0">20</h5>-->
+						<!--					<span>Mon</span>-->
+						<!--				</div>-->
+						<!--				<div class="event-data ms-2">-->
+						<!--					<h5 class="mb-0"><a href="javascript:void(0)">Development planning</a></h5>-->
+						<!--					<span>w3it Technologies</span>-->
+						<!--				</div>-->
+						<!--			</div>-->
+						<!--			<span class="text-secondary">12:05 PM</span>-->
+						<!--		</div>-->
+						<!--	</div>-->
+						<!--</div>-->
 					</div>
 				</div>
-
 			</div>
+			
+			
+			
+			
+			<!--<div class="col-xl-3 col-md-6 up-shd">-->
+			<!--	<div class="card">-->
+			<!--		<div class="card-header pb-0 border-0">-->
+			<!--			<h4 class="heading mb-0">New Tickets</h4>-->
+			<!--		</div>-->
+			<!--		<div class="card-body">-->
+			<!--			<div id="" class="project-chart">No ticket found.</div>-->
+			<!--			<div class="project-date">-->
+							
+			<!--			</div>-->
+			<!--		</div>-->
+			<!--	</div>-->
+			<!--</div>-->
+			
+			
+            
+			
+			
+	
+			<!--<div class="col-xl-6 col-lg-6">-->
+			<!--	<div class="card">-->
+			<!--		<div class="card-header  border-0 pb-0">-->
+			<!--			<h4 class="card-title">Pending FollowUp</h4>-->
+			<!--		</div>-->
+			<!--		<div class="card-body p-0">-->
+			<!--			<div id="DZ_W_Todo1" class="widget-media dz-scroll height600 my-4 px-4">-->
+			<!--				<ul class="timeline">-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2">-->
+			<!--								<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Dr sultads Send you Photo</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2 media-info">-->
+			<!--								KG-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Resport created successfully</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2 media-success">-->
+			<!--								<i class="fa fa-home"></i>-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Reminder : Treatment Time!</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2">-->
+			<!--								<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Dr sultads Send you Photo</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2 media-info">-->
+			<!--								KG-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Resport created successfully</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2">-->
+			<!--								<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Dr sultads Send you Photo</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2 media-info">-->
+			<!--								KG-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Resport created successfully</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2">-->
+			<!--								<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Dr sultads Send you Photo</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2 media-danger">-->
+			<!--								KG-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Resport created successfully</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2 media-primary">-->
+			<!--								<i class="fa fa-home"></i>-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Reminder : Treatment Time!</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2">-->
+			<!--								<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Dr sultads Send you Photo</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2 media-info">-->
+			<!--								KG-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Resport created successfully</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2">-->
+			<!--								<img alt="image" width="50" src="{{asset('images/avatar/1.jpg')}}">-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Dr sultads Send you Photo</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-panel">-->
+			<!--							<div class="media me-2 media-info">-->
+			<!--								KG-->
+			<!--							</div>-->
+			<!--							<div class="media-body">-->
+			<!--								<h5 class="mb-1">Resport created successfully</h5>-->
+			<!--							</div>-->
+			<!--							<small class="d-block">29 July 2020 - 02:26 PM</small>-->
+			<!--						</div>-->
+			<!--					</li>-->
+			<!--				</ul>-->
+			<!--			</div>-->
+			<!--		</div>-->
+			<!--	</div>-->
+			<!--</div>-->
+	
+			<!--<div class="col-xl-6  col-lg-6">-->
+			<!--	<div class="card">-->
+			<!--		<div class="card-header border-0 pb-0">-->
+			<!--			<h4 class="card-title">Project Activity Timeline</h4>-->
+			<!--		</div>-->
+			<!--		<div class="card-body p-0">-->
+			<!--			<div id="DZ_W_TimeLine" class="widget-timeline dz-scroll height600 my-4 px-4">-->
+			<!--				<ul class="timeline">-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge primary"></div>-->
+			<!--						<a class="timeline-panel " href="#">-->
+			<!--							<span>10 minutes ago</span>-->
+			<!--							<h6 class="mb-0">Youtube, a video-sharing website, goes live <strong-->
+			<!--									class="text-primary">$500</strong>.</h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge info">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel " href="#">-->
+			<!--							<span>20 minutes ago</span>-->
+			<!--							<h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>-->
+			<!--							<p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge danger">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel " href="#">-->
+			<!--							<span>30 minutes ago</span>-->
+			<!--							<h6 class="mb-0">john just buy your product <strong class="text-warning">Sell-->
+			<!--									$250</strong></h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge success">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel" href="#">-->
+			<!--							<span>15 minutes ago</span>-->
+			<!--							<h6 class="mb-0">StumbleUpon is acquired by eBay. </h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge primary"></div>-->
+			<!--						<a class="timeline-panel " href="#">-->
+			<!--							<span>10 minutes ago</span>-->
+			<!--							<h6 class="mb-0">Youtube, a video-sharing website, goes live <strong-->
+			<!--									class="text-primary">$500</strong>.</h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge info">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel " href="#">-->
+			<!--							<span>20 minutes ago</span>-->
+			<!--							<h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>-->
+			<!--							<p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge warning">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel" href="#">-->
+			<!--							<span>20 minutes ago</span>-->
+			<!--							<h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge dark">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel" href="#">-->
+			<!--							<span>20 minutes ago</span>-->
+			<!--							<h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge primary"></div>-->
+			<!--						<a class="timeline-panel " href="#">-->
+			<!--							<span>10 minutes ago</span>-->
+			<!--							<h6 class="mb-0">Youtube, a video-sharing website, goes live <strong-->
+			<!--									class="text-primary">$500</strong>.</h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge info">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel " href="#">-->
+			<!--							<span>20 minutes ago</span>-->
+			<!--							<h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>-->
+			<!--							<p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--				</ul>-->
+			<!--			</div>-->
+			<!--		</div>-->
+			<!--	</div>-->
+			<!--</div>-->
+	
+			<!--<div class="col-xl-6 col-lg-6">-->
+			<!--	<div class="card">-->
+			<!--		<div class="card-header border-0 pb-0">-->
+			<!--			<h4 class="card-title">User Activity Timeline</h4>-->
+			<!--		</div>-->
+			<!--		<div class="card-body p-0">-->
+			<!--			<div id="DZ_W_TimeLine11" class="widget-timeline dz-scroll style-1 height600 my-4 px-4">-->
+			<!--				<ul class="timeline">-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge primary"></div>-->
+			<!--						<a class="timeline-panel" href="#">-->
+			<!--							<span>10 minutes ago</span>-->
+			<!--							<h6 class="mb-0">Youtube, a video-sharing website, goes live <strong-->
+			<!--									class="text-primary">$500</strong>.</h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge info">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel" href="#">-->
+			<!--							<span>20 minutes ago</span>-->
+			<!--							<h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>-->
+			<!--							<p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge danger">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel" href="#">-->
+			<!--							<span>30 minutes ago</span>-->
+			<!--							<h6 class="mb-0">john just buy your product <strong class="text-warning">Sell-->
+			<!--									$250</strong></h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge success">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel " href="#">-->
+			<!--							<span>15 minutes ago</span>-->
+			<!--							<h6 class="mb-0">StumbleUpon is acquired by eBay. </h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge info">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel" href="#">-->
+			<!--							<span>20 minutes ago</span>-->
+			<!--							<h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>-->
+			<!--							<p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge danger">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel" href="#">-->
+			<!--							<span>30 minutes ago</span>-->
+			<!--							<h6 class="mb-0">john just buy your product <strong class="text-warning">Sell-->
+			<!--									$250</strong></h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge warning">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel " href="#">-->
+			<!--							<span>20 minutes ago</span>-->
+			<!--							<h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge dark">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel " href="#">-->
+			<!--							<span>20 minutes ago</span>-->
+			<!--							<h6 class="mb-0">Mashable, a news website and blog, goes live.</h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge info">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel" href="#">-->
+			<!--							<span>20 minutes ago</span>-->
+			<!--							<h6 class="mb-0">New order placed <strong class="text-info">#XF-2356.</strong></h6>-->
+			<!--							<p class="mb-0">Quisque a consequat ante Sit amet magna at volutapt...</p>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--					<li>-->
+			<!--						<div class="timeline-badge danger">-->
+			<!--						</div>-->
+			<!--						<a class="timeline-panel" href="#">-->
+			<!--							<span>30 minutes ago</span>-->
+			<!--							<h6 class="mb-0">john just buy your product <strong class="text-warning">Sell-->
+			<!--									$250</strong></h6>-->
+			<!--						</a>-->
+			<!--					</li>-->
+			<!--				</ul>-->
+			<!--			</div>-->
+			<!--		</div>-->
+			<!--	</div>-->
+			<!--</div>-->
+		</div>
+
+	</div>
  @endsection
 
 @push('scripts')
@@ -950,6 +1343,137 @@
             dzSettingsOptions.version = 'light';
             new dzSettings(dzSettingsOptions);
         },1500)
+    });
+</script>
+<script>
+    $(document).on('click', '.closeJobBtn', function () {
+
+        var button = $(this);
+        var jobId = button.data('id');
+    
+        Swal.fire({
+            title: 'Close this Job?',
+            text: "This will change the Job Status to Close.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Close it',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+    
+            if (result.isConfirmed) {
+    
+                $.ajax({
+    
+                    url: '/dashboard/close-job/' + jobId,
+    
+                    type: 'POST',
+    
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+    
+                    success: function (response) {
+    
+                        if (response.success) {
+    
+                            Swal.fire(
+                                'Closed!',
+                                response.message,
+                                'success'
+                            );
+    
+                            // Remove row
+                            button.closest('tr').fadeOut(300, function () {
+                                $(this).remove();
+                            });
+    
+                            // Update card count
+                            var count = parseInt($('.needToCloseCount').text());
+                            $('.needToCloseCount').text(count - 1);
+                        }
+                    }
+    
+                });
+    
+            }
+    
+        });
+    
+    });
+</script>
+  
+<script>
+    // pending jobs
+    $(document).ready(function(){
+        $('#pendingJobsModal').on('show.bs.modal', function () {
+            $('#pendingJobsContent').html('<p class="text-center">Loading...</p>');
+            
+            $.ajax({
+                url: "{{ route('dashboard.pendingJobs') }}",
+                type: 'GET',
+                success: function(data) {
+                    // Inject the partial HTML into modal body
+                    $('#pendingJobsContent').html(data);
+                },
+                error: function(xhr, status, error) {
+                    $('#pendingJobsContent').html('<p class="text-danger text-center">Failed to load data!</p>');
+                    console.error(error);
+                }
+            });
+        });
+    });
+    
+    // close jobs
+    $(document).ready(function(){
+        $('#closeJobsModal').on('show.bs.modal', function () {
+            $('#closeJobsContent').html('<p class="text-center">Loading...</p>');
+            
+            $.ajax({
+                url: "{{ route('dashboard.closeJobs') }}",
+                type: 'GET',
+                success: function(data) {
+                    // Inject the partial HTML into modal body
+                    $('#closeJobsContent').html(data);
+                },
+                error: function(xhr, status, error) {
+                    $('#closeJobsContent').html('<p class="text-danger text-center">Failed to load data!</p>');
+                    console.error(error);
+                }
+            });
+        });
+    });
+    
+    // leo date model
+    $(document).ready(function(){
+        $('#leoDateModal').on('show.bs.modal', function(){
+            $('#leoDateContent').html('<p class="text-center">Loading...</p>');
+    
+            $.ajax({
+                url: "{{ route('dashboard.leoPending') }}",
+                type: "GET",
+                success: function(data){
+                    $('#leoDateContent').html(data);
+                },
+                error: function(){
+                    $('#leoDateContent').html('<p class="text-danger text-center">Failed to load data!</p>');
+                }
+            }); 
+        });
+        
+        $('#ComplateOperationModal').on('show.bs.modal', function(){
+            $('#ComplateOperationContent').html('<p class="text-center">Loading...</p>');
+    
+            $.ajax({
+                url: "{{ route('dashboard.complateOperation') }}",
+                type: "GET",
+                success: function(data){
+                    $('#ComplateOperationContent').html(data);
+                },
+                error: function(){
+                    $('#ComplateOperationContent').html('<p class="text-danger text-center">Failed to load data!</p>');
+                }
+            });
+        });
     });
 </script>
 @endpush
@@ -1131,5 +1655,7 @@
       </div>
     </div>
   </div>
+
+
 @endpush
 

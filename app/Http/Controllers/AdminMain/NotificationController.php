@@ -26,4 +26,23 @@ class NotificationController extends Controller
 
         return back()->with('success', 'Notification removed.');
     }
+    
+    // For change Job Status Open and Close
+    public function markAsReadJobStatus($id)
+    {
+        $notification = auth()->user()
+            ->notifications()
+            ->where('id', $id)
+            ->first();
+    
+        if ($notification) {
+            $notification->markAsRead();
+    
+            // Redirect to the related Job Edit page
+            return redirect()->route('job-masters.edit', $notification->data['job_id']);
+        }
+    
+        return redirect()->back()->with('error', 'Notification not found.');
+    }
+
 }

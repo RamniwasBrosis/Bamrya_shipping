@@ -10,6 +10,16 @@ use Illuminate\Support\Str;
 
 class MasterBlTypeController extends Controller
 {
+    public $company_id ;
+
+    public function __construct(){
+        $this->middleware(function ($request, $next) {
+            $this->company_id = Auth::user()->company_id;
+            $this->user_id = auth()->user()->id;
+            return $next($request);
+        });
+    }
+    
     /**
      * Display a listing of the resource.
      */
@@ -21,7 +31,7 @@ class MasterBlTypeController extends Controller
             $query->where('bl_description', 'LIKE', '%'.$request->bl_description.'%');
         }
               
-        $blTypes = $query->orderBy('created_at', 'desc')->paginate(10);
+        $blTypes = $query->where('company_id', $this->company_id)->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin-main.admin.bltype.index', compact('blTypes'));
     }
@@ -50,6 +60,7 @@ class MasterBlTypeController extends Controller
         $blType->uuid = Str::uuid();
         $blType->bl_description =  $request->bl_description; 
         $blType->status =  $request->status; 
+        $blType->user_id =  $this->user_id; 
 
         $blType->save();
         
@@ -83,7 +94,7 @@ class MasterBlTypeController extends Controller
             'bl_description' => 'required|max:200',
             'status' => 'required|boolean',
         ]);
-
+        $validation['user_id'] = $this->user_id;
         $blType = MasterBlType::findOrFail($id);
         $blType->update($validation);
 

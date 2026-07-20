@@ -15,6 +15,7 @@ class MemberUserController extends Controller
     public function __construct(){
         $this->middleware(function ($request, $next) {
             $this->company_id = Auth::user()->company_id;
+            $this->user_id = auth()->user()->id;
             return $next($request);
         });
     }
@@ -44,7 +45,7 @@ class MemberUserController extends Controller
      */
     public function create()
     {
-        $roles = Role::all();
+        $roles = Role::where('company_id', Auth::user()->company_id)->get();
         return view('admin-main.admin.users.create', compact('roles'));
     }
 
@@ -70,6 +71,7 @@ class MemberUserController extends Controller
             'company_id' => $company_id,
             'status' => $request->status,
             'role' => $request->role_name,
+            'user_id' => $this->user_id,
         ]);
 
         $user->assignRole($request->role_name);
@@ -111,6 +113,7 @@ class MemberUserController extends Controller
         $user = User::findOrFail($id);
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->user_id = $this->user_id;
 
         if ($request->filled('password')) {
             $user->password = bcrypt($request->password);

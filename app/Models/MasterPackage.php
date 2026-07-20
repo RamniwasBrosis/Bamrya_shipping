@@ -4,10 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class MasterPackage extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['company_id','package_code', 'description', 'status', 'uuid'];
+    protected $fillable = ['company_id','package_code', 'description', 'status', 'uuid','user_id'];
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

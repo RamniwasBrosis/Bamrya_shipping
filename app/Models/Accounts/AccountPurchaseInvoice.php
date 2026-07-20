@@ -2,69 +2,34 @@
 
 namespace App\Models\Accounts;
 
-use App\Models\MasterImportParty;
+use App\Models\Accounts\MasterImportParty;
+use App\Models\Accounts\AccountPurchaseInvoiceContainer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Operations\OperationJobMaster;
+use App\Models\Accounts\PurchaseParties;
+use App\Models\User;
 
 class AccountPurchaseInvoice extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'company_id',
-        'uuid',
-        'Inv_cat',
-        'job_no',
-        'voyage_code',
-        'pod',
-        'container',
-        'consignee',
-        'cbm',
-        'gross_weight',
-        'chargeable_weight',
-        'party_type',
-        'billing_party_id',
-        'invoice_no',
-        'invoice_type',
-        'overseas_exchange_rate',
-        'gst_type',
-        'invoice_date',
-
-        'charge_name',
-        'gst',
-        'currency',
-        'prepaid_coll',
-        'rate_basis',
-        'gst_applicable',
-        'per_unit',
-        'exchange_rate',
-        'rate_per_unit',
-        'freight',
-        'amount',
-        'tds_amount',
-        'tds',
-        'remarks',
-
-        'caf_percent',
-        'caf_amount',
-        'baf_percent',
-        'baf_amount',
-        'cc_percent',
-        'cc_amount',
-
-        'cc_apply',
-        'caf_apply',
-
-        'gstin',
-        'sac_code',
-
-        'cgst',
-        'sgst',
-        'igst',
-        'total',
-    ];
-
+    protected $guarded = [];
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+    
     public function partyName(){
-        return $this->belongsTo(MasterImportParty::class, 'billing_party_id');
+        return $this->belongsTo(PurchaseParties::class, 'billing_party_id');
+    }
+    
+    public function operationJob(){
+        return $this->belongsTo(OperationJobMaster::class, 'job_no', 'id');
+    }
+    
+    public function chargesContainer(){
+        return $this->hasMany(AccountPurchaseInvoiceContainer::class, 'purchase_invoice_id');
     }
 }
