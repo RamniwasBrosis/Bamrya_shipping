@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\ImportPartyExport;
 
 class MasterImportPartyController extends Controller
 {
@@ -31,12 +34,35 @@ class MasterImportPartyController extends Controller
     {
         $page_title = 'Import Parties';
         $query = MasterImportParty::with('party')->where('company_id', $this->company_id);
-
+        $partyType = $request->party_type;
         if($request->filled('party_name')){
             $query->where('party_name', 'LIKE', '%'.$request->party_name.'%');
         }
+        if($request->filled('party_type')){
+            $query->where('party_type', $request->party_type);
+        }
         
-        $importParties = $query->orderBy('created_at', 'desc')->paginate(10);
+        //export 
+        if ($request->action == 'export') {
+            $importParties = $query->orderBy('created_at', 'desc')->where('company_id', $this->company_id)->get();
+            //excel
+            if ($request->export_type == 'excel') {
+                return Excel::download(
+                    new ImportPartyExport($importParties),
+                    'Import-Parties.xlsx'
+                );
+            }
+            //pdf
+            if ($request->export_type == 'pdf') {
+                $pdf = Pdf::loadView(
+                    'admin-main.admin.party.import.pdf',
+                    compact('importParties','partyType')
+                );
+                return $pdf->download('Import-Parties.pdf');
+            }
+        }
+        
+        $importParties = $query->orderBy('created_at', 'desc')->paginate(25);
         
         $partyNameList = MasterImportParty::where('company_id', $this->company_id)->orderBy('party_name')->get();
         
@@ -344,5 +370,7 @@ class MasterImportPartyController extends Controller
     
         return back()->with('success', 'Document deleted successfully.');
     }
+    
+    
 
 }

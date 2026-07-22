@@ -1,5 +1,20 @@
 @extends('admin-main.layouts.default')
 @section('content')
+@if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+@if ($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
     <div class="page-titles">
         <ol class="breadcrumb">
             <li class="breadcrumb-item active"><a href="#">Edit Enquiry</a></li>
@@ -12,15 +27,43 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="form-validation">
-                            <form class="needs-validation" novalidate>
+                            <form class="needs-validation" action="{{ route('Enquiry.update', $enquiry->id) }}" method="Post">
                                 @csrf
+                                @method('PUT')
                                 <input type="hidden" name="enquiry_id" class="enquiry_id">
                                 <div class="row">
                                     <div class="col-xl-6">
                                         <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">Enquiry No:<span
+                                                    class="text-danger">*</span></label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" name="enquiry_no" value="{{$enquiry->enquiry_no}}" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">Reference ID:</label>
                                             <div class="col-sm-9">
                                                 <input type="text" class="form-control" value="{{$enquiry->reference_id}}" name="reference_id">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">Job Activity:<span
+                                                class="text-danger">*</span></label>
+                                            <div class="col-sm-9">
+                                                <select class="select2 form-control wide" name="job_activity">
+                                                    <option value="">Select</option>
+                                                    <option value="SEAIMP.FWD" @if($enquiry?->job_activity == 'SEAIMP.FWD') selected @endif>SEAIMP.FWD</option>
+    
+                                                    <option value="SEAEXP.FWD" @if($enquiry?->job_activity == 'SEAEXP.FWD') selected @endif>SEAEXP.FWD</option>
+    
+                                                    <option value="AIRIMP.FWD" @if($enquiry?->job_activity == 'AIRIMP.FWD') selected @endif>AIRIMP.FWD</option>
+    
+                                                    <option value="AIREXP.FWD" @if($enquiry?->job_activity == 'AIREXP.FWD') selected @endif>AIREXP.FWD</option>
+    
+                                                    <option value="SEAIMP.NVOCC" @if($enquiry?->job_activity == 'SEAIMP.NVOCC') selected @endif>SEAIMP.NVOCC</option>
+
+                                                    <option value="SEAEXP.NVOCC" @if($enquiry?->job_activity == 'SEAEXP.NVOCC') selected @endif>SEAEXP.NVOCC</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="mb-3 row">
@@ -60,10 +103,21 @@
                                             <label class="col-sm-3 col-form-label">Inco Terms:</label>
                                             <div class="col-sm-9 d-flex align-items-center">
                                                 <select class="select2 form-control wide me-2" name="inco_terms" placeholder="Select">
-                                                    <option value="{{$enquiry->inco_terms}}" {{$enquiry->inco_terms == $enquiry->inco_terms? 'selected' : ''}}>{{$enquiry->inco_terms}}</option>
+                                                    <option value="">Select Inco Terms</option>
+                                                    <option value="EXW (Ex Works)" {{$enquiry->inco_terms == 'EXW (Ex Works)' ? 'selected' : ''}}>EXW (Ex Works)</option>
+                                                    <option value="FOB" {{$enquiry->inco_terms == 'FOB' ? 'selected' : ''}}>FOB</option>
+                                                    <option value="C&F" {{$enquiry->inco_terms == 'C&F' ? 'selected' : ''}}>C&F</option>
+                                                    <option value="CIF" {{$enquiry->inco_terms == 'CIF' ? 'selected' : ''}}>CIF</option>
+                                                    <option value="FCA (Free Carrier)" {{$enquiry->inco_terms == 'FCA (Free Carrier)' ? 'selected' : ''}}>FCA (Free Carrier)</option>
+                                                    <option value="CPT (Carriage Paid To)" {{$enquiry->inco_terms == 'CPT (Carriage Paid To)' ? 'selected' : ''}}>CPT (Carriage Paid To)</option>
+                                                    <option value="CIP (Carriage and Insurance Paid To)" {{$enquiry->inco_terms == 'CIP (Carriage and Insurance Paid To)' ? 'selected' : ''}}>CIP (Carriage and Insurance Paid To)</option>
+                                                    <option value="DAP (Delivered at Place)" {{$enquiry->inco_terms == 'DAP (Delivered at Place)' ? 'selected' : ''}}>DAP (Delivered at Place)</option>
+                                                    <option value="DPU (Delivered at Place Unloaded)" {{$enquiry->inco_terms == 'DPU (Delivered at Place Unloaded)' ? 'selected' : ''}}>DPU (Delivered at Place Unloaded)</option>
+                                                    <option value="DDP (Delivered Duty Paid)" {{$enquiry->inco_terms == 'DDP (Delivered Duty Paid)'? 'selected' : ''}}>DDP (Delivered Duty Paid)</option>
                                                 </select>
                                             </div>
                                         </div>
+                                        
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">Gross Weight:</label>
                                             <div class="col-sm-9">
@@ -108,12 +162,7 @@
                                                 </button>
                                             </div>
                                         </div>
-                                        <div class="mb-3 row">
-                                            <label class="col-sm-3 col-form-label">No of Pkgs:</label>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="no_of_pkgs" value="{{$enquiry->no_of_pkgs}}"> 
-                                            </div>
-                                        </div>
+                                        
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">Chargeable Weight:</label>
                                             <div class="col-sm-9">
@@ -125,7 +174,7 @@
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">Enquiry Date:</label>
                                             <div class="col-sm-9">
-                                                <input type="date" class="form-control" name="enquiry_date" value{{$enquiry->enquiry_date}}>
+                                                <input type="date" class="form-control" name="enquiry_date" value={{$enquiry->enquiry_date}}>
                                             </div>
                                         </div>
                                         <div class="mb-3 row">
@@ -147,13 +196,13 @@
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">Contact Details:</label>
                                             <div class="col-sm-9">
-                                                <input type="date" class="form-control" name="contact_details" value="{{$enquiry->contact_details}}">
+                                                <input type="text" class="form-control" name="contact_details" value="{{$enquiry->contact_details}}">
                                             </div>
                                         </div>
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">Commodity Desc:</label>
                                             <div class="col-sm-9">
-                                                <input type="date" class="form-control" name="commodity_desc" value="{{$enquiry->commodity_desc}}">
+                                                <input type="text" class="form-control" name="commodity_desc" value="{{$enquiry->commodity_desc}}">
                                             </div>
                                         </div>
                                         <div class="mb-3 row">
@@ -166,22 +215,27 @@
                                             </div>
                                         </div>
                                         <div class="mb-3 row">
-                                            <label class="col-sm-3 col-form-label">Selling Rate:</label>
-                                            <div class="col-sm-9 d-flex align-items-center">
-                                                <input type="date" class="form-control" name="selling_rate" value="{{$enquiry->selling_rate}}">
+                                            <label class="col-sm-3 col-form-label">No of Pkgs:</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" name="no_of_pkgs" value="{{$enquiry->no_of_pkgs}}"> 
                                             </div>
                                         </div>
-                                        <div class="col-xl-6 col-xxl-6">
-                                            <div class="mb-3 row">
-                                                <label class="col-sm-3 col-form-label">Enquiry Status:</label>
-                                                <div class="col-sm-9">
-                                                    <select class="form-control" name="enquiry_status" value="{{$enquiry->enquiry_status}}">
-                                                        <option value="" class="has-arrow">Select</option>
-                                                        <option value="Active" {{ $enquiry->enquiry_status == $enquiry->enquiry_status ? 'selected' : '' }}>Active</option>
-                                                        <option value="Order" {{ $enquiry->enquiry_status == $enquiry->enquiry_status ? 'selected' : '' }}>Order</option>
-                                                        <option value="Lost" {{ $enquiry->enquiry_status == $enquiry->enquiry_status ? 'selected' : '' }}>Lost</option>
-                                                    </select>
-                                                </div>
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">Selling Rate:</label>
+                                            <div class="col-sm-9 d-flex align-items-center">
+                                                <input type="text" class="form-control" name="selling_rate" value="{{$enquiry->selling_rate}}">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">Enquiry Status:</label>
+                                            <div class="col-sm-9">
+                                                <select class="form-control" name="enquiry_status" value="{{$enquiry->enquiry_status}}">
+                                                    <option value="" class="has-arrow">Select</option>
+                                                    <option value="Active" {{ $enquiry->enquiry_status == 'Active' ? 'selected' : '' }}>Active</option>
+                                                    <option value="Order" {{ $enquiry->enquiry_status == 'Order' ? 'selected' : '' }}>Order</option>
+                                                    <option value="Lost" {{ $enquiry->enquiry_status == 'Lost' ? 'selected' : '' }}>Lost</option>
+                                                    <option value="Complete" {{ $enquiry->enquiry_status == 'Complete' ? 'selected' : '' }}>Complete</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="mb-3 row">
@@ -197,15 +251,16 @@
                                             <div class="col-sm-9 d-flex align-items-center">
                                                 <select class="select2 form-control wide me-2" placeholder="Select" name="lcl_fcl">
                                                     <option value="">Select</option>
-                                                    <option value="lcl" {{ $enquiry->lcl_fcl == $enquiry->lcl_fcl ? 'selected' : '' }}>LCL</option>
-                                                    <option value="fcl" {{ $enquiry->lcl_fcl == $enquiry->lcl_fcl ? 'selected' : '' }}>FCL</option>
+                                                    <option value="lcl" {{ $enquiry->lcl_fcl == 'lcl' ? 'selected' : '' }}>LCL</option>
+                                                    <option value="fcl" {{ $enquiry->lcl_fcl == 'fcl' ? 'selected' : '' }}>FCL</option>
+                                                    <option value="air" {{ $enquiry->lcl_fcl == 'air' ? 'selected' : '' }}>AIR</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">CBM:</label>
                                             <div class="col-sm-9">
-                                                <input type="date" class="form-control" name="cbm" value="{{$enquiry->cbm}}">
+                                                <input type="text" class="form-control" name="cbm" value="{{$enquiry->cbm}}">
                                             </div>
                                         </div>
                                     </div>
@@ -222,26 +277,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                    <button class="btn btn-warning me-md-2" type="button">Cancel</button>
-                                    <button class="btn btn-primary" type="button">Save</button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <h4>CBM CALCULATOR</h4>
-                        <hr>
-                        <div class="form-validation">
-                            <form class="needs-validation" novalidate>
+                                <hr>
+                                <h4>CBM CALCULATOR</h4>
                                 <div class="row">
                                     <div class="col-xl-6">
-                                        <div class="mb-3 row">
-                                            <label class="col-sm-3 col-form-label">Enquiry No:<span
-                                                    class="text-danger">*</span></label>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="enquiry_no" value={{$enquiry->enquiry_no}}>
-                                            </div>
-                                        </div>
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">Length:</label>
                                             <div class="col-sm-9">
@@ -283,15 +322,26 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="d-grid justify-content-md-start">
-                                    <button class="btn btn-danger">UPDATE CBM/CHRG WT</button>
-                                </div><br>
+                                @if($enquiry->enquiry_status != 'Complete')
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                        <button class="btn btn-warning me-md-2" type="button">Cancel</button>
+                                        <button class="btn btn-primary" type="submit">Update</button>
+                                    </div>
+                                @endif
+                            </form>
+                        </div>
+
+                        <!--<h4>CBM CALCULATOR</h4>-->
+                        <!--<hr>-->
+                        <!--<div class="form-validation">-->
+                        <!--    <form class="needs-validation" novalidate>-->
+                        <!--        <br>-->
                                 <!--<div class="d-grid gap-2 d-md-flex justify-content-md-end">-->
                                 <!--    <button class="btn btn-warning me-md-2" type="button">Cancel</button>-->
                                 <!--    <button class="btn btn-primary" type="button">ADD CBM</button>-->
                                 <!--</div>-->
-                            </form>
-                        </div>
+                        <!--    </form>-->
+                        <!--</div>-->
 
                         <!--<hr>-->
                         <!--<div class="form-validation">-->
@@ -1009,7 +1059,7 @@
                     cbmEl.value = cbm.toFixed(3);
         
                     // Chargeable weight (Air standard: 1 CBM = 1000 KG)
-                    const chargeableWeight = cbm * 1000;
+                    const chargeableWeight = (length * width * height * qty) / 6000;
                     chgWtEl.value = chargeableWeight.toFixed(2);
                 } else {
                     cbmEl.value = '';

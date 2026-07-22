@@ -136,10 +136,10 @@
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
                                     <label class="col-sm-3 col-form-label">Enquiry Reference No:</label>
                                     <div class="col-sm-9">                            
-                                        <select name="enquiry_reference_no" class="form-control" id="">
+                                        <select name="enquiry_reference_no" class="form-control" id="enquiry_reference_no">
                                             <option value="">select</option> 
                                             @foreach($enquiries as $enquiry)
-                                                <option value="{{$enquiry->id}}">{{$enquiry->reference_id}}</option> 
+                                                <option value="{{$enquiry->id}}">{{$enquiry->enquiry_no}}</option> 
                                             @endforeach
                                         </select>
                                     </div>
@@ -267,6 +267,7 @@
                         </form>
                     </div>
                     <div id="responseMessage"></div>
+                    <div id="enquiryResponse"></div>
                 </div>
             </div>
         </div>
@@ -596,6 +597,121 @@
             
         });
 
+    </script>
+    <script>
+        $(document).ready(function(){
+            $(document).on('change', '#enquiry_reference_no', function () {
+
+            let enquiryId = $(this).val();
+        
+            if (enquiryId == '') {
+                $('#enquiryResponse').html('');
+                return;
+            }
+        
+            $.ajax({
+                url: "{{ route('job-master.get-enquiry-details', '') }}/" + enquiryId,
+                type: "GET",
+                success: function (response) {
+        
+                    if(response.status){
+        
+                        let enquiry = response.data;
+        
+                        let html = `
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <strong>Enquiry Details</strong>
+                            </div>
+        
+                            <div class="card-body">
+        
+                                <div class="row">
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>Reference No :</strong><br>
+                                        ${enquiry.reference_id ?? '-'}
+                                    </div>
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>Loading Port :</strong><br>
+                                        ${enquiry.loading_port?.port_name ?? '-'}
+                                    </div>
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>Discharge Port :</strong><br>
+                                        ${enquiry.discharge_port?.port_name ?? '-'}
+                                    </div>
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>Consignee :</strong><br>
+                                        ${enquiry.consignee?.party_name ?? '-'}
+                                    </div>
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>Gross Weight :</strong><br>
+                                        ${enquiry.gross_weight ?? '-'}
+                                    </div>
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>Chargeable Weight :</strong><br>
+                                        ${enquiry.chargeable_weight ?? '-'}
+                                    </div>
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>No. of Packages :</strong><br>
+                                        ${enquiry.no_of_pkgs ?? '-'}
+                                    </div>
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>No. of Containers :</strong><br>
+                                        ${enquiry.no_of_container ?? '-'}
+                                    </div>
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>CBM :</strong><br>
+                                        ${enquiry.cbm ?? '-'}
+                                    </div>
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>Buying Rate :</strong><br>
+                                        ${enquiry.buying_rate ?? '-'}
+                                    </div>
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>Selling Rate :</strong><br>
+                                        ${enquiry.selling_rate ?? '-'}
+                                    </div>
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>Shipment Type :</strong><br>
+                                        ${enquiry.shipment_type ?? '-'}
+                                    </div>
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>ETA / ETD :</strong><br>
+                                        ${enquiry.eta_etd ?? '-'}
+                                    </div>
+        
+                                    <div class="col-md-4 mb-2">
+                                        <strong>Commodity :</strong><br>
+                                        ${enquiry.commodity_desc ?? '-'}
+                                    </div>
+        
+                                </div>
+        
+                            </div>
+                        </div>`;
+        
+                        $('#enquiryResponse').html(html);
+        
+                    }
+        
+                }
+            });
+        
+        });
+        });
     </script>
     
 @endpush

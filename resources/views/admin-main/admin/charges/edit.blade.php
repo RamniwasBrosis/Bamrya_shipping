@@ -37,13 +37,52 @@
                                     <input type="text" name="tally_ledger_name" class="form-control" value="{{ old('tally_ledger_name', $charge->tally_ledger_name) }}">
                                     @error('tally_ledger_name') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
-
+    
                                 <div class="col-xl-3 col-md-6 mb-3">
                                     <label class="form-label">Currency (I/U): <span class="text-danger">*</span></label>
                                     <select name="currency" class="form-control">
+                                        <option value="AED" {{ $charge->currency == 'AED' ? 'selected' : '' }}>AED</option>
+                                        <option value="AUD" {{ $charge->currency == 'AUD' ? 'selected' : '' }}>AUD</option>
+                                        <option value="BGN" {{ $charge->currency == 'BGN' ? 'selected' : '' }}>BGN</option>
+                                        <option value="BRL" {{ $charge->currency == 'BRL' ? 'selected' : '' }}>BRL</option>
+                                        <option value="CAD" {{ $charge->currency == 'CAD' ? 'selected' : '' }}>CAD</option>
+                                        <option value="CHF" {{ $charge->currency == 'CHF' ? 'selected' : '' }}>CHF</option>
+                                        <option value="CNY" {{ $charge->currency == 'CNY' ? 'selected' : '' }}>CNY</option>
+                                        <option value="CSD" {{ $charge->currency == 'CSD' ? 'selected' : '' }}>CSD</option>
+                                        <option value="CZK" {{ $charge->currency == 'CZK' ? 'selected' : '' }}>CZK</option>
+                                        <option value="DKK" {{ $charge->currency == 'DKK' ? 'selected' : '' }}>DKK</option>
+                                        <option value="EEK" {{ $charge->currency == 'EEK' ? 'selected' : '' }}>EEK</option>
+                                        <option value="EGP" {{ $charge->currency == 'EGP' ? 'selected' : '' }}>EGP</option>
+                                        <option value="EUR" {{ $charge->currency == 'EUR' ? 'selected' : '' }}>EUR</option>
+                                        <option value="GBP" {{ $charge->currency == 'GBP' ? 'selected' : '' }}>GBP</option>
+                                        <option value="HKD" {{ $charge->currency == 'HKD' ? 'selected' : '' }}>HKD</option>
+                                        <option value="HRK" {{ $charge->currency == 'HRK' ? 'selected' : '' }}>HRK</option>
+                                        <option value="HUF" {{ $charge->currency == 'HUF' ? 'selected' : '' }}>HUF</option>
+                                        <option value="IDR" {{ $charge->currency == 'IDR' ? 'selected' : '' }}>IDR</option>
+                                        <option value="ILS" {{ $charge->currency == 'ILS' ? 'selected' : '' }}>ILS</option>
                                         <option value="INR" {{ $charge->currency == 'INR' ? 'selected' : '' }}>INR</option>
+                                        <option value="ISK" {{ $charge->currency == 'ISK' ? 'selected' : '' }}>ISK</option>
+                                        <option value="JPY" {{ $charge->currency == 'JPY' ? 'selected' : '' }}>JPY</option>
+                                        <option value="MXP" {{ $charge->currency == 'MXP' ? 'selected' : '' }}>MXP</option>
+                                        <option value="MYR" {{ $charge->currency == 'MYR' ? 'selected' : '' }}>MYR</option>
+                                        <option value="NOK" {{ $charge->currency == 'NOK' ? 'selected' : '' }}>NOK</option>
+                                        <option value="NZD" {{ $charge->currency == 'NZD' ? 'selected' : '' }}>NZD</option>
+                                        <option value="PHP" {{ $charge->currency == 'PHP' ? 'selected' : '' }}>PHP</option>
+                                        <option value="PLN" {{ $charge->currency == 'PLN' ? 'selected' : '' }}>PLN</option>
+                                        <option value="ROL" {{ $charge->currency == 'ROL' ? 'selected' : '' }}>ROL</option>
+                                        <option value="RUR" {{ $charge->currency == 'RUR' ? 'selected' : '' }}>RUR</option>
+                                        <option value="SAR" {{ $charge->currency == 'SAR' ? 'selected' : '' }}>SAR</option>
+                                        <option value="SEK" {{ $charge->currency == 'SEK' ? 'selected' : '' }}>SEK</option>
+                                        <option value="SGD" {{ $charge->currency == 'SGD' ? 'selected' : '' }}>SGD</option>
+                                        <option value="SIT" {{ $charge->currency == 'SIT' ? 'selected' : '' }}>SIT</option>
+                                        <option value="SKK" {{ $charge->currency == 'SKK' ? 'selected' : '' }}>SKK</option>
+                                        <option value="THB" {{ $charge->currency == 'THB' ? 'selected' : '' }}>THB</option>
+                                        <option value="TRL" {{ $charge->currency == 'TRL' ? 'selected' : '' }}>TRL</option>
+                                        <option value="TWD" {{ $charge->currency == 'TWD' ? 'selected' : '' }}>TWD</option>
+                                        <option value="UAH" {{ $charge->currency == 'UAH' ? 'selected' : '' }}>UAH</option>
+                                        <option value="US" {{ $charge->currency == 'US' ? 'selected' : '' }}>US</option>
                                         <option value="USD" {{ $charge->currency == 'USD' ? 'selected' : '' }}>USD</option>
-                                        <option value="OTH" {{ $charge->currency == 'OTH' ? 'selected' : '' }}>Other</option>
+                                        <option value="OTH" {{ $charge->currency == 'Others' ? 'selected' : '' }}>Others</option>
                                     </select>
                                     @error('currency') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>

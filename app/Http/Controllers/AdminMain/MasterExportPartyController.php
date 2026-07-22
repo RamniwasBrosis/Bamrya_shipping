@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Exports\ExportPartyExport;
 
 class MasterExportPartyController extends Controller
 {
@@ -34,6 +37,26 @@ class MasterExportPartyController extends Controller
         if($request->filled('party_name')){
             $query->where('party_name', 'LIKE', '%'.$request->party_name.'%');
         }
+        
+        if ($request->action == 'export') {
+            $exportParties = $query->orderBy('created_at', 'desc')->where('company_id', $this->company_id)->get();
+            //excel
+            if ($request->export_type == 'excel') {
+                return Excel::download(
+                    new ExportPartyExport($exportParties),
+                    'Shipper-Parties.xlsx'
+                );
+            }
+            //pdf
+            if ($request->export_type == 'pdf') {
+                $pdf = Pdf::loadView(
+                    'admin-main.admin.party.export.pdf',
+                    compact('exportParties')
+                );
+                return $pdf->download('Shipper-Parties.pdf');
+            }
+        }
+        
         $exportParties = $query->where('company_id', $this->company_id)->orderBy('created_at', 'desc')->paginate(10);
 
         $partyNameList = MasterExportParty::where('company_id', $this->company_id)->orderBy('party_name')->get();

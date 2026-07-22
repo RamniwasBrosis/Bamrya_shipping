@@ -19,6 +19,7 @@ use App\Models\MasterCharge;
 use App\Models\Operations\OperationEnquiries;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use App\Models\CompanySetting;
 
 class EnquiryController extends Controller
 {
@@ -36,15 +37,16 @@ class EnquiryController extends Controller
     public function index()
     {
         $page_title = "Enquiry";
-        $enquiries = OperationEnquiries::with('BuyChargeDetails','SellingChargeDetails', 'shippingLine', 'salesPerson', 'importPartyDetails', 'loadingPortDetails', 'dischargePortDetails')
+        $enquiries = OperationEnquiries::with('BuyChargeDetails','SellingChargeDetails', 'shippingLine', 'salesPerson', 'consignee', 'loadingPort', 'dischargePort')
                     ->where('company_id', $this->company_id)
                     ->get();
         
         return view('admin-main.admin.enquiry.index', compact('enquiries', 'page_title'));
     }
 
-    public function create(){
-        
+    public function create()
+    {
+        $page_title = "Enquiry create";
         $ports = MasterPort::where('company_id', $this->company_id)->get();
         $packages = MasterPackage::where('company_id', $this->company_id)->get();
         $job_numbers = OperationJobMaster::where('company_id', $this->company_id)->where('job_activity', 'AIREXP.FWD')->orderBy('created_at', 'desc')->get();
@@ -59,8 +61,61 @@ class EnquiryController extends Controller
     
         $files = OperationAllFileUpload::where('company_id', $this->company_id)->where('file_related', 'air_export')->orderBy('created_at', 'desc')->get();
         $charges = MasterCharge::where('company_id', $this->company_id)->get();
+        $enquiryNumber = $this->generateEnquiryNumber();
      
-        return view('admin-main.admin.enquiry.create', compact('charges', 'shipping_lines', 'exportParites', 'partyTypes' , 'ports', 'job_numbers', 'parties', 'files', 'party_lists', 'packages', 'salePersons', 'forwarders'));
+        return view('admin-main.admin.enquiry.create', compact('page_title','charges', 'shipping_lines', 'exportParites', 'partyTypes' , 'ports', 'job_numbers', 'parties', 'files', 'party_lists', 'packages', 'salePersons', 'forwarders','enquiryNumber'));
+    }
+    
+    // generate auto increment enquiry no
+    private function generateEnquiryNumber()
+    {
+        $month = date('n');
+        $year = date('Y');
+        
+        if ($month < 4) {
+        
+            $fyStart = $year - 1;
+            $fyEnd = $year;
+        
+        } else {
+        
+            $fyStart = $year;
+            $fyEnd = $year + 1;
+        
+        }
+        $financialYear = $fyStart.'-'.substr($fyEnd,-2);
+        // company code
+        $setting = CompanySetting::where('company_id', $this->company_id)->first();
+        if (!$setting || empty($setting->company_code)) {
+            throw new \Exception('Company Code is not configured.');
+        }
+        $companyCode = $setting->company_code;
+        
+        $lastEnquiry = OperationEnquiries::where(
+            'company_id',
+            $this->company_id
+        )
+        ->where(
+            'financial_year',
+            $financialYear
+        )
+        ->orderByDesc('enquiry_sequence')
+        ->first();
+        
+        //generate next sequence
+        $nextSequence = $lastEnquiry
+            ? $lastEnquiry->enquiry_sequence + 1
+            : 1;
+        
+        $enquiryNo =
+            $companyCode .
+            str_pad($nextSequence,2,'0',STR_PAD_LEFT)
+            .'/'
+            .substr($fyStart,-2)
+            .'-'
+            .substr($fyEnd,-2);
+        
+        return ['enquiry_no' => $enquiryNo, 'sequence' => $nextSequence, 'financial_year' => $financialYear];
     }
         
     public function store(Request $request)
@@ -69,11 +124,17 @@ class EnquiryController extends Controller
             'discharge_port_id' => 'required|integer',
             'consignee_id'      => 'required|integer',
             'gross_weight'      => 'required|numeric',
+            'job_activity'      => 'required',
+            'enquiry_no' => 'required',
+            'enquiry_date' => 'required',
         ], [
             'discharge_port_id.required' => 'Discharge Port is required',
+            'job_activity.required' => 'Job Activity is required',
             'consignee_id.required'      => 'Consignee is required',
             'gross_weight.required'      => 'Gross Weight is required',
             'gross_weight.numeric'       => 'Gross Weight must be numeric',
+            'enquiry_no.required' => 'Enquiry No is required',
+            'enquiry_date.required' => 'Enquiry Date is required',
         ]);
     
         if ($validator->fails()) {
@@ -91,6 +152,12 @@ class EnquiryController extends Controller
         $enquiry->company_id          = $this->company_id;
         $enquiry->uuid                = Str::uuid();
         $enquiry->reference_id        = $request->reference_id;
+        
+        $number = $this->generateEnquiryNumber();
+        $enquiry->enquiry_no = $number['enquiry_no'];
+        $enquiry->enquiry_sequence = $number['sequence'];
+        $enquiry->financial_year = $number['financial_year'];
+        
         $enquiry->discharge_port_id   = $request->discharge_port_id;
         $enquiry->consignee_id        = $request->consignee_id;
         $enquiry->inco_terms          = $request->inco_terms;
@@ -113,6 +180,7 @@ class EnquiryController extends Controller
         $enquiry->cbm                 = $request->cbm;
         $enquiry->follow_up           = $request->follow_up;
         $enquiry->lost_enquiry_remarks= $request->lost_enquiry_remarks;
+        $enquiry->job_activity= $request->job_activity;
         $enquiry->user_id= $this->user_id;
     
         $enquiry->save();
@@ -127,10 +195,8 @@ class EnquiryController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'enquiry_id' => 'required|exists:operation_enquiries,id',
-            'enquiry_no' => 'required',
         ], [
             'enquiry_id.required' => 'Enquiry ID missing',
-            'enquiry_no.required' => 'Enquiry No is required',
         ]);
         
         if ($validator->fails()) {
@@ -143,7 +209,6 @@ class EnquiryController extends Controller
         $enquiry = OperationEnquiries::findOrFail($request->enquiry_id);
     
         // ===== CBM / DIMENSIONS =====
-        $enquiry->enquiry_no    = $request->enquiry_no;
         $enquiry->length        = $request->length;
         $enquiry->width         = $request->width;
         $enquiry->height        = $request->height;
@@ -285,6 +350,7 @@ class EnquiryController extends Controller
     
     public function edit($id)
     {
+        $page_title = "Enquiry edit";
         $ports = MasterPort::where('company_id', $this->company_id)->get();
         $party_lists  = MasterParty::all();
         $partyTypes = MasterParty::whereNotIn('party_type', [9, 6, 8])->get();
@@ -293,9 +359,9 @@ class EnquiryController extends Controller
         $shipping_lines = MasterShipping::where('company_id', $this->company_id)->get();
         $charges = MasterCharge::where('company_id', $this->company_id)->get();
         
-        $enquiry = OperationEnquiries::with('BuyChargeDetails','SellingChargeDetails', 'shippingLine', 'salesPerson', 'importPartyDetails', 'loadingPortDetails', 'dischargePortDetails')->findOrFail($id);
+        $enquiry = OperationEnquiries::with('BuyChargeDetails','SellingChargeDetails', 'shippingLine', 'salesPerson', 'consignee', 'loadingPort', 'dischargePort')->findOrFail($id);
     
-        return view('admin-main.admin.enquiry.edit', compact('enquiry', 'ports', 'party_lists', 'partyTypes', 'parties', 'salePersons', 'shipping_lines', 'charges'));
+        return view('admin-main.admin.enquiry.edit', compact('enquiry', 'ports', 'party_lists', 'partyTypes', 'parties', 'salePersons', 'shipping_lines', 'charges','page_title'));
     }
     
     public function destroy(string $id)
@@ -315,5 +381,78 @@ class EnquiryController extends Controller
        }else{
            return response()->json(['status' => false, 'data' => "Data not found related to this charges."]);
        }
+    }
+    
+    public function update(Request $request, $id)
+    {
+        $enquiry = OperationEnquiries::findOrFail($id);
+    
+        // Validate all fields (adjust rules as needed)
+        $validator = Validator::make($request->all(), [
+            'discharge_port_id' => 'required|integer',
+            'consignee_id'      => 'required|integer',
+            'gross_weight'      => 'required|numeric',
+            'job_activity'      => 'required',
+            'enquiry_no'        => 'required|string',
+            // Add validation for CBM fields if required
+            'length'            => 'nullable|numeric',
+            'width'             => 'nullable|numeric',
+            'height'            => 'nullable|numeric',
+            'quantity'          => 'nullable|numeric',
+            'total_cbm'         => 'nullable|numeric',
+            'total_chg_wt'      => 'nullable|numeric',
+            // ... other fields ...
+        ], [
+            'discharge_port_id.required' => 'Discharge Port is required',
+            'consignee_id.required'      => 'Consignee is required',
+            'gross_weight.required'      => 'Gross Weight is required',
+            'job_activity.required'      => 'Job Activity is required',
+            'gross_weight.numeric'       => 'Gross Weight must be numeric',
+            'enquiry_no.required' => 'Enquiry No is required',
+        ]);
+    
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+    
+        // Assign all fields
+        $enquiry->reference_id        = $request->reference_id;
+        $enquiry->discharge_port_id   = $request->discharge_port_id;
+        $enquiry->consignee_id        = $request->consignee_id;
+        $enquiry->inco_terms          = $request->inco_terms;
+        $enquiry->gross_weight        = $request->gross_weight;
+        $enquiry->buying_rate         = $request->buying_rate;
+        $enquiry->shipment_type       = $request->shipment_type;
+        $enquiry->eta_etd             = $request->eta_etd;
+        $enquiry->sales_person_id     = $request->sales_person_id;
+        $enquiry->no_of_pkgs          = $request->no_of_pkgs;
+        $enquiry->chargeable_weight   = $request->chargeable_weight;
+        $enquiry->enquiry_date        = $request->enquiry_date;
+        $enquiry->loading_port_id     = $request->loading_port_id;
+        $enquiry->contact_details     = $request->contact_details;
+        $enquiry->commodity_desc      = $request->commodity_desc;
+        $enquiry->kgs_mts             = $request->kgs_mts;
+        $enquiry->selling_rate        = $request->selling_rate;
+        $enquiry->enquiry_status      = $request->enquiry_status;
+        $enquiry->no_of_container     = $request->no_of_container;
+        $enquiry->lcl_fcl             = $request->lcl_fcl;
+        $enquiry->cbm                 = $request->cbm;
+        $enquiry->follow_up           = $request->follow_up;
+        $enquiry->lost_enquiry_remarks= $request->lost_enquiry_remarks;
+        $enquiry->job_activity = $request->job_activity;
+    
+        // ---- CBM fields ----
+        $enquiry->enquiry_no    = $request->enquiry_no;
+        $enquiry->length        = $request->length;
+        $enquiry->width         = $request->width;
+        $enquiry->height        = $request->height;
+        $enquiry->quantity      = $request->quantity;
+        $enquiry->total_cbm     = $request->total_cbm;
+        $enquiry->total_chg_wt  = $request->total_chg_wt;
+    
+        $enquiry->save();
+    
+        // Redirect with success message or return JSON
+        return redirect()->back()->with('success', 'Enquiry updated successfully.');
     }
 }

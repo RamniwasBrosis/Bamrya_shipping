@@ -76,6 +76,7 @@
                                         <option value="UAH">UAH</option>
                                         <option value="US">US</option>
                                         <option value="USD">USD</option>
+                                        <option value="OTH">Others</option>
                                     </select>
                                     @error('currency') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>

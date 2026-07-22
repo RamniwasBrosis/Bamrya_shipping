@@ -28,9 +28,25 @@
                                 @endforeach
                             </select>
                         </div>
-                        
+                        <!--export -->
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
-                            <button id="applyFilter" class="btn btn-primary" type="submit">Apply</button>
+                            <label class="form-label">Export</label>
+                        
+                            <select name="export_type" class="form-control">
+                                <option value="">Select</option>
+                                <option value="pdf" {{ request('export_type') == 'pdf' ? 'selected' : '' }}>
+                                    PDF
+                                </option>
+                                
+                                <option value="excel" {{ request('export_type') == 'excel' ? 'selected' : '' }}>
+                                    Excel
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-xl-3 col-sm-6 col-lg-4 mb-3">
+                            <button id="applyFilter" class="btn btn-primary" type="submit" name="action" value="filter">Apply</button>
+                            <button type="submit" name="action" value="export" class="btn btn-success">Export</button>
                             <a id="resetFilter" class="btn btn-danger light ms-2" href="{{route('export-parties.index')}}">Reset</a>
                         </div>
                     </form>
@@ -109,11 +125,11 @@
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(response) {
-                    alert('Import Party Record deleted successfully.');
+                    alert('Export Party Record deleted successfully.');
                     location.reload();
                 },
                 error: function(xhr) {
-                    alert('Failed to delete Import Party Record.');
+                    alert('Failed to delete Export Party Record.');
                     console.log(xhr.responseText);
                 }
             });

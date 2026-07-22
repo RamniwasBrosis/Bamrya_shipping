@@ -133,7 +133,12 @@
                                     <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
                                         <label class="col-sm-3 col-form-label">Enquiry Reference No:</label>
                                         <div class="col-sm-9">
-                                            <select class="default-select  form-control wide" name="enquiry_reference_no" placeholder="Select"></select>
+                                            <select name="enquiry_reference_no" class="form-control" id="enquiry_reference_no">
+                                                <option value="">select</option> 
+                                                @foreach($enquiries as $enquiry)
+                                                    <option value="{{$enquiry->id}}" {{$jobMaster->enquiry_reference_no == $enquiry->id ? 'selected' : '' }}>{{$enquiry->enquiry_no}}</option> 
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
 

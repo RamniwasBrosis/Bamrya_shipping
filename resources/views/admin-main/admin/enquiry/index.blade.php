@@ -73,13 +73,15 @@
                         <table id="empoloyees-tblwrapper" class="table">
                             <thead>
                                 <tr>
-                                    <th>Fixed Charge ID</th>
+                                    <th>S.No</th>
                                     <th>Party</th>
+                                    <th>Activity</th>
                                     <th>LCL/FCL</th>
                                     <th>Buying Rate</th>
-                                    <th>Charge Name</th>
-                                    <th>RATE BASIS</th>
-                                    <th>CURRENCY</th>
+                                    <th>Selling Rate</th>
+                                    <th>Sales Person</th>
+                                    <th>Gross weight</th>
+                                    <th>Status</th>
                                     <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
@@ -90,37 +92,41 @@
                                         <td>{{ $loop->iteration }}</td>
                                 
                                         <td>
-                                            {{ optional($enquiry->importPartyDetails)->party_name ?? '-' }}
+                                            {{ optional($enquiry->consignee)->party_name ?? '-' }}
                                         </td>
                                 
+                                        <td>{{ $enquiry->job_activity ?? '-' }}</td>
                                         <td>{{ $enquiry->lcl_fcl ?? '-' }}</td>
                                 
                                         <td>{{ $enquiry->buying_rate ?? '-' }}</td>
                                 
                                         <td>
-                                            {{ optional($enquiry->BuyChargeDetails)->charge_name ?? '-' }}
+                                            {{ $enquiry->selling_rate ?? '-' }}
                                         </td>
                                 
-                                        <td>{{ $enquiry->buy_rate_basic ?? '-' }}</td>
+                                        <td>{{ $enquiry->salesPerson->name ?? '-' }}</td>
                                 
-                                        <td>{{ $enquiry->buy_currency ?? '-' }}</td>
+                                        <td>{{ $enquiry->gross_weight ?? '-' }}</td>
+                                        <td>{{ $enquiry->enquiry_status ?? '-' }}</td>
                                         <td>{{ $enquiry->user->name ?? '-' }}</td>
                                 
                                         <td>
                                             <a class="badge badge-info light border-0"
                                                href="{{ route('enquiry.edit', $enquiry->id) }}">
-                                                Edit
+                                                Edit/View
                                             </a>
+                                            @if($enquiry->enquiry_status != 'Complete')
+                                                <form action="{{ route('enquiry.destroy', $enquiry->id) }}" method="POST" style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                
+                                                    <button type="submit" class="badge badge-danger light border-0"
+                                                            onclick="return confirm('Are you sure you want to delete this enquiry?')">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            @endif
                                 
-                                            <form action="{{ route('enquiry.destroy', $enquiry->id) }}" method="POST" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                            
-                                                <button type="submit" class="badge badge-danger light border-0"
-                                                        onclick="return confirm('Are you sure you want to delete this enquiry?')">
-                                                    Delete
-                                                </button>
-                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach

@@ -151,7 +151,7 @@
                                             <td>{{ $sea_export->jobMaster->job_no ?? 'N/A' }}</td>
                                             <td>{{ $sea_export->shipperName->party_name ?? 'N/A' }}</td>
                                             <td>{{ $sea_export->booking_no ?? 'N/A' }}</td>
-                                            <td colspan="6" class="text-center text-muted">
+                                            <td colspan="8" class="text-center text-muted">
                                                 No container added
                                             </td>
                                             <td>

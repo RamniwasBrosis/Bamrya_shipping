@@ -37,17 +37,17 @@ class OperationEnquiries extends Model
         return $this->belongsTo(OperationSalesPerson::class, 'sales_person_id');
     }
 
-    public function importPartyDetails()
+    public function consignee()
     {
         return $this->belongsTo(MasterImportParty::class, 'consignee_id');
     }
 
-    public function loadingPortDetails()
+    public function loadingPort()
     {
         return $this->belongsTo(MasterPort::class, 'loading_port_id');
     }
 
-    public function dischargePortDetails()
+    public function dischargePort()
     {
         return $this->belongsTo(MasterPort::class, 'discharge_port_id');
     }

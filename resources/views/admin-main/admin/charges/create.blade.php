@@ -40,9 +40,49 @@
                                 <div class="col-xl-3 col-md-6 mb-3">
                                     <label class="form-label">Currency (I/U): <span class="text-danger">*</span></label>
                                     <select name="currency" class="form-control">
+                                        <option value="">select</option>
+                                        <option value="AED">AED</option>
+                                        <option value="AUD">AUD</option>
+                                        <option value="BGN">BGN</option>
+                                        <option value="BRL">BRL</option>
+                                        <option value="CAD">CAD</option>
+                                        <option value="CHF">CHF</option>
+                                        <option value="CNY">CNY</option>
+                                        <option value="CSD">CSD</option>
+                                        <option value="CZK">CZK</option>
+                                        <option value="DKK">DKK</option>
+                                        <option value="EEK">EEK</option>
+                                        <option value="EGP">EGP</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="HKD">HKD</option>
+                                        <option value="HRK">HRK</option>
+                                        <option value="HUF">HUF</option>
+                                        <option value="IDR">IDR</option>
+                                        <option value="ILS">ILS</option>
                                         <option value="INR">INR</option>
+                                        <option value="ISK">ISK</option>
+                                        <option value="JPY">JPY</option>
+                                        <option value="MXP">MXP</option>
+                                        <option value="MYR">MYR</option>
+                                        <option value="NOK">NOK</option>
+                                        <option value="NZD">NZD</option>
+                                        <option value="PHP">PHP</option>
+                                        <option value="PLN">PLN</option>
+                                        <option value="ROL">ROL</option>
+                                        <option value="RUR">RUR</option>
+                                        <option value="SAR">SAR</option>
+                                        <option value="SEK">SEK</option>
+                                        <option value="SGD">SGD</option>
+                                        <option value="SIT">SIT</option>
+                                        <option value="SKK">SKK</option>
+                                        <option value="THB">THB</option>
+                                        <option value="TRL">TRL</option>
+                                        <option value="TWD">TWD</option>
+                                        <option value="UAH">UAH</option>
+                                        <option value="US">US</option>
                                         <option value="USD">USD</option>
-                                        <option value="OTH">Other</option>
+                                        <option value="OTH">Others</option>
                                     </select>
                                     @error('currency') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>

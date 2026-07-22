@@ -20,13 +20,53 @@
                             <select id="party_name" name="party_name" class="form-control select2">
                                 <option value="">--select--</option>
                                 @foreach ($partyNameList as $partyName)
-                                    <option value="{{$partyName->party_name}}">{{$partyName->party_name}}</option>
+                                    <option value="{{ $partyName->party_name }}"
+                                        {{ request('party_name') == $partyName->party_name ? 'selected' : '' }}>
+                                        {{ $partyName->party_name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
-                        
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
-                            <button id="applyFilter" class="btn btn-primary" type="submit">Apply</button>
+                            <label class="form-label">Party Type</label>
+                            <select name="party_type" id="party_type" class="form-control select2">
+                                <option value="">Select Party Type</option>
+                                <option value="1" {{ request('party_type') == '1' ? 'selected' : '' }}>Consignee</option>
+                                <option value="3" {{ request('party_type') == '3' ? 'selected' : '' }}>CHA</option>
+                                <option value="10" {{ request('party_type') == '10' ? 'selected' : '' }}>Billing Party</option>
+                                <!--<option value="2">Shipper</option>-->
+                                <option value="4" {{ request('party_type') == '4' ? 'selected' : '' }}>Agent Name</option>
+                                <option value="5" {{ request('party_type') == '5' ? 'selected' : '' }}>Empty Yard</option>
+                                <option value="6" {{ request('party_type') == '6' ? 'selected' : '' }}>Notify Party</option>
+                                <option value="7" {{ request('party_type') == '7' ? 'selected' : '' }}>CFS Yard</option>
+                                <option value="8" {{ request('party_type') == '8' ? 'selected' : '' }}>Shipping Line/Air Line</option>
+                                <option value="9" {{ request('party_type') == '9' ? 'selected' : '' }}>Sales Person</option>
+                                <option value="11" {{ request('party_type') == '11' ? 'selected' : '' }}>PIC</option>
+                                <option value="15" {{ request('party_type') == '15' ? 'selected' : '' }}>IATA Agent</option>
+                                <option value="19" {{ request('party_type') == '19' ? 'selected' : '' }}>Co-loader</option>
+                                <option value="21" {{ request('party_type') == '21' ? 'selected' : '' }}>Surveyor</option>
+                                <option value="22" {{ request('party_type') == '22' ? 'selected' : '' }}>Delivery Agent Name</option>
+                            </select>
+                        </div>
+                        <!--export -->
+                        <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
+                            <label class="form-label">Export</label>
+                        
+                            <select name="export_type" class="form-control">
+                                <option value="">Select</option>
+                                <option value="pdf" {{ request('export_type') == 'pdf' ? 'selected' : '' }}>
+                                    PDF
+                                </option>
+                                
+                                <option value="excel" {{ request('export_type') == 'excel' ? 'selected' : '' }}>
+                                    Excel
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-xl-3 col-sm-6 col-lg-4 mb-3">
+                            <button id="applyFilter" class="btn btn-primary" type="submit" name="action" value="filter">Apply</button>
+                            <button type="submit" name="action" value="export" class="btn btn-success">Export</button>
                             <a href="{{ route('import-parties.index') }}" class="btn btn-danger light ms-2">Reset</a>
                         </div>
                     </form>
@@ -74,7 +114,7 @@
                         </table>
                     </div>
                     <div class="d-flex justify-content-center mt-3">
-                        {!! $importParties->links('pagination::bootstrap-5') !!}
+                        {!! $importParties->withQueryString()->links('pagination::bootstrap-5') !!}
                     </div>
                 </div>
             </div>

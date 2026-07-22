@@ -1,5 +1,20 @@
 @extends('admin-main.layouts.default')
 @section('content')
+@if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+@if ($errors->any())
+    <div class="alert alert-danger alert-dismissible fade show">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
     <div class="page-titles">
         <ol class="breadcrumb">
             <li class="breadcrumb-item active"><a href="#">Add New Enquiry</a></li>
@@ -16,7 +31,14 @@
                                 @csrf
                                 <div class="row">
                                     <div class="col-xl-6">
-                            
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">
+                                                Enquiry No:<span class="text-danger">*</span>
+                                            </label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" name="enquiry_no" readonly value="{{$enquiryNumber['enquiry_no']}}">
+                                            </div>
+                                        </div>
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">Reference ID:</label>
                                             <div class="col-sm-9">
@@ -24,6 +46,20 @@
                                             </div>
                                         </div>
                             
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">Job Activity:<span class="text-danger">*</span></label>
+                                            <div class="col-sm-9 d-flex align-items-center">
+                                                <select name="job_activity" id="job_activity" class="form-control select2" required>
+                                                    <option value="">Select</option>
+                                                    <option value="SEAIMP.FWD">SEAIMP.FWD</option>
+                                                    <option value="SEAEXP.FWD">SEAEXP.FWD</option>
+                                                    <option value="AIRIMP.FWD">AIRIMP.FWD</option>
+                                                    <option value="AIREXP.FWD">AIREXP.FWD</option>
+                                                    <option value="SEAIMP.NVOCC">SEAIMP.NVOCC</option>
+                                                    <option value="SEAEXP.NVOCC">SEAEXP.NVOCC</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">Discharge Port:<span class="text-danger">*</span></label>
                                             <div class="col-sm-9 d-flex align-items-center">
@@ -61,11 +97,22 @@
                                                 </button>
                                             </div>
                                         </div>
-                                    
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">Inco Terms:</label>
                                             <div class="col-sm-9 d-flex align-items-center">
-                                                <select class="default-select form-control wide me-2" name="inco_terms"></select>
+                                                <select class="select2 form-control me-2" name="inco_terms">
+                                                    <option value="">Select Inco Terms</option>
+                                                    <option value="EXW (Ex Works)">EXW (Ex Works)</option>
+                                                    <option value="FOB">FOB</option>
+                                                    <option value="C&F">C&F</option>
+                                                    <option value="CIF">CIF</option>
+                                                    <option value="FCA (Free Carrier)">FCA (Free Carrier)</option>
+                                                    <option value="CPT (Carriage Paid To)">CPT (Carriage Paid To)</option>
+                                                    <option value="CIP (Carriage and Insurance Paid To)">CIP (Carriage and Insurance Paid To)</option>
+                                                    <option value="DAP (Delivered at Place)">DAP (Delivered at Place)</option>
+                                                    <option value="DPU (Delivered at Place Unloaded)">DPU (Delivered at Place Unloaded)</option>
+                                                    <option value="DDP (Delivered Duty Paid)">DDP (Delivered Duty Paid)</option>
+                                                </select>
                                             </div>
                                         </div>
                             
@@ -121,13 +168,6 @@
                                         </div>
                             
                                         <div class="mb-3 row">
-                                            <label class="col-sm-3 col-form-label">No of Pkgs:</label>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="no_of_pkgs">
-                                            </div>
-                                        </div>
-                            
-                                        <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">Chargeable Weight:</label>
                                             <div class="col-sm-9">
                                                 <input type="text" class="form-control" name="chargeable_weight">
@@ -139,7 +179,7 @@
                                     <div class="col-xl-6">
                             
                                         <div class="mb-3 row">
-                                            <label class="col-sm-3 col-form-label">Enquiry Date:</label>
+                                            <label class="col-sm-3 col-form-label">Enquiry Date:<span class="text-danger">*</span></label>
                                             <div class="col-sm-9">
                                                 <input type="date" class="form-control" name="enquiry_date">
                                             </div>
@@ -187,6 +227,12 @@
                                                 </select>
                                             </div>
                                         </div>
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">No of Pkgs:</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" name="no_of_pkgs">
+                                            </div>
+                                        </div>
                             
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">Selling Rate:</label>
@@ -203,6 +249,7 @@
                                                     <option value="Active">Active</option>
                                                     <option value="Order">Order</option>
                                                     <option value="Lost">Lost</option>
+                                                    <!--<option value="Complete">Complete</option>-->
                                                 </select>
                                             </div>
                                         </div>
@@ -215,12 +262,13 @@
                                         </div>
                             
                                         <div class="mb-3 row">
-                                            <label class="col-sm-3 col-form-label">LCL/FCL:<span class="text-danger">*</span></label>
+                                            <label class="col-sm-3 col-form-label">Mode Of Shipment:<span class="text-danger">*</span></label>
                                             <div class="col-sm-9 d-flex align-items-center">
                                                 <select class="default-select form-control wide me-2" name="lcl_fcl">
                                                     <option value="">Select</option>
                                                     <option value="lcl">LCL</option>
                                                     <option value="fcl">FCL</option>
+                                                    <option value="air">AIR</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -265,15 +313,6 @@
                                 <input type="hidden" name="enquiry_id" class="enquiry_id">
                                 <div class="row">
                                     <div class="col-xl-6">
-                                        <div class="mb-3 row">
-                                            <label class="col-sm-3 col-form-label">
-                                                Enquiry No:<span class="text-danger">*</span>
-                                            </label>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="enquiry_no">
-                                            </div>
-                                        </div>
-                            
                                         <div class="mb-3 row">
                                             <label class="col-sm-3 col-form-label">Length:</label>
                                             <div class="col-sm-9">
@@ -1112,8 +1151,8 @@
                     const cbm = (length * width * height * qty) / 1000000;
                     cbmEl.value = cbm.toFixed(3);
         
-                    // Chargeable weight (Air standard: 1 CBM = 1000 KG)
-                    const chargeableWeight = cbm * 1000;
+                    // Chargeable Weight (kg)
+                    const chargeableWeight = (length * width * height * qty) / 6000;
                     chgWtEl.value = chargeableWeight.toFixed(2);
                 } else {
                     cbmEl.value = '';

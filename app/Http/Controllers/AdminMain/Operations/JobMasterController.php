@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\Validation\ValidationException;
 use App\Models\Operations\OperationEnquiries;
+use App\Models\MasterPort;
 
 class JobMasterController extends Controller
 {
@@ -34,6 +35,7 @@ class JobMasterController extends Controller
      */
     public function index(Request $request)
     {
+        $page_title = "Job Master";
         $query = OperationJobMaster::with(['consigneeName', 'shipperName']);
 
         // Filter by job date
@@ -74,13 +76,11 @@ class JobMasterController extends Controller
         $jobs = $query->orderBy('created_at', 'desc')->get();
 
         $job_masters = $query->orderBy('created_at', 'desc')->paginate(25);
-        
-        
-        
+
         $shipperPartyNames = MasterExportParty::where('company_id', $this->company_id)->get();
         $consigneePartyNames = MasterImportParty::where('company_id', $this->company_id)->get();
 
-        return view('admin-main.admin.jobMaster.index', compact('job_masters', 'shipperPartyNames', 'consigneePartyNames', 'jobs'));
+        return view('admin-main.admin.jobMaster.index', compact('job_masters', 'shipperPartyNames', 'consigneePartyNames', 'jobs','page_title'));
     }
 
 
@@ -236,6 +236,18 @@ class JobMasterController extends Controller
         $jobMaster->user_id = $this->user_id;
 
         $jobMaster->save();
+        
+        //status change to used of enquires
+        if ($request->filled('enquiry_reference_no')) {
+
+            $enquiry = OperationEnquiries::find($request->enquiry_reference_no);
+        
+            if ($enquiry) {
+                $enquiry->update([
+                    'enquiry_status' => 'Complete'
+                ]);
+            }
+        }
   
         return redirect()->back()->with('success', 'Job Master created successfully.');
 
@@ -262,6 +274,7 @@ class JobMasterController extends Controller
         
         $parties = '';
         $partyDetails = '';
+        $enquiries = OperationEnquiries::where('company_id', $this->company_id)->where('enquiry_status', 'Complete')->get();
         if($jobMaster->job_activity == 'AIRIMP.FWD' || $jobMaster->job_activity == 'SEAIMP.FWD' || $jobMaster->job_activity == 'SEAIMP.NVOCC'){
             $partyDetails = MasterImportParty::where('company_id', $this->company_id)->where('status', 1)->find($jobMaster->job_party_id);
             $parties = MasterImportParty::where('company_id', $this->company_id)->where('party_type', 1)->where('status', 1)->get();
@@ -275,7 +288,7 @@ class JobMasterController extends Controller
                 ->first();
 
         $party_lists  = MasterParty::all();
-        return view('admin-main.admin.jobMaster.edit', compact('jobMaster', 'parties', 'party_lists','partyDetails', 'company_code'));
+        return view('admin-main.admin.jobMaster.edit', compact('jobMaster', 'parties', 'party_lists','partyDetails', 'company_code','enquiries'));
     }
 
     /**
@@ -486,7 +499,8 @@ class JobMasterController extends Controller
         ]);
     }
     
-    private function addBillingParty($validated){
+    private function addBillingParty($validated)
+    {
         
         MasterBillingParty::create([
             
@@ -511,6 +525,23 @@ class JobMasterController extends Controller
             "tds_percent" => $validated['tds_percent'],
             "status" => $validated['status']
         ]);
+    }
+    
+    public function getEnquiryDetails($id)
+    {
+        $enquiry = OperationEnquiries::where('company_id', $this->company_id)
+            ->with([
+                'loadingPort:id,port_name',
+                'dischargePort:id,port_name',
+                'consignee:id,party_name'
+            ])
+            ->findOrFail($id);
+    
+        return response()->json([
+            'status' => true,
+            'data' => $enquiry
+        ]);
+
     }
     
     

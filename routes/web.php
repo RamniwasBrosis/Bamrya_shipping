@@ -178,7 +178,6 @@ Route::middleware('auth')->group(function () {
             Route::delete('other-document/delete/{id}/{name}', [MasterImportPartyController::class, 'deleteDocument'])->name('other.document.delete');
 
         });
-
     });
     
    // (2) opreration routes
@@ -223,6 +222,7 @@ Route::middleware('auth')->group(function () {
 
     // Job Master 
     Route::post('/new-party-store', [JobMasterController::class, 'storeNewPartyAjax'])->name('job-master.new-party.store');
+    Route::get('/job-master/get-enquiry-details/{id}', [JobMasterController::class, 'getEnquiryDetails'])->name('job-master.get-enquiry-details');
     
 
     // Air Import related routes
@@ -338,6 +338,7 @@ Route::middleware('auth')->group(function () {
             Route::resource('export-bl-entry', ExportBlEntryController::class);       
             Route::resource('transports', TransportController::class);       
 
+            Route::resource('/Enquiry', EnquiryController::class);
             Route::get('/Enquiry', [EnquiryController::class, 'index']);
             Route::get('/Enquiry/create', [EnquiryController::class, 'create']);
             
