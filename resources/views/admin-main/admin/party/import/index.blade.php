@@ -48,6 +48,20 @@
                                 <option value="22" {{ request('party_type') == '22' ? 'selected' : '' }}>Delivery Agent Name</option>
                             </select>
                         </div>
+                        <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
+                            <label class="form-label">Party Mode</label>
+                            <select name="party_mode" class="form-control">
+                                <option value="all" {{ request('party_mode', 'all') == 'all' ? 'selected' : '' }}>
+                                    All
+                                </option>
+                                <option value="local" {{ request('party_mode') == 'local' ? 'selected' : '' }}>
+                                    Local
+                                </option>
+                                <option value="foreign" {{ request('party_mode') == 'foreign' ? 'selected' : '' }}>
+                                    Foreign
+                                </option>
+                            </select>
+                        </div>
                         <!--export -->
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Export</label>

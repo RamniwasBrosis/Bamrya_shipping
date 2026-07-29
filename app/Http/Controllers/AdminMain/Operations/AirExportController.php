@@ -209,6 +209,10 @@ class AirExportController extends Controller
             'sbill_no' => 'nullable|string',
             'customer_inv_no' => 'nullable|string',
             'flight_status' => 'nullable|string',
+            'to_air_sec' => 'nullable|string',
+            'by_second' => 'nullable|string',
+            'to_air_third' => 'nullable|string',
+            'by_third' => 'nullable|string',
         ]);
 
         $data['company_id'] = $this->company_id;
@@ -349,6 +353,10 @@ class AirExportController extends Controller
             'sbill_no' => 'nullable|string',
             'customer_inv_no' => 'nullable|string',
             'flight_status' => 'nullable|string',
+            'to_air_sec' => 'nullable|string',
+            'by_second' => 'nullable|string',
+            'to_air_third' => 'nullable|string',
+            'by_third' => 'nullable|string',
         ]);
         $data['user_id'] = $this->user_id;
 

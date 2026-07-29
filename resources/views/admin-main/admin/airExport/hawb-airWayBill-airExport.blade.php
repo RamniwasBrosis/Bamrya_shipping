@@ -232,10 +232,18 @@
                     </div>
                     <div style="font-size: 12px;padding-left: 15px;">{{$airExportDraftData->by_first_carrier ?? ''}}</div>
                   </td>
-                  <td style="border-left:1px solid #000;border-bottom:none; width: 10%; padding:2px; font-size:8px; text-align:center; width:10%;vertical-align: top; text-align: left">to</td>
-                  <td style="border-left:1px solid #000;border-bottom:none; width: 10%; padding:2px; font-size:8px; text-align:center; width:10%;vertical-align: top; text-align: left">by</td>
-                  <td style="border-left:1px solid #000;border-bottom:none; width: 10%; padding:2px; font-size:8px; text-align:center; width:10%;vertical-align: top; text-align: left">to</td>
-                  <td style="border-left:1px solid #000;border-bottom:none; width: 10%; padding:2px; font-size:8px; text-align:center; width:10%;vertical-align: top; text-align: left;">by</td>
+                  <td style="border-left:1px solid #000;border-bottom:none; width: 10%; padding:2px; font-size:8px; text-align:center; width:10%;vertical-align: top; text-align: left">
+                    to<br><br><span style="font-size: 12px;">{{$airExportDraftData->to_air_sec??''}}</span>
+                  </td>
+                  <td style="border-left:1px solid #000;border-bottom:none; width: 10%; padding:2px; font-size:8px; text-align:center; width:10%;vertical-align: top; text-align: left">
+                    by<br><br><span style="font-size: 12px;">{{$airExportDraftData->by_second??''}}</span>
+                  </td>
+                  <td style="border-left:1px solid #000;border-bottom:none; width: 10%; padding:2px; font-size:8px; text-align:center; width:10%;vertical-align: top; text-align: left">
+                    to<br><br><span style="font-size: 12px;">{{$airExportDraftData->to_air_third??''}}</span>
+                  </td>
+                  <td style="border-left:1px solid #000;border-bottom:none; width: 10%; padding:2px; font-size:8px; text-align:center; width:10%;vertical-align: top; text-align: left;">
+                    by<br><br><span style="font-size: 12px;">{{$airExportDraftData->by_third??''}}</span>    
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -287,9 +295,24 @@
                     <div style=" padding: 0;display: flex;">
                       <div style=" margin: 0px auto;"><div class="border-crav" style="font-size:9px; padding: 4px 10px; color: #555;">Requested Flight/Date</div></div>
                     </div>
-                    <div style=" padding: 0; display: flex;">
-                      <div style="width: 50%; text-align: center; border-right:1px solid #000;">{{$airExportDraftData->flight_number_1 ?? ''}}</div>
-                      <div style="width: 50%; text-align: center;">{{$airExportDraftData->flight_date_1 ?? ''}}</div>
+                    <div style="padding: 0; display: flex;">
+                        <div style="width: 33%; text-align: center; border-right:1px solid #000;">
+                            @if($airExportDraftData->flight_number_1 || $airExportDraftData->flight_date_1)
+                                {{ $airExportDraftData->flight_number_1 ?? '' }}{{ ($airExportDraftData->flight_number_1 && $airExportDraftData->flight_date_1) ? ' / ' : '' }}{{ $airExportDraftData->flight_date_1 ?? '' }}
+                            @endif
+                        </div>
+                    
+                        <div style="width: 33%; text-align: center; border-right:1px solid #000;">
+                            @if($airExportDraftData->flight_number_2 || $airExportDraftData->flight_date_2)
+                                {{ $airExportDraftData->flight_number_2 ?? '' }}{{ ($airExportDraftData->flight_number_2 && $airExportDraftData->flight_date_2) ? ' / ' : '' }}{{ $airExportDraftData->flight_date_2 ?? '' }}
+                            @endif
+                        </div>
+                    
+                        <div style="width: 33%; text-align: center;">
+                            @if($airExportDraftData->flight_number_3 || $airExportDraftData->flight_date_3)
+                                {{ $airExportDraftData->flight_number_3 ?? '' }}{{ ($airExportDraftData->flight_number_3 && $airExportDraftData->flight_date_3) ? ' / ' : '' }}{{ $airExportDraftData->flight_date_3 ?? '' }}
+                            @endif
+                        </div>
                     </div>
                   </td>
                 </tr>

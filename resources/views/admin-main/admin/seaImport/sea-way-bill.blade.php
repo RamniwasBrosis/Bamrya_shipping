@@ -610,6 +610,23 @@
                                             <br><br><br><br><br>
                                             <div style="text-align: right; margin-top: 20px; font-weight: bold;">
                                                 SHIPPED ONBOARD DATE: {{ safeData($container, 'sobDate') }}
+                                            
+                                                @php
+                                                    $blDescription = optional($seaImportDraftData->blType)->bl_description;
+                                                @endphp
+                                            
+                                                @if(!empty($seaImportDraftData->hbl_type) && $blDescription === 'TELEX RELEASE')
+                                                    <br><br><br><br><br><br><br>
+                                                    <span style="
+                                                            display: inline-block;
+                                                            margin-top: 8px;
+                                                            padding: 6px 18px;
+                                                            border: 2px solid #000;
+                                                            font-weight: bold;
+                                                            text-align: center;
+                                                            font-size: 15px;
+                                                        ">{{ $blDescription }}</span>
+                                                @endif
                                             </div>
                                         </td>
                                         <td style="text-align: center;">
@@ -1441,6 +1458,23 @@
                                     <br><br><br><br><br>
                                     <div style="text-align: right; margin-top: 20px; font-weight: bold;">
                                         SHIPPED ONBOARD DATE: {{ safeData($container, 'sobDate') }}
+                                        
+                                        @php
+                                            $blDescription = optional($seaImportDraftData->blType)->bl_description;
+                                        @endphp
+                                    
+                                        @if(!empty($seaImportDraftData->hbl_type) && $blDescription === 'TELEX RELEASE')
+                                            <br><br><br><br><br><br><br>
+                                            <span style="
+                                                    display: inline-block;
+                                                    margin-top: 8px;
+                                                    padding: 6px 18px;
+                                                    border: 2px solid #000;
+                                                    font-weight: bold;
+                                                    text-align: center;
+                                                    font-size: 15px;
+                                                ">{{ $blDescription }}</span>
+                                        @endif
                                     </div>
                                 </td>
                                 <td style="text-align: center;">

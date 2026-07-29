@@ -197,7 +197,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/new-billing-party', [CommonFormsController::class, 'newBillingParty'])->name('new-billing-party.store');
     Route::post('/new-purchase-party', [CommonFormsController::class, 'newPurchaseParty'])->name('new-purchase-party.store');
 
-    Route::POST('multi-file-upload', [CommanMultiFilesUploadController::class, 'updateFileUpload'])->name('multi-file-upload.updateFileUpload'); 
+    Route::POST('multi-file-upload', [CommanMultiFilesUploadController::class, 'updateFileUpload'])->name('multi-file-upload.updateFileUpload');
     Route::post('multi-file-upload/search-file', [CommanMultiFilesUploadController::class, 'searchFile'])->name('multi-file-upload.searchFile');
     Route::get('multi-file-upload/download/{id}', [CommanMultiFilesUploadController::class, 'downloadFile'])->name('multi-file-upload.downloadFile');
     Route::delete('multi-file-upload/{id}', [CommanMultiFilesUploadController::class, 'destroy'])->name('multi-file-upload.delete');
@@ -582,7 +582,7 @@ Route::middleware('auth')->group(function () {
         Route::prefix('admin')->group(function(){
             Route::get('company-settings', [CompanySettingController::class, 'edit'])->name('company-settings.edit');
             Route::put('company-settings/{id}', [CompanySettingController::class, 'update'])->name('company-settings.update');
-            Route::resource('branches', CompanyBranchController::class);            
+            Route::resource('branches', CompanyBranchController::class);
         });  
     });
     

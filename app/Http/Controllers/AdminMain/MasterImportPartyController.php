@@ -33,40 +33,63 @@ class MasterImportPartyController extends Controller
     public function index(Request $request)
     {
         $page_title = 'Import Parties';
-        $query = MasterImportParty::with('party')->where('company_id', $this->company_id);
+    
+        $query = MasterImportParty::with('party')
+            ->where('company_id', $this->company_id);
+    
         $partyType = $request->party_type;
-        if($request->filled('party_name')){
-            $query->where('party_name', 'LIKE', '%'.$request->party_name.'%');
+    
+        // Party Name
+        if ($request->filled('party_name')) {
+            $query->where('party_name', 'LIKE', '%' . $request->party_name . '%');
         }
-        if($request->filled('party_type')){
+    
+        // Party Type
+        if ($request->filled('party_type')) {
             $query->where('party_type', $request->party_type);
         }
-        
-        //export 
+    
+        // Party Mode
+        if ($request->filled('party_mode') && $request->party_mode != 'all') {
+            $query->where('party_mode', $request->party_mode);
+        }
+    
+        // Export
         if ($request->action == 'export') {
-            $importParties = $query->orderBy('created_at', 'desc')->where('company_id', $this->company_id)->get();
-            //excel
+    
+            $importParties = $query
+                ->orderBy('created_at', 'desc')
+                ->get();
+    
             if ($request->export_type == 'excel') {
                 return Excel::download(
                     new ImportPartyExport($importParties),
                     'Import-Parties.xlsx'
                 );
             }
-            //pdf
+    
             if ($request->export_type == 'pdf') {
                 $pdf = Pdf::loadView(
                     'admin-main.admin.party.import.pdf',
-                    compact('importParties','partyType')
+                    compact('importParties', 'partyType')
                 );
+    
                 return $pdf->download('Import-Parties.pdf');
             }
         }
-        
-        $importParties = $query->orderBy('created_at', 'desc')->paginate(25);
-        
-        $partyNameList = MasterImportParty::where('company_id', $this->company_id)->orderBy('party_name')->get();
-        
-        return view('admin-main.admin.party.import.index', compact('page_title','importParties', 'partyNameList'));
+    
+        $importParties = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(25);
+    
+        $partyNameList = MasterImportParty::where('company_id', $this->company_id)
+            ->orderBy('party_name')
+            ->get();
+    
+        return view(
+            'admin-main.admin.party.import.index',
+            compact('page_title', 'importParties', 'partyNameList')
+        );
     }
 
     /**
@@ -280,6 +303,7 @@ class MasterImportPartyController extends Controller
             'status'          => 'required|boolean',
             'state'           => 'nullable|string|max:50',
             'state_code'      => 'nullable|string|max:50',
+            'party_mode'      => 'nullable|string|max:50',
         ]);
         
         $masterParty = MasterImportParty::findOrFail($id);
@@ -322,6 +346,7 @@ class MasterImportPartyController extends Controller
         $masterParty->state_code = $validated['state_code'];
         $masterParty->status = $validated['status'];
         $masterParty->user_id = $this->user_id;
+        $masterParty->party_mode = $request->party_mode ?? '';
 
         if(!$validated['party_code']){
             $masterParty->party_code = '0';

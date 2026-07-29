@@ -33,35 +33,56 @@ class MasterExportPartyController extends Controller
     public function index(Request $request)
     {
         $page_title = 'Export Parties';
-        $query = MasterExportParty::query();
-        if($request->filled('party_name')){
-            $query->where('party_name', 'LIKE', '%'.$request->party_name.'%');
+    
+        $query = MasterExportParty::where('company_id', $this->company_id);
+    
+        // Party Name Filter
+        if ($request->filled('party_name')) {
+            $query->where('party_name', 'LIKE', '%' . $request->party_name . '%');
         }
-        
+    
+        // Party Mode Filter
+        if ($request->filled('party_mode') && $request->party_mode != 'all') {
+            $query->where('party_mode', $request->party_mode);
+        }
+    
+        // Export
         if ($request->action == 'export') {
-            $exportParties = $query->orderBy('created_at', 'desc')->where('company_id', $this->company_id)->get();
-            //excel
+    
+            $exportParties = $query->orderBy('created_at', 'desc')->get();
+    
+            // Excel
             if ($request->export_type == 'excel') {
                 return Excel::download(
                     new ExportPartyExport($exportParties),
                     'Shipper-Parties.xlsx'
                 );
             }
-            //pdf
+    
+            // PDF
             if ($request->export_type == 'pdf') {
                 $pdf = Pdf::loadView(
                     'admin-main.admin.party.export.pdf',
                     compact('exportParties')
                 );
+    
                 return $pdf->download('Shipper-Parties.pdf');
             }
         }
-        
-        $exportParties = $query->where('company_id', $this->company_id)->orderBy('created_at', 'desc')->paginate(10);
-
-        $partyNameList = MasterExportParty::where('company_id', $this->company_id)->orderBy('party_name')->get();
-
-        return view('admin-main.admin.party.export.index', compact('page_title','exportParties', 'partyNameList'));
+    
+        // Listing
+        $exportParties = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+    
+        $partyNameList = MasterExportParty::where('company_id', $this->company_id)
+            ->orderBy('party_name')
+            ->get();
+    
+        return view(
+            'admin-main.admin.party.export.index',
+            compact('page_title', 'exportParties', 'partyNameList')
+        );
     }
 
     /**
@@ -274,6 +295,7 @@ class MasterExportPartyController extends Controller
             'credit_days'     => 'nullable|integer|min:1',
             'tds_percent'     => 'nullable|integer|min:0|max:100',
             'status'          => 'required|boolean',
+            'party_mode'      => 'nullable|string|max:50',
         ]);
         
         $masterParty = MasterExportParty::findOrFail($id);
@@ -317,6 +339,7 @@ class MasterExportPartyController extends Controller
         $masterParty->state_code = $validated['state_code'];
         $masterParty->status = $validated['status'];
         $masterParty->user_id = $this->user_id;
+        $masterParty->party_mode = $request->party_mode ?? '';
 
         if(!$validated['party_code']){
             $masterParty->party_code = '0';

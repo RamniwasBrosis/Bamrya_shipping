@@ -158,6 +158,7 @@
                                         </td>
                                         <td>{{ $userName ?? '-' }}</td>
                                         <td>
+                                            <a href="{{ route('salesInvoice.import', $sales_invoice->id) }}" type="button" class="btn btn-success btn-sm">Print</a>
                                             <a class="badge badge-info light border-0" href="{{url('admin/sales-invoices/'.$sales_invoice->uuid.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-salesInvoice" href="javascript:void(0);" data-id="{{$sales_invoice->id}}">Delete</a>
                                             

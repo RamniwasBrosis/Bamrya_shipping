@@ -91,8 +91,8 @@
                                         <div class="row">
                                             <!-- Row 1 -->
                                             <div class="col-md-4 mb-3">
-                                                <label class="form-label">Job No: <span class="text-danger">*</span></label>
-                                                <input type="text" value="{{$purchase_invoice->operationJob->full_job_no}}" readonly class="form-control" name="full_job_no" style="background: #eee; cursor: not-allowed;">
+                                                <label class="form-label">Job No: </label>
+                                                <input type="text" value="{{$purchase_invoice->operationJob->full_job_no??''}}" readonly class="form-control" name="full_job_no" style="background: #eee; cursor: not-allowed;">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Inv No: <span class="text-danger">*</span></label>
@@ -739,7 +739,7 @@
                                 @foreach($chargeDetails as $chargeDetail)
                                     <tr>
                                       <th scope="row">{{ $chargeDetail->id }}</th>
-                                      <td>{{ $chargeDetail?->purchaseInvoice?->operationJob->job_no }}</td>
+                                      <td>{{ $chargeDetail?->purchaseInvoice?->operationJob->job_no??'' }}</td>
                                       <td>{{ $chargeDetail?->purchaseInvoice?->invoice_no }}</td>
                                       <td>{{ $chargeDetail?->chargeName?->charge_name }}</td>
                                       

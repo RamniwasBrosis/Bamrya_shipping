@@ -229,6 +229,7 @@ class SeaExportController extends Controller
             'transportation' => 'nullable|string',
             'transportation_details' => 'nullable|string',
             'clearance' => 'nullable|string',
+            'goods_description' => 'nullable|string',
         ]);
         
         if ($validator->fails()) {
@@ -380,6 +381,7 @@ class SeaExportController extends Controller
             'sbill_no' => 'nullable|string',
             'cartining_date' => 'nullable|date',
             'commodity' => 'nullable|string',
+            'goods_description' => 'nullable|string',
             
         ]);
         $validated['user_id'] = $this->user_id;
@@ -1086,6 +1088,10 @@ class SeaExportController extends Controller
             $gTbl->addCell($G2)->addText('Number of Packages, Kinds of Packages, General Description of Goods', ['bold' => true, 'size' => 8]);
             $gTbl->addCell($G3)->addText('Gross Weight', ['bold' => true, 'size' => 8]);
             $gTbl->addCell($G4)->addText('Measurement', ['bold' => true, 'size' => 8]);
+            // horizontally align the description...
+            $centerParagraph = [
+                'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER
+            ];
      
             if ($hasCont) {
                 foreach ($containers as $idx => $cont) {
@@ -1131,20 +1137,20 @@ class SeaExportController extends Controller
                     $qty     = $get($cont, 'total_package', '0');
                     $size     = $get($cont, 'size', '0');
                     $pkgCode = $get($seaExportDraftData->packageName, 'package_code', 'PCS');
-                    $dCell->addText('Set To Container, Size- ' . $size, ['bold' => false, 'size' => 9]);
+                    $dCell->addText('Set To Container, Size- ' . $size, ['bold' => false, 'size' => 9],$centerParagraph);
                     $dCell->addText(
                         'Total Packages: ' . $qty . ' ' . $pkgCode .
                         ' (' . $qtyInWords . ' ' . strtolower($pkgCode) . ' only)',
-                        ['bold' => true, 'size' => 9]
+                        ['bold' => true, 'size' => 9],$centerParagraph
                     );
-                    $dCell->addText('Goods Description:', ['bold' => true, 'size' => 8]);
-                    $tx($dCell, $get($cont, 'goods_description', 'N/A'), ['size' => 9]);
+                    $dCell->addText('Goods Description:', ['bold' => true, 'size' => 8],$centerParagraph);
+                    $tx($dCell, $get($cont, 'goods_description', 'N/A'), ['size' => 9],$centerParagraph);
                     $dCell->addTextBreak(1);
                     if ($inv = $get($cont, 'customer_inv_no'))
-                        $dCell->addText('INVOICE NO: ' . $inv, ['size' => 8]);
+                        $dCell->addText('INVOICE NO: ' . $inv, ['size' => 8],$centerParagraph);
                         $dCell->addTextBreak(1);
                     if ($sb = $get($cont, 'sbill_no'))
-                        $dCell->addText('SB. NO: ' . $sb, ['size' => 8]);
+                        $dCell->addText('SB. NO: ' . $sb, ['size' => 8],$centerParagraph);
                         $dCell->addTextBreak(1);
                     $dCell->addTextBreak(2);
                     if ($sob = $get($cont, 'sob_date'))
@@ -1172,7 +1178,7 @@ class SeaExportController extends Controller
                 $ncCell = $gTbl->addCell($G1);
                 $ncCell->addText('NO CONTAINER', ['bold' => true, 'size' => 9]);
                 $ncCell->addText(
-                    'Packages: ' . $get($seaExportDraftData, 'total_package', '0') . ' ' .
+                    'Packages: ' . $get($seaExportDraftData, 'quantity', '0') . ' ' .
                     $get($seaExportDraftData->packageName, 'package_code', 'PCS'),
                     ['size' => 8]
                 );
@@ -1184,16 +1190,16 @@ class SeaExportController extends Controller
      
                 $ndCell = $gTbl->addCell($G2);
                 $ndCell->addText(
-                    'Total Packages: ' . $get($seaExportDraftData, 'total_package', '0') . ' ' .
+                    'Total Packages: ' . $get($seaExportDraftData, 'quantity', '0') . ' ' .
                     $get($seaExportDraftData->packageName, 'package_code', 'PCS') . ' ONLY',
-                    ['bold' => true, 'size' => 9]
+                    ['bold' => true, 'size' => 9],$centerParagraph
                 );
-                $ndCell->addText('Goods Description:', ['bold' => true, 'size' => 8]);
-                $tx($ndCell, $get($seaExportDraftData, 'goods_description', 'N/A'), ['size' => 9]);
+                $ndCell->addText('Goods Description:', ['bold' => true, 'size' => 8],$centerParagraph);
+                $tx($ndCell, $get($seaExportDraftData, 'goods_description', 'N/A'), ['size' => 9],$centerParagraph);
                 if ($inv = $get($seaExportDraftData, 'customer_inv_no'))
-                    $ndCell->addText('INVOICE NO: ' . $inv, ['size' => 8]);
+                    $ndCell->addText('INVOICE NO: ' . $inv, ['size' => 8],$centerParagraph);
                 if ($sb = $get($seaExportDraftData, 'sbill_no'))
-                    $ndCell->addText('SB. NO: ' . $sb, ['size' => 8]);
+                    $ndCell->addText('SB. NO: ' . $sb, ['size' => 8],$centerParagraph);
      
                 $nwCell = $gTbl->addCell($G3);
                 $tx($nwCell, $get($seaExportDraftData, 'gross_weight', '0'), ['bold' => true, 'size' => 10], $aC);

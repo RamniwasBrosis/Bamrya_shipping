@@ -146,6 +146,7 @@
                                         <td style="color: red;">{{round($purchase_invoice->chargesContainer->sum('total')) ?? '--'}}</td>
                                         <td>{{ $userName ?? '-' }}</td>
                                         <td>
+                                            <a href="{{ route('ImportPurchaseInvoice.import', $purchase_invoice->id) }}" type="button" class="btn btn-success btn-sm">Print</a>
                                             <a class="badge badge-info light border-0" href="{{url('admin/purchase-invoices/'.$purchase_invoice->uuid.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-purchaseInvoice" href="javascript:void(0);" data-id="{{$purchase_invoice->id}}">Delete</a>
                                         </td>

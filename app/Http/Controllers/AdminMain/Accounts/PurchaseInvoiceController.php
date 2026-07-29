@@ -81,7 +81,8 @@ class PurchaseInvoiceController extends Controller
             }
     
             $fy = $fyStart . '-' . substr($fyEnd, -2);
-            $job_nums[$invoice->job_no] = $invoice->inv_cat . '/' . $invoice->job_no . '/' . $fy;
+            // $job_nums[$invoice->job_no] = $invoice->inv_cat . '/' . $invoice->job_no . '/' . $fy;
+            $job_nums[$invoice->job_no] = $invoice->full_job_no;
         }
         $page_title = 'Purchase';
         return view('admin-main.admin.purchaseInvoice.index', compact('purchase_invoices', 'job_nums','page_title'));
@@ -112,7 +113,7 @@ class PurchaseInvoiceController extends Controller
             return response()->json(['status' => false, 'message' => 'A record with this Invoice number already exists.']); 
         }
         $validated = $request->validate([
-            'job_no' => 'required|string',
+            'job_no' => 'nullable|string',
             'voyage_code' => 'nullable|string',
             'pod' => 'nullable|string',
             'container' => 'nullable|string',
@@ -213,7 +214,7 @@ class PurchaseInvoiceController extends Controller
         $sales_invoice = AccountPurchaseInvoice::findOrFail($id);
 
         $validated = $request->validate([
-            'job_no' => 'required|string',
+            'job_no' => 'nullable|string',
             'voyage_code' => 'nullable|string',
             'pod' => 'nullable|string',
             'container' => 'nullable|string',

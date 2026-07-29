@@ -121,19 +121,16 @@ class OperationSeaImport extends Model
         return $this->belongsTo(MasterPackage::class, 'package_id', 'id');
     }
     
-    
-    
     public function agentName()
     {
         return $this->belongsTo(MasterImportParty::class, 'agent_id', 'id');
     }
     
-    
-    
     public function deliveryAgentName()
     {
         return $this->belongsTo(MasterImportParty::class, 'delivery_agent_id', 'id');
     }
+    
     public function blType()
     {
         return $this->belongsTo(MasterBlType::class, 'hbl_type', 'id');

@@ -88,7 +88,7 @@
                                             <!-- Row 1 -->
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Job No: <span class="text-danger">*</span></label>
-                                                <select name="" id="option" class="form-control select2" required>
+                                                <select name="" id="option" class="form-control select2">
                                                     <option value="">Select</option>
                                                     {{-- Populate with @foreach if needed --}}
                                                 </select>

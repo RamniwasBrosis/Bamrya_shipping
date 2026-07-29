@@ -623,6 +623,14 @@
                             <div class="row">
                                 <h4>Air Waybill Details</h4>
                                 <hr>
+                                <div class="col-xl-6">
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label">By First Carrier:</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" name="by_first_carrier" value="{{ old('by_first_carrier') }}">
+                                        </div>
+                                    </div>
+                                </div>
                                 
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -633,11 +641,36 @@
                                     </div>
                                 </div>
                                 
+                                
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
-                                        <label class="col-sm-3 col-form-label">By First Carrier:</label>
+                                        <label class="col-sm-3 col-form-label">By(second):</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" name="by_first_carrier" value="{{ old('by_first_carrier') }}">
+                                            <input type="text" class="form-control" name="by_second" value="{{old('by_second')}}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label">TO(second):</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" name="to_air_sec" value="{{ old('to_air_sec') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label">By(third):</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" name="by_third" value="{{old('by_third')}}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label">TO(third):</label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" name="to_air_third" value="{{ old('to_air_third') }}">
                                         </div>
                                     </div>
                                 </div>

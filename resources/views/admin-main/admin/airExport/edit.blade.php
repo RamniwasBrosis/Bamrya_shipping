@@ -508,14 +508,12 @@
                             <hr>
                             <div class="col-xl-6">
                                 <div class="mb-3 row">
-                                    <label class="col-sm-3 col-form-label">Freight:<span
-                                            class="text-danger">*</span></label>
+                                    <label class="col-sm-3 col-form-label">By First Carrier:</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="freight" value="{{ $air_export->freight }}">
+                                        <input type="text" class="form-control" name="by_first_carrier" value="{{ $air_export->by_first_carrier }}">
                                     </div>
                                 </div>
                             </div>
-                            
                             <div class="col-xl-6">
                                 <div class="mb-3 row">
                                     <label class="col-sm-3 col-form-label">TO:</label>
@@ -524,15 +522,49 @@
                                     </div>
                                 </div>
                             </div>
-                            
                             <div class="col-xl-6">
                                 <div class="mb-3 row">
-                                    <label class="col-sm-3 col-form-label">By First Carrier:</label>
+                                    <label class="col-sm-3 col-form-label">By(Second):</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="by_first_carrier" value="{{ $air_export->by_first_carrier }}">
+                                        <input type="text" class="form-control" name="by_second" value="{{ $air_export->by_second ?? '' }}">
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-xl-6">
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">TO(second):</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="to_air_sec" value="{{ $air_export->to_air_sec }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">By(third):</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="by_third" value="{{ $air_export->by_third ?? '' }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">TO(third):</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="to_air_third" value="{{ $air_export->to_air_third }}">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-xl-6">
+                                <div class="mb-3 row">
+                                    <label class="col-sm-3 col-form-label">Freight:<span
+                                            class="text-danger">*</span></label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="freight" value="{{ $air_export->freight }}">
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div class="col-xl-6">
                                 <div class="mb-3 row">
                                     <label class="col-sm-3 col-form-label">Currency:</label>

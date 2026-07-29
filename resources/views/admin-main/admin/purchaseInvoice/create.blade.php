@@ -93,8 +93,8 @@
                                         <div class="row">
                                             <!-- Row 1 -->
                                             <div class="col-md-4 mb-3">
-                                                <label class="form-label">Job No: <span class="text-danger">*</span></label>
-                                                <select name="" id="option" class="form-control select2" required>
+                                                <label class="form-label">Job No: </label>
+                                                <select name="" id="option" class="form-control select2">
                                                     <option value="">Select</option>
                                                     {{-- Populate with @foreach if needed --}}
                                                 </select>
@@ -102,7 +102,7 @@
                                             
                                             <!-- Row 2 -->
                                             <div class="col-md-4 mb-3">
-                                                <label class="form-label">Inv No: <span class="text-danger">*</span></label>
+                                                <label class="form-label">Inv No:<span class="text-danger">*</span></label>
                                                 <input type="text" name="invoice_no" class="form-control" required>
                                             </div>
                                             <div class="col-md-4 mb-3">
@@ -114,7 +114,7 @@
                                                 <input type="date" name="invoice_due_date" class="form-control" value="">
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label class="form-label">Invoice Type:</label>
+                                                <label class="form-label">Invoice Type:<span class="text-danger">*</span></label>
                                                 <select name="invoice_type" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <option value="PURCHASE">PURCHASE</option>
@@ -202,7 +202,7 @@
                                                 <input type="text" name="freight_terms" class="form-control" style="background: #eee; cursor: not-allowed;">
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label class="form-label">Party Type:<span class="text-danger">*</span><</label>
+                                                <label class="form-label">Party Type:<span class="text-danger">*</span></label>
                                                 <select name="party_type" class="form-control">
                                                     <option value="">Select</option>
                                                     <option value="cha">CHA</option>
@@ -259,8 +259,8 @@
                                                 <input type="text" name="vessel_name" class="form-control" value="{{ old('vessel_name', $salesInvoice->vessel_name ?? '') }}">
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label class="form-label">AWB / BL NO: <span class="text-danger">*</span></label>
-                                                <input type="text" name="awb_bl_no" required class="form-control" value="{{ old('awb_bl_no', $salesInvoice->awb_bl_no ?? '') }}">
+                                                <label class="form-label">AWB / BL NO: </label>
+                                                <input type="text" name="awb_bl_no" class="form-control" value="{{ old('awb_bl_no', $salesInvoice->awb_bl_no ?? '') }}">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">MAWB NO:</label>

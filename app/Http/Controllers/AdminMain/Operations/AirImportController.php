@@ -309,6 +309,10 @@ class AirImportController extends Controller
             'handling_information' => 'nullable|string|max:255',
            
             'by_first_carrier' => 'nullable|string',
+            'by_second' => 'nullable|string',
+            'to_air_sec' => 'nullable|string',
+            'by_third' => 'nullable|string',
+            'to_air_third' => 'nullable|string',
             'declared_value_by_carrier' => 'nullable|string',
             'declared_value_by_customs' => 'nullable|string',
             'other_charges_due_carrier' => 'nullable|string',
@@ -436,6 +440,10 @@ class AirImportController extends Controller
             'arrival_date' => 'nullable|date',
             
             'by_first_carrier' => 'nullable|string',
+            'by_second' => 'nullable|string',
+            'to_air_sec' => 'nullable|string',
+            'by_third' => 'nullable|string',
+            'to_air_third' => 'nullable|string',
             'declared_value_by_carrier' => 'nullable|string',
             'declared_value_by_customs' => 'nullable|string',
             'other_charges_due_carrier' => 'nullable|string',

@@ -93,8 +93,8 @@ class SalesInvoiceController extends Controller
             return response()->json(['status' => false, 'message' => 'A record with this Invoice number already exists.']); 
         }
         $validated = $request->validate([
-            'job_no' => 'required|integer', // ensures FK
-            'full_job_no' => 'required|string',
+            'job_no' => 'nullable|integer', // ensures FK
+            'full_job_no' => 'nullable|string',
             'voyage_code' => 'nullable|string',
             'pod' => 'nullable|string',
             'pol' => 'nullable|string',
@@ -195,8 +195,8 @@ class SalesInvoiceController extends Controller
         $sales_invoice = AccountSaleInvoice::findOrFail($id);
 
         $validated = $request->validate([
-            'job_no' => 'required|string',
-            'full_job_no' => 'required|string',
+            'job_no' => 'nullable|string',
+            'full_job_no' => 'nullable|string',
             'voyage_code' => 'nullable|string',
             'pod' => 'nullable|string',
             'container' => 'nullable|string',
@@ -206,7 +206,7 @@ class SalesInvoiceController extends Controller
             'chargeable_weight' => 'nullable|string',
             'party_type' => 'nullable|string',
             'billing_party_id' => 'required|integer',
-            'invoice_no' => 'nullable|string',
+            'invoice_no' => 'required|string',
             'invoice_type' => 'required|string',
             'overseas_exchange_rate' => 'nullable|numeric',
             'gst_type' => 'required|string',

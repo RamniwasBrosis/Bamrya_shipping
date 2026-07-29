@@ -695,6 +695,14 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-xl-6">
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label">Goods Description:</label>
+                                        <div class="col-sm-9">
+                                            <textarea class="form-control h-100" name="goods_description" rows="3">{{$sea_export->goods_description}}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -1245,7 +1253,7 @@
                                 <div class="mb-3 row">
                                     <label class="col-sm-3 col-form-label">Goods Description:</label>
                                     <div class="col-sm-9">
-                                        <textarea class="form-control h-100" id="shipment_goods_description" name="goods_description" rows="3">{{ old('goods_description') }}</textarea>
+                                        <textarea class="form-control h-100" id="shipment_goods_description" name="goods_description" rows="3"></textarea>
                                     </div>
                                 </div>
                             </div>

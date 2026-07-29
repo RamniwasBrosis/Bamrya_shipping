@@ -267,15 +267,17 @@
 
     @php
         // Helper function to get safe data
-        function safeData($data, $property, $default = '') {
-            $value = optional($data)->$property;
+        if (!function_exists('safeData')) {
+            function safeData($data, $property, $default = '')
+            {
+                $value = optional($data)->$property;
         
-            // null, empty string, ya sirf spaces ho to blank return karo
-            if (is_null($value) || trim($value) === '') {
-                return '';
+                if (is_null($value) || trim((string)$value) === '') {
+                    return $default;
+                }
+        
+                return $value;
             }
-        
-            return $value;
         }
         
         // Get container count
@@ -604,6 +606,23 @@
                                             <br><br><br><br><br>
                                             <div style="text-align: right; margin-top: 20px; font-weight: bold;">
                                                 SHIPPED ONBOARD DATE: {{ safeData($container, 'sob_date') }}
+                                            
+                                                @php
+                                                    $blDescription = optional($seaExportDraftData->blType)->bl_description;
+                                                @endphp
+                                            
+                                                @if(!empty($seaExportDraftData->bl_type) && $blDescription === 'TELEX RELEASE')
+                                                    <br><br><br><br><br><br><br>
+                                                    <span style="
+                                                            display: inline-block;
+                                                            margin-top: 8px;
+                                                            padding: 6px 18px;
+                                                            border: 2px solid #000;
+                                                            font-weight: bold;
+                                                            text-align: center;
+                                                            font-size: 15px;
+                                                        ">{{ $blDescription }}</span>
+                                                @endif
                                             </div>
                                         </td>
                                         <td style="text-align: center;">
@@ -1434,7 +1453,24 @@
                                     @endif
                                     <br><br><br><br><br>
                                     <div style="text-align: right; margin-top: 20px; font-weight: bold;">
-                                        SHIPPED ONBOARD DATE: {{ safeData($container, 'sob_date') }}
+                                        SHIPPED ONBOARD DATE: {{ safeData($seaExportDraftData, 'sob_date') }}
+                                    
+                                        @php
+                                            $blDescription = optional($seaExportDraftData->blType)->bl_description;
+                                        @endphp
+                                    
+                                        @if(!empty($seaExportDraftData->bl_type) && $blDescription === 'TELEX RELEASE')
+                                            <br><br><br><br><br><br><br>
+                                            <span style="
+                                                    display: inline-block;
+                                                    margin-top: 8px;
+                                                    padding: 6px 18px;
+                                                    border: 2px solid #000;
+                                                    font-weight: bold;
+                                                    text-align: center;
+                                                    font-size: 15px;
+                                                ">{{ $blDescription }}</span>
+                                        @endif
                                     </div>
                                 </td>
                                 <td style="text-align: center;">

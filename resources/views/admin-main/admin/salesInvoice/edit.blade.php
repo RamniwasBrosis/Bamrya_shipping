@@ -779,7 +779,7 @@
                                 @foreach($chargeDetails as $chargeDetail)
                                     <tr>
                                       <th scope="row">{{ $chargeDetail->id }}</th>
-                                      <td>{{ $chargeDetail?->salesInvoice->operationJob->job_no }}</td>
+                                      <td>{{ $chargeDetail?->salesInvoice->operationJob->job_no ?? '' }}</td>
                                       <td>{{ $chargeDetail?->salesInvoice->invoice_no }}</td>
                                       <td>{{ $chargeDetail?->chargeName->charge_name }}</td>
                                       

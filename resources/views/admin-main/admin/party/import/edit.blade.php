@@ -61,6 +61,17 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="col-xl-3 col-xxl-12 col-md-6 mb-3" id="party_mode">
+                                <label for="password" class="col-sm-4 col-form-label">Party Mode:</label>
+                                <div class="col-sm-12">
+                                    <select class="form-control" name="party_mode">
+                                        <option value="" selected>select</option>
+                                        <option value="local" {{$importParty->party_mode == 'local' ? 'selected' : ''}}>Local</option>
+                                        <option value="foreign" {{$importParty->party_mode == 'foreign' ? 'selected' : ''}}>Foreign</option>
+                                    </select>
+                                    <small class="text-danger error-party_mode"></small>
+                                </div>
+                            </div>
                             <div class="col-xl-3 col-xxl-12 col-md-6 mb-3">
                                 <label class="form-label">Contact Person:</label>
                                 <input type="text" name="contact_person" class="form-control" value="{{ old('contact_person', $importParty->contact_person) }}">

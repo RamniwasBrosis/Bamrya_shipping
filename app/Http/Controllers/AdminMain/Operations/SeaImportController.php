@@ -780,7 +780,7 @@ class SeaImportController extends Controller
         $page_title = 'Sea Import BL-Draft';
         // Get all the necessary data
         $seaImportDraftData = OperationSeaImport::with([
-            'ConsigneeName', 'blType', 'shipperName', 'deliveryPortName', 
+            'ConsigneeName', 'blType', 'shipperName', 'deliveryPortName',
             'loadingPortName', 'dischargePortName', 'receiptPortName',  
             'container', 'agentName', 'deliveryAgentName', 'shippingLine', 
             'packageName', 'notifyName'
