@@ -30,24 +30,24 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- DataTables CSS -->
     <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
-    
+
 	<!-- FAVICONS ICON -->
 	<link rel="shortcut icon" type="image/png" href="{{ asset('public/images/favicon.png')}}">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-	
+
 	@if(!empty(config('dz.public.pagelevel.css.'.$action)))
 		@foreach(config('dz.public.pagelevel.css.'.$action) as $style)
-			<link href="{{ asset('public/'.$style) }}" rel="stylesheet" type="text/css"/>
+			<link href="{{ asset($style) }}" rel="stylesheet" type="text/css"/>
 		@endforeach
 	@endif
 
 	{{-- Global Theme Styles (used by all pages) --}}
 	@if(!empty(config('dz.public.global.css')))
 		@foreach(config('dz.public.global.css') as $style)
-			<link href="{{ asset('public/'.$style) }}" rel="stylesheet" type="text/css"/>
+			<link href="{{ asset($style) }}" rel="stylesheet" type="text/css"/>
 		@endforeach
 	@endif
-	
+
 	<style>
 	    #preloader {
           background: #fff;
@@ -61,7 +61,7 @@
           justify-content: center;
           z-index: 99999;
         }
-        
+
         /* Loader container */
         .loader-container {
           display: flex;
@@ -69,7 +69,7 @@
           align-items: center;
           gap: 15px;
         }
-        
+
         /* Simple rotating circle */
         .loader-circle {
           width: 60px;
@@ -79,7 +79,7 @@
           border-radius: 50%;
           animation: spin 1s linear infinite;
         }
-        
+
         /* Professional text */
         .loader-text {
           font-size: 1.2rem;
@@ -88,13 +88,13 @@
           letter-spacing: 1px;
           font-family: "Segoe UI", sans-serif;
         }
-        
+
         /* Animation */
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
-        
+
         /* Dark mode */
         [data-theme-version="dark"] #preloader {
           background: #1E1E1E;
@@ -102,7 +102,7 @@
         [data-theme-version="dark"] .loader-text {
           color: #f0f0f0;
         }
-    
+
         .dsr-table thead th {
             background-color: #d2ebf9;
             position: sticky;
@@ -110,7 +110,7 @@
             z-index: 10;
             font-weight: bold;
         }
-        
+
         .dsr-table th,
         .dsr-table td {
             max-width: 250px;
@@ -204,66 +204,66 @@
         @include('admin-main.elements.footer')
 
 	</div>
-	  
+
 
     @if(!empty(config('dz.public.global.js.top')))
         @foreach(config('dz.public.global.js.top') as $script)
-            <script src="{{ asset('public/'.$script) }}" type="text/javascript"></script>
+            <script src="{{ asset($script) }}" type="text/javascript"></script>
         @endforeach
     @endif
     @if(!empty(config('dz.public.pagelevel.js.'.$action)))
         @foreach(config('dz.public.pagelevel.js.'.$action) as $script)
-            <script src="{{ asset('public/'.$script) }}" type="text/javascript"></script>
+            <script src="{{ asset($script) }}" type="text/javascript"></script>
         @endforeach
     @endif
     @if(!empty(config('dz.public.global.js.bottom')))
         @foreach(config('dz.public.global.js.bottom') as $script)
-            <script src="{{ asset('public/'.$script) }}" type="text/javascript"></script>
+            <script src="{{ asset($script) }}" type="text/javascript"></script>
         @endforeach
     @endif
     <script>
         $(document).ready(function () {
             flatpickr("input[type='date']", {
                 altInput: true,
-                altFormat: "d/m/Y",   
-                dateFormat: "Y-m-d", 
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
                 allowInput: true,
                 onReady: function(selectedDates, dateStr, instance) {
-                    instance.altInput.placeholder = "dd/mm/yy"; 
+                    instance.altInput.placeholder = "dd/mm/yy";
                 }
             });
         });
-        
+
         $('select[name="party_type"]').on('change', function(){
             var val = $(this).val();
-            
+
             if(val == 1 || val == 2){
-               $('#party_mode').removeClass('d-none') 
+               $('#party_mode').removeClass('d-none')
             }else{
-                $('#party_mode').addClass('d-none') 
+                $('#party_mode').addClass('d-none')
             }
         })
-        
+
         $('select[name="party_mode"]').on('change', function(){
             var val = $(this).val();
             if(val == 'local'){
-               $('#document').removeClass('d-none') 
+               $('#document').removeClass('d-none')
             }else{
-                $('#document').addClass('d-none') 
+                $('#document').addClass('d-none')
             }
-            
+
         });
     </script>
-    
+
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    
+
     <!--select2-->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <!--sweatalert-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-   
+
     @stack('scripts')
 
 </body>

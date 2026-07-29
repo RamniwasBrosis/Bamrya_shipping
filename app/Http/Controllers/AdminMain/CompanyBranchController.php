@@ -15,22 +15,24 @@ class CompanyBranchController extends Controller
      */
     public function index(Request $request)
     {
-        $query = CompanyBranch::query();
-
+        $query = CompanyBranch::where('company_id', Auth::user()->company_id);
         if ($request->filled('branch_code')) {
-            $query->where('branch_code', 'like',  $request->branch_code );
+            $query->where('branch_code', 'like', "%{$request->branch_code}%");
         }
-
         if ($request->filled('branch_name')) {
-            $query->orWhere('branch_name', 'like', $request->branch_name );
+            $query->where('branch_name', 'like', "%{$request->branch_name}%");
         }
-
-        $branches = $query->orderBy('created_at', 'desc')->paginate(10);
-
-        $branchCodes = CompanyBranch::orderBy('branch_code')->get();
-        $branchNames = CompanyBranch::orderBy('branch_name')->get();
-
-        return view('admin-main.admin.branch.index', compact('branches', 'branchCodes', 'branchNames'));
+        $branches = $query->latest()->paginate(10);
+        $branchCodes = CompanyBranch::where('company_id', Auth::user()->company_id)
+                        ->orderBy('branch_code')
+                        ->get();
+        $branchNames = CompanyBranch::where('company_id', Auth::user()->company_id)
+                        ->orderBy('branch_name')
+                        ->get();
+        return view(
+            'admin-main.admin.branch.index',
+            compact('branches','branchCodes','branchNames')
+        );
     }
 
     /**
@@ -47,22 +49,65 @@ class CompanyBranchController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'branch_code' => 'required|unique:company_branches,branch_code',
-            'branch_name' => 'required',
+            'branch_code' => [
+                'required',
+                Rule::unique('company_branches')
+                    ->where(function ($query) {
+                        return $query->where('company_id', Auth::user()->company_id);
+                    }),
+            ],
+
+            'branch_name' => 'required|max:150',
+
+            'address' => 'nullable',
+
+            'city' => 'nullable|max:100',
+            'state' => 'nullable|max:100',
+            'country' => 'nullable|max:100',
+            'pincode' => 'nullable|max:20',
+
+            'phone' => 'nullable|max:20',
+            'landline_phone' => 'nullable|max:20',
+            'email' => 'nullable|email|max:150',
+
+            'gstin_no' => 'nullable|max:50',
+            'pan_no' => 'nullable|max:50',
+            'tan_no' => 'nullable|max:50',
+            'cin_no' => 'nullable|max:50',
+
+            'manager_name' => 'nullable|max:150',
+
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+
             'status' => 'required|boolean',
         ]);
 
-        $branch = new CompanyBranch();
+        $data = $request->except('logo');
 
-        $branch->company_id = Auth::user()->company_id;
-        $branch->branch_code = $request->branch_code;
-        $branch->branch_name = $request->branch_name;
-        $branch->status = $request->status;
+        $data['company_id'] = Auth::user()->company_id;
 
-        $branch->save();
+        if ($request->hasFile('logo')) {
 
-        return response()->json(['success' => 'Branch record created successfull']);
+            $path = public_path('uploads/branch_logo');
 
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
+            }
+
+            $file = $request->file('logo');
+
+            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+
+            $file->move($path, $filename);
+
+            $data['logo'] = $filename;
+        }
+
+        CompanyBranch::create($data);
+
+        return response()->json([
+            'success' => 'Branch created successfully.'
+        ]);
     }
 
     /**
@@ -70,53 +115,99 @@ class CompanyBranchController extends Controller
      */
     public function show(string $id)
     {
-    
+
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
-        $branch = CompanyBranch::findOrFail($id);
+        $branch = CompanyBranch::where('company_id', Auth::user()->company_id)
+                    ->findOrFail($id);
 
-        return view('admin-main.admin.branch.edit', compact('branch'));
+        return view(
+            'admin-main.admin.branch.edit',
+            compact('branch')
+        );
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
+        $branch = CompanyBranch::where('company_id', Auth::user()->company_id)
+                    ->findOrFail($id);
         $request->validate([
             'branch_code' => [
                 'required',
-                Rule::unique('company_branches', 'branch_code')->ignore($id),
+                Rule::unique('company_branches')
+                    ->where(function ($query) {
+                        return $query->where('company_id', Auth::user()->company_id);
+                    })
+                    ->ignore($branch->id),
             ],
-            'branch_name' => 'required',
+            'branch_name' => 'required|max:150',
+            'address' => 'nullable',
+            'city' => 'nullable|max:100',
+            'state' => 'nullable|max:100',
+            'country' => 'nullable|max:100',
+            'pincode' => 'nullable|max:20',
+            'phone' => 'nullable|max:20',
+            'landline_phone' => 'nullable|max:20',
+            'email' => 'nullable|email|max:150',
+            'gstin_no' => 'nullable|max:50',
+            'pan_no' => 'nullable|max:50',
+            'tan_no' => 'nullable|max:50',
+            'cin_no' => 'nullable|max:50',
+            'manager_name' => 'nullable|max:150',
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'status' => 'required|boolean',
         ]);
 
+        $data = $request->except('logo');
+        if ($request->hasFile('logo')) {
+            $path = public_path('uploads/branch_logo');
+            if (!file_exists($path)) {
+                mkdir($path,0777,true);
+            }
+            if ($branch->logo && file_exists($path.'/'.$branch->logo)) {
+                unlink($path.'/'.$branch->logo);
+            }
+            $file = $request->file('logo');
+            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+            $file->move($path,$filename);
+            $data['logo'] = $filename;
+        }
+        $branch->update($data);
 
-        $branch = CompanyBranch::findOrFail($id);
-
-        $branch->branch_code = $request->branch_code;
-        $branch->branch_name = $request->branch_name;
-        $branch->status = $request->status;
-
-        $branch->save();
-
-        return response()->json(['success' => 'Branch record updated successfull']);
+        return response()->json([
+            'success' => 'Branch updated successfully.'
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        $branch = CompanyBranch::findOrFail($id);
+        $branch = CompanyBranch::where('company_id', Auth::user()->company_id)
+                    ->findOrFail($id);
+
+        if ($branch->logo) {
+
+            $path = public_path('uploads/branch_logo/'.$branch->logo);
+
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+
         $branch->delete();
 
-        return response()->json(['success' => 'Branch record deleted successfull']);
+        return response()->json([
+            'success' => 'Branch deleted successfully.'
+        ]);
     }
 }

@@ -29,7 +29,7 @@
                             </select>
                         </div>
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
-                            <label class="form-label">search by branch code</label>
+                            <label class="form-label">search by branch name</label>
                             <select id="statusFilter" class="form-control default-select" name="branch_name">
                                 <option value="">select</option>
                                 @foreach ($branchNames as $branchName)
@@ -65,7 +65,7 @@
                                             @else
                                                 <aspan class="badge badge-danger light border-0"> In-active</span>
                                             @endif
-                                            
+
                                         </td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/branches/'.$branche->id.'/edit')}}">Edit</a>

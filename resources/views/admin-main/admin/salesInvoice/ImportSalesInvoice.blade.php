@@ -140,10 +140,10 @@
             {{-- BUTTONS --}}
             <div class="row mt-3">
                 <div class="col-md-12 text-start">
-                    <button class="btn btn-primary" id="previewBtn">PREVIEW</button> 
+                    <button class="btn btn-primary" id="previewBtn">PREVIEW</button>
                     <!--<button class="btn btn-warning text-white">GENERATE E-INVOICE</button>-->
-                    <a href="{{ route('salesInvoice.printSalesInvoice', $salesInvoice->id) }}" 
-                       class="btn btn-warning text-white" 
+                    <a href="{{ route('salesInvoice.printSalesInvoice', $salesInvoice->id) }}"
+                       class="btn btn-warning text-white"
                        target="_blank">
                        PRINT E-INVOICE
                     </a>
@@ -158,7 +158,7 @@
                     {{ $salesInvoice->invoice_type }}
                 </h3>
                 <hr>
-            
+
                 <!-- HEADER: Logo + Company Info -->
                 <table class="header-table">
                     <tr>
@@ -174,7 +174,7 @@
                         </td>
                     </tr>
                 </table>
-            
+
                 <!-- SHIPPER & INVOICE INFO -->
                 <table>
                     <!--<tr>-->
@@ -191,7 +191,7 @@
                                 {{ $salesInvoice->partyName->address_line2 ?? '' }}<br>
                                 {{ $salesInvoice->partyName->city ?? '' }} &nbsp;{{ $salesInvoice->partyName->state ?? '' }} - {{ $salesInvoice->partyName->pincode ?? '' }}<br>
                                 State Code - ({{ $salesInvoice->partyName->state_code ?? '' }})&nbsp;&nbsp;&nbsp;GSTIN: {{ $salesInvoice->partyName->gstin ?? '' }}
-                                
+
                             </span>
                         </td>
                         <td><strong>INVOICE NO. </strong>{{ $salesInvoice->invoice_no ?? '' }}</td>
@@ -209,19 +209,19 @@
                         <th><strong>PORT OF LOADING: </strong>{{ $salesInvoice->pol ?? '' }}</th>
                         <td><strong>PORT OF DISCHARGE: </strong>{{ $salesInvoice->pod ?? '' }}</td>
                     </tr>
-            
+
                     <tr>
                         <td><strong>SHIPPER INV. NO:</strong> {{ $salesInvoice->full_invoice_no ?? '' }}</td>
                         <td><strong>CHARGABLE WEIGHT: </strong>{{ $salesInvoice->chargeable_weight ?? '' }}</td>
                         <td><strong>NO OF PKGS: </strong>{{ $salesInvoice->packages ?? 0 }}</td>
                     </tr>
-            
+
                     <tr>
                         <td><strong>S.BILL/BOE NO. & DATE:</strong>{{ $salesInvoice->shipping_no ?? '' }}</td>
                         <td><strong>MBL/MAWB: </strong>{{ $salesInvoice->mawb_no ? $salesInvoice->mawb_no : $salesInvoice->awb_bl_no }}</td>
                         <td><strong>HBL/HAWB: </strong>{{ $salesInvoice->hbl_no ? $salesInvoice->hbl_no : $salesInvoice->hawb_no }}</td>
                     </tr>
-            
+
                     <tr>
                         <td><strong>CBM:</strong> {{ $salesInvoice->cbm ?? '' }}</td>
                         <td><strong>ETD/ETA: </strong>{{ $salesInvoice->etd_date ?? '' }} / {{ $salesInvoice->eta_date ?? '' }}</td>
@@ -232,13 +232,13 @@
                         <td><strong>CONTAINER NO: </strong>{{ $salesInvoice->container ?? '' }}</td>
                         <td><strong>CONTAINER QTY: </strong>{{ $salesInvoice->container_qty ?? '0' }}</td>
                     </tr>
-                    
+
                     <tr>
                         <td colspan="3"><strong>CONSIGNEE NAME: </strong>{{ $salesInvoice->consignee ?? '' }}</td>
                     </tr>
-                    
+
                 </table>
-            
+
                 <!-- CHARGES TABLE -->
                 <table class="charges" style="min-height: 200px;">
                     <thead>
@@ -260,7 +260,7 @@
                     </thead>
                     <tbody>
                         @php $i = 1; @endphp
-                        @php 
+                        @php
                             $totalAmount = 0;
                             $finalAmount = 0;
                             $totalTdsPercent = 0;
@@ -271,28 +271,28 @@
                             $igstAmount = 0;
                         @endphp
                         @foreach($chargeDetails as $charge)
-                        @php 
+                        @php
                             $taxableAmount = $charge->total;
                             $gstValue = $charge->cgst + $charge->sgst + $charge->igst;
                             $totalWithGST = $charge->total;
-                    
+
                             $totalAmount += $charge->freight;
                             $finalAmount += $totalWithGST;
-                    
+
                             $totalTdsPercent += $charge->tds;
                             $totalTdsAmount += $charge->tds_amount;
-                    
+
                             $gstAmount += $gstValue;
                             $cgstAmount += $charge->cgst;
                             $sgstAmount += $charge->sgst;
                             $igstAmount += $charge->igst;
                         @endphp
-                    
+
                         <tr>
                             <td class="text-center">{{ $i++ }}</td>
                             <td>
                                 {{ $charge->chargeName->charge_name }}<br>
-                            
+
                                 @if(!empty($charge->charge_desc))
                                     ({{ $charge->charge_desc }})
                                 @endif
@@ -302,16 +302,16 @@
                             <td class="text-center">{{ $charge->currency }}</td>
                             <td class="text-center">{{ number_format($charge->exchange_rate, 2) }}</td>
                             <td class="text-center">{{ number_format($charge->per_unit, 2) }}</td>
-                    
+
                             <!-- Taxable Amount (Correct) -->
                             <td class="text-right">{{ number_format($charge->freight, 2) }}</td>
-                    
+
                             <!-- GST % and components -->
                             <td class="text-right">{{ number_format($charge->gst, 0) }}</td>
                             <td class="text-right">{{ number_format($charge->cgst, 2) }}</td>
                             <td class="text-right">{{ number_format($charge->sgst, 2) }}</td>
                             <td class="text-right">{{ number_format($charge->igst, 2) }}</td>
-                    
+
                             <!-- Total Amount including GST (Correct) -->
                             <td class="text-right">{{ number_format($totalWithGST, 2) }}</td>
                         </tr>
@@ -331,7 +331,7 @@
                         <td class="text-right"><strong>{{number_format($igstAmount ?? 0, 2)}}</strong></td>
                         <td class="text-right"><strong>{{number_format($finalAmount ?? 0, 2)}}</strong></td>
                     </tr>
-    
+
                         @if(!empty($salesInvoice->charges))
                             <tr>
                                 <td class="text-center"></td>
@@ -350,16 +350,16 @@
                         @endif
                     </tbody>
                 </table>
-            
+
                 <!-- TAX & TOTALS -->
                 <table class="totals-table">
                     @php
                         // FINAL BEFORE ROUND OFF
                         $finalAmountWithTds = $finalAmount - $totalTdsAmount;
-                
+
                         // ROUND OFF LOGIC
                         $decimal = $finalAmountWithTds - floor($finalAmountWithTds);
-                
+
                         if ($decimal < 0.50) {
                             // ROUND DOWN
                             $roundedTotal = floor($finalAmountWithTds);
@@ -369,17 +369,17 @@
                             $roundedTotal = ceil($finalAmountWithTds);
                             $roundOff = $roundedTotal - $finalAmountWithTds;   // positive
                         }
-                
+
                         // AMOUNT IN WORDS
                         $f = new \NumberFormatter('en_IN', \NumberFormatter::SPELLOUT);
                         $amountInWords = ucfirst($f->format($roundedTotal)) . ' only';
                     @endphp
-                
+
                     <tr>
                         <td width="70%" rowspan="6" class="amount-words">
                             <strong>Amount in Words:</strong><br>
                             {{ $amountInWords ?? '' }}<br><br>
-                            
+
                             <strong>BANK DETAILS </strong><br>
                             <strong>A/C NAME :</strong> {{ $accountDetails->beneficiary_name ?? 'N/A' }}<br>
                             <strong>BANK NAME :</strong> {{ $accountDetails->bank_name ?? 'N/A' }}<br>
@@ -387,36 +387,36 @@
                             <strong>A/C NO. :</strong> {{ $accountDetails->account_no ?? 'N/A' }}<br>
                             <strong>IFSC CODE :</strong> {{ $accountDetails->ifsc_code ?? 'N/A' }}<br><br>
                         </td>
-                
+
                         <th>WITHOUT GST AMOUNT</th>
                         <td class="text-right">{{ number_format($totalAmount ?? 0, 2) }}</td>
                     </tr>
-                
+
                     <tr>
                         <th>GST</th>
                         <td class="text-right">{{ number_format($gstAmount ?? 0, 2) }}</td>
                     </tr>
-                
+
                     <tr>
                         <th>TOTAL AMOUNT</th>
                         <td class="text-right">{{ number_format($finalAmount ?? 0, 2) }}</td>
                     </tr>
-                
+
                     <tr>
                         <th>ROUND OFF</th>
                         <td class="text-right">{{ number_format($roundOff, 2) }}</td>
                     </tr>
-                
+
                     <tr>
                         <th>TDS %</th>
                         <td class="text-right">{{ number_format($totalTdsPercent ?? 0, 2) }}</td>
                     </tr>
-                
+
                     <tr>
                         <th>TDS AMOUNT</th>
                         <td class="text-right">{{ number_format($totalTdsAmount ?? 0, 2) }}</td>
                     </tr>
-                
+
                     <tr>
                         <th colspan="2" class="text-right">GRAND TOTAL Rs</th>
                         <td class="text-right"><strong>{{ number_format($roundedTotal ?? 0, 2) }}</strong></td>
@@ -424,7 +424,7 @@
                 </table>
 
 
-            
+
                 <!-- BANK DETAILS -->
                 <table class="bank-details">
                     <tr>
@@ -445,7 +445,7 @@
                             padding:8px;
                             height:160px;
                         ">
-                            
+
                             <div style="
                                 display:flex;
                                 flex-direction:column;
@@ -454,25 +454,25 @@
                                 height:100%;
                                 text-align:center;
                             ">
-                                
+
                                 <!-- Top Company Name -->
                                 <div>
                                     <strong style="font-size: 18px;">{{ $company->company_name }}</strong>
                                 </div>
-                        
+
                                 <!-- Middle Signature Image -->
                                 <div>
-                                    <img src="{{ asset('public/images/seal-sign.jpg') }}" 
+                                    <img src="{{ asset('public/images/seal-sign.jpg') }}"
                                          style="height: 103px; width:auto;">
                                 </div>
-                        
+
                                 <!-- Bottom Text -->
                                 <div>
                                     AUTHORISED SIGNATORY
                                 </div>
-                        
+
                             </div>
-                        
+
                         </td>
                     </tr>
                 </table>

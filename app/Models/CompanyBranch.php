@@ -9,8 +9,8 @@ class CompanyBranch extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['company_id', 'branch_code', 'branch_name', 'status'];
-    
+    protected $guarded = [];
+
     public function company()
     {
         return $this->beLongsTo(Company::class);
