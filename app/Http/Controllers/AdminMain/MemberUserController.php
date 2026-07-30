@@ -7,10 +7,11 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\CompanyBranch;
 
 class MemberUserController extends Controller
 {
-    public $company_id ;
+    public $company_id;
 
     public function __construct(){
         $this->middleware(function ($request, $next) {
@@ -26,7 +27,8 @@ class MemberUserController extends Controller
     public function index(Request $request)
     {
 
-        $query = User::whereNotIn('role', ['super-admin'])
+        $query = User::with('branch')
+            ->whereNotIn('role', ['super-admin'])
             ->where('company_id', $this->company_id);
 
         if ($request->filled('name')) {
@@ -35,7 +37,7 @@ class MemberUserController extends Controller
 
         $users = $query->paginate(10);
 
-        $userNames = $query->orderBy('name', 'desc')->get(['id', 'name']); 
+        $userNames = $query->orderBy('name', 'desc')->get(['id', 'name']);
 
         return view('admin-main.admin.users.index', compact('users', 'userNames'));
     }
@@ -46,7 +48,8 @@ class MemberUserController extends Controller
     public function create()
     {
         $roles = Role::where('company_id', Auth::user()->company_id)->get();
-        return view('admin-main.admin.users.create', compact('roles'));
+        $branches = CompanyBranch::where('company_id', Auth::user()->company_id)->get();
+        return view('admin-main.admin.users.create', compact('roles','branches'));
     }
 
     /**
@@ -61,7 +64,8 @@ class MemberUserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|confirmed',
             'role_name' => 'required',
-            'status' => 'required'
+            'status' => 'required',
+            'branch_id' => 'required'
         ]);
 
         $user = User::create([
@@ -71,6 +75,7 @@ class MemberUserController extends Controller
             'company_id' => $company_id,
             'status' => $request->status,
             'role' => $request->role_name,
+            'branch_id' => $request->branch_id,
             'user_id' => $this->user_id,
         ]);
 
@@ -94,7 +99,8 @@ class MemberUserController extends Controller
     {
         $user = User::findOrFail($id);
         $roles = Role::all();
-        return view('admin-main.admin.users.edit', compact('user', 'roles'));
+        $branches = CompanyBranch::where('company_id', Auth::user()->company_id)->get();
+        return view('admin-main.admin.users.edit', compact('user', 'roles','branches'));
     }
 
     /**
@@ -107,12 +113,14 @@ class MemberUserController extends Controller
             'email' => 'required|email|unique:users,email,'.$id,
             'password' => 'nullable|confirmed',
             'role_name' => 'required',
-            'status' => 'required'
+            'status' => 'required',
+            'branch_id' => 'required'
         ]);
 
         $user = User::findOrFail($id);
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->branch_id = $request->branch_id;
         $user->user_id = $this->user_id;
 
         if ($request->filled('password')) {

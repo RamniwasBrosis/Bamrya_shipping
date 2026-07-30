@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\CompanyBranch;
 
 class User extends Authenticatable
 {
@@ -25,7 +26,7 @@ class User extends Authenticatable
         'role',
         'company_id',
         'status',
-        'role','user_id'
+        'role','user_id','branch_id'
     ];
 
     /**
@@ -47,11 +48,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-    
+
     public function company(){
         return $this->belongsTo(Company::class);
     }
-    
+
     // User who created/updated this user
     public function user()
     {
@@ -62,5 +63,9 @@ class User extends Authenticatable
     public function childUsers()
     {
         return $this->hasMany(User::class, 'user_id');
+    }
+    public function branch()
+    {
+        return $this->belongsTo(CompanyBranch::class);
     }
 }

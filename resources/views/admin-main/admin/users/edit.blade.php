@@ -24,9 +24,9 @@
                                         <input type="text" class="form-control" name="name" value="{{$user->name}}">
                                         <span class="text-danger error-text name_error"></span>
                                     </div>
-                                    
+
                                 </div>
-                               
+
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
                                     <label class="col-sm-3 col-form-label">Email ID:<span
                                             class="text-danger">*</span></label>
@@ -34,7 +34,7 @@
                                         <input type="text" class="form-control" name="email" value="{{$user->email}}">
                                         <span class="text-danger error-text email_error"></span>
                                     </div>
-                                    
+
                                 </div>
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
                                     <label class="col-sm-3 col-form-label">Password:<span
@@ -43,7 +43,7 @@
                                         <input type="password" class="form-control" name="password">
                                         <span class="text-danger error-text password_error"></span>
                                     </div>
-                                    
+
                                 </div>
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
                                     <label class="col-sm-3 col-form-label">Retype Password:<span
@@ -54,6 +54,19 @@
                                     <span class="text-danger error-text password_confirmation_error"></span>
                                 </div>
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
+                                    <label class="col-sm-3 col-form-label">Branch:<span
+                                            class="text-danger">*</span></label>
+                                    <div class="col-sm-9">
+                                        <select class="select2 form-control wide" name="branch_id">
+                                            @foreach ($branches as $branch)
+                                                <option value="">Select Branch</option>
+                                                <option value="{{$branch->id}}" {{$user->branch_id == $branch->id ? 'selected' : ''}}>{{$branch->branch_name}}</option>
+                                            @endforeach
+                                        </select>
+                                        <span class="text-danger error-text branch_id_error"></span>
+                                    </div>
+                                </div>
+                                <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
                                     <label class="col-sm-3 col-form-label">Role:<span
                                             class="text-danger">*</span></label>
                                     <div class="col-sm-9">
@@ -61,7 +74,7 @@
                                             @foreach ($roles as $role)
                                                 <option value="{{$role->name}}" {{$user->role == $role->name ? 'selected' : ''}}>{{$role->name}}</option>
                                             @endforeach
-                                        </select> 
+                                        </select>
                                         <span class="text-danger error-text role_name_error"></span>
                                     </div>
                                 </div>
@@ -69,7 +82,7 @@
                                     <label class="col-sm-3 col-form-label">Company:<span
                                             class="text-danger">*</span></label>
                                     <div class="col-sm-9">
-                                        <select class="default-select  form-control wide" placeholder="Select"></select> 
+                                        <select class="default-select  form-control wide" placeholder="Select"></select>
                                     </div>
                                 </div> --}}
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
@@ -79,7 +92,7 @@
                                         <select class="default-select  form-control wide" placeholder="Select" name="status">
                                             <option value="1" {{$user->status == 1? 'selected' : ''}}>Active</option>
                                             <option value="0" {{$user->status == 0? 'selected' : ''}}>Deactive</option>
-                                        </select> 
+                                        </select>
                                         <span class="text-danger error-text status_error"></span>
                                     </div>
                                 </div>
@@ -102,7 +115,7 @@ $(document).ready(function () {
 
     $('#EditForm').on('submit', function(e) {
         e.preventDefault();
-        
+
         $('#btnSub').html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Loading...');
         $('#btnSub').prop('disabled', true);
 
@@ -111,7 +124,7 @@ $(document).ready(function () {
         let formData = form.serialize() + '&_method=PUT';
 
         $('.error-text').text(''); // Clear previous errors
-    
+
         $.ajax({
             url: actionUrl,
             method: 'PUT',

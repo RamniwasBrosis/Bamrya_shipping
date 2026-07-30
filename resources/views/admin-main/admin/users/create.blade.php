@@ -24,9 +24,9 @@
                                         <input type="text" class="form-control" name="name">
                                         <span class="text-danger error-text name_error"></span>
                                     </div>
-                                    
+
                                 </div>
-                                
+
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
                                     <label class="col-sm-3 col-form-label">Email ID:<span
                                             class="text-danger">*</span></label>
@@ -34,8 +34,9 @@
                                         <input type="text" class="form-control" name="email">
                                         <span class="text-danger error-text email_error"></span>
                                     </div>
-                                    
+
                                 </div>
+
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
                                     <label class="col-sm-3 col-form-label">Password:<span
                                             class="text-danger">*</span></label>
@@ -43,7 +44,7 @@
                                         <input type="password" class="form-control" name="password">
                                         <span class="text-danger error-text password_error"></span>
                                     </div>
-                                    
+
                                 </div>
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
                                     <label class="col-sm-3 col-form-label">Retype Password:<span
@@ -59,20 +60,32 @@
                                     <div class="col-sm-9">
                                         <select class="default-select  form-control wide" placeholder="Select" name="role_name">
                                             <option value="">select</option>
-                                            @foreach ($roles as $role)                                                
+                                            @foreach ($roles as $role)
                                                 <option value="{{$role->name}}">{{$role->name}}</option>
                                             @endforeach
-                                        </select> 
+                                        </select>
                                         <span class="text-danger error-text role_name_error"></span>
                                     </div>
                                 </div>
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
+                                    <label class="col-sm-3 col-form-label">Branch:<span
+                                            class="text-danger">*</span></label>
+                                    <div class="col-sm-9">
+                                        <select name="branch_id" id="" class="form-control select2 wide">
+                                            <option value="">Select Branch</option>
+                                            @foreach ($branches as $branch)
+                                                <option value="{{ $branch->id }}">{{ $branch->branch_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                {{-- <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
                                     <label class="col-sm-3 col-form-label">Company:<span
                                             class="text-danger">*</span></label>
                                     <div class="col-sm-9">
-                                        <select class="default-select  form-control wide" placeholder="Select" name="company_id"></select> 
+                                        <select class="default-select  form-control wide" placeholder="Select" name="company_id"></select>
                                     </div>
-                                </div>
+                                </div> --}}
                                 <div class="mb-3 col-xl-3 col-xxl-12 col-md-6 row">
                                     <label class="col-sm-3 col-form-label">Status:<span
                                             class="text-danger">*</span></label>
@@ -80,7 +93,7 @@
                                         <select class="default-select  form-control wide" placeholder="Select" name="status">
                                             <option value="1">Active</option>
                                             <option value="0">Inactive</option>
-                                        </select> 
+                                        </select>
                                         <span class="text-danger error-text status_error"></span>
                                     </div>
                                 </div>
@@ -104,7 +117,7 @@ $(document).ready(function() {
 
     $('#addUserForm').on('submit', function(e) {
         e.preventDefault();
-        
+
         $('#btnSub').html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Loading...');
         $('#btnSub').prop('disabled', true);
 
@@ -117,11 +130,11 @@ $(document).ready(function() {
             success: function(response) {
                 $('#btnSub').html('').text('Submit');
                 $('#btnSub').prop('disabled', false);
-                
+
                 window.location.href = "{{ url('admin/users') }}";
             },
             error: function(xhr) {
-                $('.error-text').text(''); 
+                $('.error-text').text('');
                 $('#btnSub').html('').text('Submit');
                 $('#btnSub').prop('disabled', false);
 
@@ -136,7 +149,7 @@ $(document).ready(function() {
                 }
             }
         });
-        
+
     });
 });
 </script>

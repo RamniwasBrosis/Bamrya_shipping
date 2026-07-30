@@ -38,6 +38,7 @@
                                     <th>User Name</th>
                                     <th>Email ID</th>
                                     <th>Role Name</th>
+                                    <th>Branch</th>
                                     <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
@@ -48,8 +49,9 @@
                                         <td>{{$user->name}}</td>
                                         <td>{{$user->email}}</td>
                                         <td>{{$user->role}}</td>
+                                        <td>{{$user->branch->branch_name??''}}</td>
                                         <td>{{$user->user->name??''}}</td>
-                                        
+
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/users/'.$user->id.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-user" href="javascript:void(0);" data-id="{{$user->id}}">Delete</a>

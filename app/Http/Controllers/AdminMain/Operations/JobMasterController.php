@@ -17,11 +17,12 @@ use Illuminate\Auth\Events\Validated;
 use Illuminate\Validation\ValidationException;
 use App\Models\Operations\OperationEnquiries;
 use App\Models\MasterPort;
+use App\Models\CompanyBranch;
 
 class JobMasterController extends Controller
 {
 
-    public $company_id ;
+    public $company_id;
 
     public function __construct(){
         $this->middleware(function ($request, $next) {
@@ -47,7 +48,7 @@ class JobMasterController extends Controller
         if ($request->filled('job_activity')) {
             $query->where('job_activity', 'LIKE', '%' . $request->job_activity . '%');
         }
-        
+
         // job number
         if ($request->filled('job_number')) {
             $query->where('id', 'LIKE', '%' . $request->job_number . '%');
@@ -57,7 +58,7 @@ class JobMasterController extends Controller
             $query->whereIn('job_activity', ['AIREXP.FWD', 'SEAEXP.FWD', 'SEAEXP.NVOCC'])
                   ->where('job_party_id', 'LIKE', '%' .$request->shipper_parties. '%');
         }
-    
+
         //  Filter by Consignee Party (Import Party)
         if ($request->filled('consignee_parties')) {
             $query->whereIn('job_activity', ['AIRIMP.FWD', 'SEAIMP.FWD'])
@@ -72,7 +73,7 @@ class JobMasterController extends Controller
 
         // Always restrict to current company
         $query->where('company_id', $this->company_id);
-        
+
         $jobs = $query->orderBy('created_at', 'desc')->get();
 
         $job_masters = $query->orderBy('created_at', 'desc')->paginate(25);
@@ -99,10 +100,10 @@ class JobMasterController extends Controller
         $lastJob = OperationJobMaster::where('company_id', $this->company_id)
             ->latest('job_no')
             ->first();
-        
+
         $nextJobNo = $lastJob ? $lastJob->job_no + 1 : 1;
-        
-        
+
+
         return view('admin-main.admin.jobMaster.create', compact('exportParties', 'importParties', 'party_lists', 'company_code','nextJobNo','enquiries'));
     }
 
@@ -111,7 +112,7 @@ class JobMasterController extends Controller
      */
     public function store(Request $request)
     {
-       
+
         $request->validate([
             'bl_issue'               => 'required|string',
             'job_date'               => 'required|date',
@@ -130,7 +131,7 @@ class JobMasterController extends Controller
             'cargo_ready_date'       => 'nullable|date',
             'pickup_date'            => 'required|date',
         ]);
-        
+
         if($request->job_activity == 'AIRIMP.FWD'){
             $pre = 'AI';
         }elseif($request->job_activity == 'AIREXP.FWD'){
@@ -144,7 +145,7 @@ class JobMasterController extends Controller
         }elseif($request->job_activity == 'SEAEXP.NVOCC'){
             $pre = 'SE';
         }
-        
+
         // Check Party Approval
         if($request->job_activity == 'AIRIMP.FWD' || $request->job_activity == 'SEAIMP.FWD' || $request->job_activity == 'SEAIMP.NVOCC'){
             $checkPartyApproval = MasterImportParty::select('approval')->where('company_id', $this->company_id)->find($request->job_party_id);
@@ -155,7 +156,7 @@ class JobMasterController extends Controller
         if($checkPartyApproval->approval == null){
             return redirect()->back()->with('error', 'This Party has not Approved.');
         }
-        
+
         $month = date('n');
         $year = date('Y');
         if ($month < 4) {
@@ -166,10 +167,13 @@ class JobMasterController extends Controller
             $fyEnd = $year + 1;
         }
         $financialYear = $fyStart . '-' . substr($fyEnd, -2);
-        
+
         $setting  = DB::table('company_settings')->where('company_id', $this->company_id)->first();
-        $lastJob = OperationJobMaster::where('company_id', $this->company_id)->orderBy('job_no', 'desc')->first();
-        
+        $lastJob = OperationJobMaster::where('company_id', $this->company_id)
+            ->where('branch_id', Auth::user()->branch_id)
+            ->orderByDesc('job_no')
+            ->first();
+
         if (!$lastJob) {
             if (empty($setting->job_no)) {
                 return response()->json([
@@ -177,19 +181,22 @@ class JobMasterController extends Controller
                     'message' => 'Starting JOB NUMBER value is empty. Please enter first job number in company settings.'
                 ], 200);
             }
-    
+
             $nextJobNo = $setting->job_no;
             $company_code = $setting ->company_code.'/' ?? '';
-    
+
             // Update old_job_no for the first time
             DB::table('company_settings')
                 ->where('company_id', $this->company_id)
                 ->update(['old_job_no' => $setting->job_no]);
         }
         elseif ($setting->old_job_no != $setting->job_no) {
-            
+
              // First Check Job Number Already Exist ya Not
-            $JobNumberCheck = OperationJobMaster::where('company_id', $this->company_id)->where('job_no', $setting->job_no)->first();
+            $JobNumberCheck = OperationJobMaster::where('company_id', $this->company_id)
+                ->where('branch_id', Auth::user()->branch_id)
+                ->where('job_no', $setting->job_no)
+                ->first();
             if($JobNumberCheck){
                 return response()->json([
                     'status' => false,
@@ -199,7 +206,7 @@ class JobMasterController extends Controller
 
             $nextJobNo = $setting->job_no;
             $company_code = $setting ->company_code.'/' ?? '';
-    
+
             DB::table('company_settings')
                 ->where('company_id', $this->company_id)
                 ->update(['old_job_no' => $setting->job_no]);
@@ -209,14 +216,21 @@ class JobMasterController extends Controller
             $company_code = $setting ->company_code.'/' ?? '';
         }
 
-        $full_job_number = $pre.'/'.$company_code.$nextJobNo.'/'.$financialYear;
-        
+        $branch = CompanyBranch::find(Auth::user()->branch_id);
+
+        $full_job_number = $pre.'/'
+            .$company_code
+            .$branch->branch_code.'/'
+            .$nextJobNo.'/'
+            .$financialYear;
+
         $jobMaster = new OperationJobMaster();
         $jobMaster->company_id = Auth::user()->company_id;
+        $jobMaster->branch_id = Auth::user()->branch_id;
         $jobMaster->issued_by = $request->bl_issue;
-        $jobMaster->job_no = $nextJobNo; 
-        $jobMaster->full_job_no = $full_job_number; 
-        $jobMaster->bl_type_prefix = $pre; 
+        $jobMaster->job_no = $nextJobNo;
+        $jobMaster->full_job_no = $full_job_number;
+        $jobMaster->bl_type_prefix = $pre;
         $jobMaster->job_date = $request->job_date;
         $jobMaster->job_activity = $request->job_activity;
         $jobMaster->job_party_id = $request->job_party_id;
@@ -236,19 +250,19 @@ class JobMasterController extends Controller
         $jobMaster->user_id = $this->user_id;
 
         $jobMaster->save();
-        
+
         //status change to used of enquires
         if ($request->filled('enquiry_reference_no')) {
 
             $enquiry = OperationEnquiries::find($request->enquiry_reference_no);
-        
+
             if ($enquiry) {
                 $enquiry->update([
                     'enquiry_status' => 'Complete'
                 ]);
             }
         }
-  
+
         return redirect()->back()->with('success', 'Job Master created successfully.');
 
     }
@@ -267,11 +281,11 @@ class JobMasterController extends Controller
     public function edit(string $id)
     {
         $jobMaster = OperationJobMaster::find($id);
-        
+
         if(!$jobMaster){
             return redirect()->back()->with('error', 'Record not found.');
         }
-        
+
         $parties = '';
         $partyDetails = '';
         $enquiries = OperationEnquiries::where('company_id', $this->company_id)->where('enquiry_status', 'Complete')->get();
@@ -282,7 +296,7 @@ class JobMasterController extends Controller
             $partyDetails = MasterExportParty::where('company_id', $this->company_id)->where('status', 1)->find($jobMaster->job_party_id);
             $parties = MasterExportParty::where('company_id', $this->company_id)->where('status', 1)->get();
         }
-        
+
         $company_code = CompanySetting::select('company_code')
                 ->where('company_id', $this->company_id)
                 ->first();
@@ -318,7 +332,7 @@ class JobMasterController extends Controller
         } catch (ValidationException $e) {
             dd($e->validator->errors()); // This will show you exactly what's failing
         }
-        
+
         if($request->job_activity == 'AIRIMP.FWD'){
             $pre = 'AI';
         }elseif($request->job_activity == 'AIREXP.FWD'){
@@ -332,7 +346,7 @@ class JobMasterController extends Controller
         }elseif($request->job_activity == 'SEAEXP.NVOCC'){
             $pre = 'SE';
         }
-        
+
         $month = date('n');
         $year = date('Y');
         if ($month < 4) {
@@ -343,15 +357,21 @@ class JobMasterController extends Controller
             $fyEnd = $year + 1;
         }
         $financialYear = $fyStart . '-' . substr($fyEnd, -2);
-        
+
         $setting  = DB::table('company_settings')->where('company_id', $this->company_id)->first();
-        
-        $full_job_number = $pre.'/'.$setting ->company_code.'/'.$request->job_no.'/'.$financialYear;
-        
+
+        $branch = CompanyBranch::find(Auth::user()->branch_id);
+
+        $full_job_number = $pre.'/'
+            .$setting->company_code.'/'
+            .$branch->branch_code.'/'
+            .$request->job_no.'/'
+            .$financialYear;
+
         $jobMaster =  OperationJobMaster::find($id);
 
         $jobMaster->issued_by = $request->bl_issue;
-        $jobMaster->job_no = $request->job_no; 
+        $jobMaster->job_no = $request->job_no;
         $jobMaster->job_date = $request->job_date;
         $jobMaster->job_activity = $request->job_activity;
         $jobMaster->job_party_id = $request->job_party_id;
@@ -387,7 +407,7 @@ class JobMasterController extends Controller
 
         return response()->json(['success' => 'job record deleted successfull']);
     }
-    
+
     public function storeNewPartyAjax(Request $request)
     {
         $rules = [
@@ -396,11 +416,11 @@ class JobMasterController extends Controller
             'party_type'      => 'required|integer',
             'status'          => 'required|boolean',
         ];
-    
+
         // Check approval condition
         $query = DB::table('master_parties_enable_features')
             ->where('company_id', $this->company_id);
-            
+
         if($request->party_type == 2){
             $checkApproval = $query->where('isShipper', 1)
             ->first();
@@ -408,7 +428,7 @@ class JobMasterController extends Controller
             $checkApproval = $query->where('isOtherParties', 1)
             ->first();
         }
-        
+
         if ($checkApproval && $checkApproval->isFeatured == 1) {
             // Documents optional
             $rules['documents'] = 'nullable|array';
@@ -420,14 +440,14 @@ class JobMasterController extends Controller
         }
 
         $validated = $request->validate($rules);
-        
+
         // print_r($request->all()); exit();
-        
+
         $paths = [];
         if ($request->hasFile('documents')) {
             foreach ($request->file('documents') as $file) {
                 $path = $file->store('party-documents', 'public');
-        
+
                 $paths[] = [
                     'name' => $file->getClientOriginalName(),
                     'path' => $path,
@@ -436,22 +456,22 @@ class JobMasterController extends Controller
                 ];
             }
         }
-        
+
         $existsInImport = false;
         $existsInExport = false;
         if($request->party_type == 2){
             $existsInExport = \DB::table('master_export_parties')
             ->where('party_name', $request->party_name)
-            ->where('id', '!=', $request->id) 
+            ->where('id', '!=', $request->id)
             ->exists();
         }else{
             $existsInImport = \DB::table('master_import_parties')
             ->where('party_name', $request->party_name)
-            ->where('id', '!=', $request->id) 
+            ->where('id', '!=', $request->id)
             ->whereNotIn('party_type', [1, 2])
             ->exists();
         }
-        
+
         if ($existsInImport || $existsInExport) {
             $msg = $request->party_type == 2 ? 'Party name already exists in Export parties.' : 'Party name already exists in Import parties.' ;
             return response()->json([
@@ -459,7 +479,7 @@ class JobMasterController extends Controller
                 'message' => $msg
             ]);
         }
-        
+
         $model = $request->party_type == 2 ? MasterExportParty::class : MasterImportParty::class;
         $masterParty = $model::create([
             'company_id' => $this->company_id,
@@ -483,11 +503,11 @@ class JobMasterController extends Controller
             'party_mode' => $request->party_mode,
             'status' => $request->status,
         ]);
-        
+
         $this->addBillingParty($request->all());
-        
-        
-     
+
+
+
         return response()->json([
             'status' => 'success',
             'message'  => 'Successfully add new prty',
@@ -495,18 +515,18 @@ class JobMasterController extends Controller
                 'id' => $masterParty->id,
                 'name' => $masterParty->party_name,
             ]
-            
+
         ]);
     }
-    
+
     private function addBillingParty($validated)
     {
-        
+
         MasterBillingParty::create([
-            
+
             'company_id' => $this->company_id,
             'uuid' => Str::uuid(),
-        
+
             "party_code" => $validated['party_code'],
             "party_name" => $validated['party_name'],
             "address_1" => $validated['address_1'],
@@ -515,7 +535,7 @@ class JobMasterController extends Controller
             "pincode" => $validated['pincode'],
             "party_type" => $validated['party_type'],
             "contact_person" => $validated['contact_person'],
-            
+
             "tel_no" => $validated['tel_no'],
             "email" => $validated['email'],
             "gstin" => $validated['gstin'],
@@ -526,7 +546,7 @@ class JobMasterController extends Controller
             "status" => $validated['status']
         ]);
     }
-    
+
     public function getEnquiryDetails($id)
     {
         $enquiry = OperationEnquiries::where('company_id', $this->company_id)
@@ -536,13 +556,13 @@ class JobMasterController extends Controller
                 'consignee:id,party_name'
             ])
             ->findOrFail($id);
-    
+
         return response()->json([
             'status' => true,
             'data' => $enquiry
         ]);
 
     }
-    
-    
+
+
 }
