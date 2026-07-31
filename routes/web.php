@@ -3,9 +3,9 @@
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Route;
-// Super Admin 
+// Super Admin
 use App\Http\Controllers\W3crmAdminController;
-// Admin 
+// Admin
 use App\Http\Controllers\AdminMain\EnquiryController;
 use App\Http\Controllers\AdminMain\PurchaseController;
 use App\Http\Controllers\AdminMain\SalesController;
@@ -111,7 +111,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/page-error-503', 'page_error_503');
         Route::get('/logout', 'logout')->name('logout');
     });
-    
+
 
     // DashBoard Related Route
     Route::get('/admin/dashboard', [W3crmAdminController::class, 'dashboard_2'])->name('dashboard');
@@ -122,7 +122,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/leo-pending', [W3crmAdminController::class, 'leoPending'])->name('dashboard.leoPending');
     Route::get('/dashboard/complate-operation', [W3crmAdminController::class, 'complateOperation'])->name('dashboard.complateOperation');
     Route::post('/dashboard/close-job/{id}', [W3crmAdminController::class, 'closeJob'])->name('dashboard.closeJob');
-    
+
     // routes/web.php
     Route::get('/dashboard/chart-data/{period}', [W3crmAdminController::class, 'getChartData'])->name('dashboard.chartData');
     Route::get('/dashboard/month-wise/chart-data/{period}', [W3crmAdminController::class, 'getMonthWiseChartData'])->name('dashboard.monthWise.chartData');
@@ -138,8 +138,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/companies/create', [CompaniesController::class, 'create']);
     Route::get('/companies/{id}/edit', [CompaniesController::class, 'edit']);
 
-    Route::get('/invoices', [InvoicesController::class, 'index']);            
-           
+    Route::get('/invoices', [InvoicesController::class, 'index']);
+
 
     Route::get('/admin-faq', [AdminFaqController::class, 'index']);
     Route::get('/admin-faq/create', [AdminFaqController::class, 'create']);
@@ -147,12 +147,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/contact-setting', [FrontSettingController::class, 'contactsetting']);
     Route::get('/footer-setting', [FrontSettingController::class, 'footersetting']);
-    
+
     // Profile
-    Route::get('/profile-edit', [ProfileController::class, 'edit'])->name('profile.edit');     
+    Route::get('/profile-edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile-update', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/profile-destroy', [ProfileController::class, 'destroy'])->name('profile.destroy');
-  
+
 
     // (1) Master routes
     Route::middleware(['permission:masters'])->group(function(){
@@ -173,15 +173,15 @@ Route::middleware('auth')->group(function () {
             Route::resource('container-sizes', MasterContainerSizeController::class);
             Route::resource('bl-types', MasterBlTypeController::class);
             Route::resource('banks', MasterBankController::class);
-            
+
             Route::delete('shipper-document/delete/{id}/{name}', [MasterExportPartyController::class, 'deleteDocument'])->name('shipper.document.delete');
             Route::delete('other-document/delete/{id}/{name}', [MasterImportPartyController::class, 'deleteDocument'])->name('other.document.delete');
 
         });
     });
-    
+
    // (2) opreration routes
-    
+
     // Common Model Forms  Route
     Route::post('add-vessel', [CommonFormsController::class, 'CommonVesselForms'])->name('new-vessels.store');
     Route::post('add-party', [CommonFormsController::class, 'CommonPartyForms'])->name('new-party.store');
@@ -205,28 +205,28 @@ Route::middleware('auth')->group(function () {
 
     // bookings related routes
     Route::POST('bookings.add-container', [BookingController::class, 'addContainer'])->name('bookings.addContainer');
-    Route::POST('bookings.file-upload', [BookingController::class, 'fileUpload'])->name('bookings.fileUpload');   
+    Route::POST('bookings.file-upload', [BookingController::class, 'fileUpload'])->name('bookings.fileUpload');
     Route::post('/bookings/search-file', [BookingController::class, 'searchFile'])->name('bookings.searchFile');
     Route::get('bookings/download/{id}', [BookingController::class, 'downloadFile'])->name('bookings.downloadFile');
     Route::put('bookings/update-container/{id}', [BookingController::class, 'updateContainer'])->name('bookings.updateContainer');
     Route::get('/booking/print/{id}', [BookingController::class, 'print'])->name('booking.print');
     Route::POST('file-upload', [BookingController::class, 'updateFileUpload'])->name('file-upload.uploadFileUpload');
     Route::post('bookings/save-containers', [BookingController::class, 'saveContainers'])->name('bookings.saveContainers');
-    
+
     Route::post('/container/save', [BookingController::class, 'saveContainer'])->name('container.save');
 
     Route::get('/container/{id}', [BookingController::class, 'getContainer']);
     Route::delete('/container/{id}', [BookingController::class, 'deleteContainer']);
-    
+
     Route::get('/container-list/{booking_id}', [BookingController::class, 'listContainers'])->name('container.list');
 
-    // Job Master 
+    // Job Master
     Route::post('/new-party-store', [JobMasterController::class, 'storeNewPartyAjax'])->name('job-master.new-party.store');
     Route::get('/job-master/get-enquiry-details/{id}', [JobMasterController::class, 'getEnquiryDetails'])->name('job-master.get-enquiry-details');
-    
+
 
     // Air Import related routes
-    Route::put('air-imports/updateHawb', [AirImportController::class, 'updateHawb'])->name('air-imports.updateHawb');   
+    Route::put('air-imports/updateHawb', [AirImportController::class, 'updateHawb'])->name('air-imports.updateHawb');
     Route::put('air-imports/updateother', [AirImportController::class, 'updateother'])->name('air-imports.updateother');
     Route::get('air-imports/bl-draft/{id}', [AirImportController::class, 'awbDraftOption'])->name('awb.draft.import.option');
     Route::get('air-imports/hawb-bl-draft/{id}', [AirImportController::class, 'hawbDraftOptionAirImp'])->name('hawb.draft.import.option');
@@ -252,9 +252,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/air-export/mawb/confirm-download',[AirExportController::class, 'confirmMawbDownload'])->name('air.export.mawb.confirm.download');
     Route::post('/air-export/hawb/check-download',[AirExportController::class, 'checkHawbDownloadPermission'])->name('air.export.hawb.check.download');
     Route::post('/air-export/confirm-hawb-download',[AirExportController::class,'confirmHawbDownload'])->name('air.export.hawb.confirm.download');
-   
+
     // Sea Import related routes
-    Route::post('sea-imports/add-container', [SeaImportController::class, 'addContainer'])->name('sea-imports.addContainer');   
+    Route::post('sea-imports/add-container', [SeaImportController::class, 'addContainer'])->name('sea-imports.addContainer');
     Route::put('sea-imports/update-container/{id}', [SeaImportController::class, 'updateContainer'])->name('sea-imports.updateContainer');
     Route::get('sea-imports/cargo-arrival/{id}', [SeaImportController::class, 'cargoArrivelDetails'])->name('bl.sea-imports.cargoArrivelDetails'); // mourya
     Route::get('sea-imports/freight-certificate/{id}', [SeaImportController::class, 'freightCertificateDetails'])->name('bl.sea-imports.freightCertificateDetails'); // mourya
@@ -269,23 +269,23 @@ Route::middleware('auth')->group(function () {
     //export restrictions
     Route::post('/sea-import/check-download',[SeaImportController::class,'checkSeaImportBlPermission'])->name('sea.import.check.download');
     Route::post('/sea-import/confirm-download',[SeaImportController::class,'confirmSeaImportBlDownload'])->name('sea.import.confirm.download');
-    
+
 
     // Sea Export related routes
-    Route::post('sea-exports/add-container', [SeaExportController::class, 'addContainer'])->name('sea-exports.addContainer');   
+    Route::post('sea-exports/add-container', [SeaExportController::class, 'addContainer'])->name('sea-exports.addContainer');
     Route::put('sea-exports/update-container/{id}', [SeaExportController::class, 'updateContainer'])->name('sea-exports.updateContainer');
     Route::get('sea-exports/bl-draft/{id}', [SeaExportController::class, 'blDraftOption'])->name('bl.draft.option');
     Route::post('/sea-exports/gross-weight-total', [SeaExportController::class, 'grossWeightTotal'])->name('sea-exports.grossWeightTotal');
-    
+
     Route::post('/sea-exports/add-shipment-line', [SeaExportController::class,'addShipmentLine'])->name('sea-exports.addShipmentLine');
     Route::put('sea-exports/update-shipment/{id}', [SeaExportController::class, 'updateShipmentLine'])->name('sea-exports.updateShipmentLine');
     Route::get('sea-exports/getShipmentDetail/{id}', [SeaExportController::class, 'getShipmentDetail'])->name('getShipmentDetail');
     Route::delete('sea-exports/delete-shipment/{id}', [SeaExportController::class, 'deleteShipmentLine'])->name('sea-exports.deleteShipmentLine');
-    
+
     Route::get('/sea-export/sea-way-bill/{id}', [SeaExportController::class, 'showSeaWayBill'])->name('sea.way.bill');
     Route::post('/sea-export/bl-draft/generate/{id}', [SeaExportController::class, 'generateDraft'])->name('draft.generate');
     Route::get('/sea-way-bill-docx/{id}', [SeaExportController::class, 'downloadSeaWayBillDocx'])->name('sea.way.bill.docx');
-    
+
     Route::get('sea-exports/loading-confirmation/{id}', [SeaExportController::class, 'loadingConfirmation'])
         ->name('bl.loadingConfirmation-seaExp');
     Route::get('sea-exports/export-loading-confirmation/{id}', [SeaExportController::class, 'exportLoadingConfirmation'])
@@ -297,19 +297,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/sea-export/confirm-download',[SeaExportController::class, 'confirmSeaExportDownload'])->name('sea.export.confirm.download');
 
     // transport related routes
-    Route::post('transports.add-container', [TransportController::class, 'addContainer'])->name('transports.addContainer');   
+    Route::post('transports.add-container', [TransportController::class, 'addContainer'])->name('transports.addContainer');
     // Route::put('transports.update-container/{id}', [TransportController::class, 'updateContainer'])->name('transports.updateContainer');
     Route::post('/transport/container/save', [TransportController::class, 'saveContainer'])
         ->name('transports.saveContainer');
-    
+
     Route::get('/transport/container/{id}', [TransportController::class, 'getContainer'])
         ->name('transports.getContainer');
-    
+
     Route::delete('/transport/container/{id}', [TransportController::class, 'deleteContainer'])
         ->name('transports.deleteContainer');
 
     // Sea Import Data Entry related routes
-    Route::post('sea-import-data-entry/add-container', [SeaImportDataEntryController::class, 'addContainer'])->name('sea-import-data-entry.addContainer');   
+    Route::post('sea-import-data-entry/add-container', [SeaImportDataEntryController::class, 'addContainer'])->name('sea-import-data-entry.addContainer');
     Route::put('sea-import-data-entry/update-container/{id}', [SeaImportDataEntryController::class, 'updateContainer'])->name('sea-import-data-entry.updateContainer');
 
     //Job Open Close Route
@@ -319,29 +319,29 @@ Route::middleware('auth')->group(function () {
     ->name('job-open-close.fetch');
     Route::get('/job-status/notification/read/{id}', [NotificationController::class, 'markAsReadJobStatus'])->name('jobStatus.notification.read');
     Route::get('/notification/all', [NotificationController::class, 'all'])->name('admin.notification.all');
-    
-    
+
+
     Route::middleware(['permission:operations'])->group(function(){
         Route::prefix('admin')->group(function(){
 
-            Route::resource('bookings', BookingController::class);       
-            Route::resource('job-masters', JobMasterController::class);  
-            Route::resource('job-open-close', JobOpenCloseController::class); 
+            Route::resource('bookings', BookingController::class);
+            Route::resource('job-masters', JobMasterController::class);
+            Route::resource('job-open-close', JobOpenCloseController::class);
 
-            Route::resource('air-imports', AirImportController::class);   
-            Route::resource('air-exports', AirExportController::class);  
-            
-            Route::resource('sea-imports', SeaImportController::class);   
-            Route::resource('sea-exports', SeaExportController::class);   
+            Route::resource('air-imports', AirImportController::class);
+            Route::resource('air-exports', AirExportController::class);
 
-            Route::resource('sea-import-data-entry', SeaImportDataEntryController::class);       
-            Route::resource('export-bl-entry', ExportBlEntryController::class);       
-            Route::resource('transports', TransportController::class);       
+            Route::resource('sea-imports', SeaImportController::class);
+            Route::resource('sea-exports', SeaExportController::class);
+
+            Route::resource('sea-import-data-entry', SeaImportDataEntryController::class);
+            Route::resource('export-bl-entry', ExportBlEntryController::class);
+            Route::resource('transports', TransportController::class);
 
             Route::resource('/Enquiry', EnquiryController::class);
             Route::get('/Enquiry', [EnquiryController::class, 'index']);
             Route::get('/Enquiry/create', [EnquiryController::class, 'create']);
-            
+
             Route::get('/PackingList', [PackingListController::class, 'index']);
             Route::get('/PackingList/create', [PackingListController::class, 'create']);
             Route::get('/PackingList/{id}/edit', [PackingListController::class, 'edit']);
@@ -350,18 +350,18 @@ Route::middleware('auth')->group(function () {
             Route::post('/upload-files', [UploadedFileController::class, 'store'])->name('files.store');
             Route::get('/upload-files/download/{id}', [UploadedFileController::class, 'download'])->name('files.download');
             Route::delete('/upload-files/{id}', [UploadedFileController::class, 'destroy'])->name('files.destroy');
-                        
+
             Route::get('/FixedCharge', [FixedChargeController::class, 'index']);
             Route::get('/FixedCharge/create', [FixedChargeController::class, 'create']);
             Route::get('/FixedCharge/{id}/edit', [FixedChargeController::class, 'edit']);
-        
+
             Route::resource('proforma-invoices', ProformaInvoiceController::class);
             Route::get('/dsr-report', [DsrRepostController::class, 'index']);
             Route::match(['get', 'post'], '/dsr-report/preview', [DsrRepostController::class, 'preview'])->name('dsr-report.preview');
             Route::get('/dsr-report/download/{format}', [DsrRepostController::class, 'download'])->name('dsr-report.download');
             Route::get('/dsr-report/download-excel', [DsrRepostController::class, 'downloadExcel'])
             ->name('dsr.download.excel');
-            
+
             // purchase
             Route::resource('purchase-invoices', PurchaseInvoiceController::class);
         });
@@ -377,17 +377,17 @@ Route::middleware('auth')->group(function () {
     Route::post('sales-invoices-cont/charges', [SalesInvoiceController::class, 'salesInvoiceChargeContainer'] )->name('sales-invoices.salesInvoiceChargeContainer');
     Route::put('sales-invoices/charges/{id}', [SalesInvoiceController::class, 'UpdateSalesInvoiceCharge'] )->name('sales-invoices.UpdateSalesInvoiceCharge');
     Route::get('sales-invoices/import/{id}', [SalesInvoiceController::class, 'ImportSalesInvoice'] )->name('salesInvoice.import');
-    Route::get('/sales-invoices/get-charge-details/{charge_id}/{invoice_id}', [SalesInvoiceController::class, 'getChargeDetails']) 
+    Route::get('/sales-invoices/get-charge-details/{charge_id}/{invoice_id}', [SalesInvoiceController::class, 'getChargeDetails'])
     ->name('sales-invoices.getChargeDetails');
     Route::get('sales-invoices/print/{id}', [SalesInvoiceController::class, 'printSalesInvoice'] )->name('salesInvoice.printSalesInvoice');
     Route::get('/sales-invoices/getChargeDetail/{id}', [SalesInvoiceController::class, 'getChargeDetailForUpdate'])->name('sales-invoices.getChargeDetail');
     Route::delete('/sales-invoices/delete-charge/{id}', [SalesInvoiceController::class, 'deleteChargeDetail'])
     ->name('sales-invoices.deleteChargeDetail');
-    
-    // common sales files 
+
+    // common sales files
     Route::POST('account/file-upload', [CommanMultiFilesUploadController::class, 'accountUpdateFileUpload'])->name('account.file-upload.uploadFileUpload');
-    
-    // Enquiry 
+
+    // Enquiry
     Route::post('enquiry/charge-details', [EnquiryController::class, 'getCharge'])->name('enquiry.getCharge');
     Route::post('admin/enquiry/store', [EnquiryController::class, 'store'])->name('enquiry.store');
     Route::post('admin/enquiry/selling-update', [EnquiryController::class, 'sellingUpdate'])->name('enquiry.selling.update');
@@ -404,7 +404,7 @@ Route::middleware('auth')->group(function () {
     Route::get('purchase-invoices/get-charge-details/{charge_id}/{invoice_id}', [PurchaseInvoiceController::class, 'getChargeDetails'])->name('purchase-invoices.getChargeDetails');
     Route::get('purchase-invoices/import/{id}', [PurchaseInvoiceController::class, 'ImportPurchaseInvoice'] )->name('ImportPurchaseInvoice.import');
     Route::get('purchase-invoices/print/{id}', [PurchaseInvoiceController::class, 'printPurchaseInvoice'] )->name('purchaseInvoice.printPurchaseInvoice');
-    
+
     Route::get('/purchase-invoices/getChargeDetail/{id}', [PurchaseInvoiceController::class, 'getChargeDetailForUpdate'])->name('purchase-invoices.getChargeDetail');
     Route::delete('/purchase-invoices/delete-charge/{id}', [PurchaseInvoiceController::class, 'deleteChargeDetail'])
     ->name('purchase-invoices.deleteChargeDetail');
@@ -421,7 +421,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/proforma-invoices/getChargeDetail/{id}', [ProformaInvoiceController::class, 'getChargeDetailForUpdate'])->name('proforma-invoices.getChargeDetail');
     Route::delete('/proforma-invoices/delete-charge/{id}', [ProformaInvoiceController::class, 'deleteChargeDetail'])->name('proforma-invoices.deleteChargeDetail');
     Route::get('proforma-invoices/print/{id}', [ProformaInvoiceController::class, 'printProformaInvoice'] )->name('proformaInvoice.printProformaInvoice');
-    
+
     // Tax Invoice routes
     Route::post('tax-invoices/job-numbers', [TaxInvoiceController::class, 'getJobNo'])->name('tax-invoices.getJobNo');
     Route::get('get-tax-invoices', [TaxInvoiceController::class, 'getTaxInvoice'])->name('tax-invoices.getTaxInvoice');
@@ -436,14 +436,14 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['permission:accounts'])->group(function(){
         Route::prefix('admin')->group(function(){
             Route::resource('sales-invoices', SalesInvoiceController::class);
-            
-            
+
+
             Route::resource('tax-invoices', TaxInvoiceController::class);
-            
+
             Route::resource('receipts', ReceiptController::class);
             Route::resource('purchase-payment', PurchasePaymentController::class);
-            Route::resource('on-accounts', OnAccountController::class);   
-            Route::resource('payment-amount', PaymentAmountController::class);   
+            Route::resource('on-accounts', OnAccountController::class);
+            Route::resource('payment-amount', PaymentAmountController::class);
 
             Route::post('file-upload', [FileUploadController::class, 'updateFileUpload'])->name('file-upload.updateFileUpload');
             Route::post('file-upload/search-file', [FileUploadController::class, 'searchFile'])->name('file-upload.searchFile');
@@ -453,74 +453,74 @@ Route::middleware('auth')->group(function () {
     });
 
     //(4) Report routes
-    Route::middleware(['permission:reports'])->group(function () { 
+    Route::middleware(['permission:reports'])->group(function () {
         Route::prefix('admin')->group(function(){
-            
+
             Route::get('/sales-report', [SalesTDSReportController::class, 'index']);
             Route::match(['get', 'post'], '/sales-tds-report/preview', [SalesTDSReportController::class, 'preview'])->name('sales-tds-report.preview');
             Route::get('/sales-report/download/{format}', [SalesTDSReportController::class, 'download'])->name('sales-tds-report.download');
-            
+
             Route::get('/purchase-report', [PurchaseTDSReportController::class, 'index']);
             Route::match(['get', 'post'], '/purchase-tds-report/preview', [PurchaseTDSReportController::class, 'preview'])->name('purchase-tds-report.preview');
             Route::get('/purchase-report/download/{format}', [PurchaseTDSReportController::class, 'download'])->name('purchase-tds-report.download');
-            
+
             Route::get('/sale-purchase-report', [SalesPurchaseReportController::class, 'index']);
             Route::match(['get', 'post'], '/sale-purchase-report/preview', [SalesPurchaseReportController::class, 'preview'])
                 ->name('sale-purchase-report.preview');
             Route::get('/sale-purchase-report/download/{format}', [SalesPurchaseReportController::class, 'download'])
                 ->name('sale-purchase-report.download');
-            
+
             Route::get('/sales-outstanding', [SalesOutstandingController::class, 'index']);
             Route::match(['get', 'post'], '/sales-outstanding/preview', [SalesOutstandingController::class, 'preview'])->name('sales-outstanding.preview');
             Route::get('/sales-outstanding/download/{format}/{id}', [SalesOutstandingController::class, 'download'])->name('sales-outstanding.download');
-            
+
             Route::get('/purchase-outstanding', [PurchaseOutstandingController::class, 'index']);
             Route::match(['get', 'post'], '/purchase-outstanding/preview', [PurchaseOutstandingController::class, 'preview'])->name('purchase-outstanding.preview');
             Route::get('/purchase-outstanding/download/{format}/{id}', [PurchaseOutstandingController::class, 'download'])->name('purchase-outstanding.download');
-            
+
             Route::get('/loading-list', [LoadingListController::class, 'index']);
             Route::post('/loading-list/preview', [LoadingListController::class, 'preview'])->name('loading-list.preview');
             Route::get('/loading-list/download/{format}', [LoadingListController::class, 'download'])->name('loading-list.download');
-        
+
             Route::get('/cost-sheet-report', [CostSheetReportController::class, 'index']);
             Route::match(['get', 'post'], '/cost-sheet-report/preview', [CostSheetReportController::class, 'preview'])->name('cost-sheet-report.preview');
             // Route::get('/cost-sheet-report/download/{format}', [CostSheetReportController::class, 'download'])->name('cost-sheet-report.download');
-            
-            
+
+
             //Receipt report
             Route::get('/receipts-list', [ReceiptReportController::class, 'listReceipt']);
             Route::post('/receipt-list/preview', [ReceiptReportController::class, 'preview'])->name('receipt-list.preview');
             Route::get('/receipt-list/download/{format}', [ReceiptReportController::class, 'download'])->name('receipt-list.download');
-            
+
             // Purchase Payment Report
             Route::get('/purchase-payment-list', [PurchaseReportController::class, 'listpurhcasePayment']);
             Route::post('/purchase-payment-list/preview', [PurchaseReportController::class, 'preview'])->name('purhcasePayment-list.preview');
-            
+
             Route::get('/SacSummaryReport', [SacSummaryReportController::class, 'first']);
             // Route::get('/SacSummaryReport/index', [SacSummaryReportController::class, 'index']);
             // Route::get('/SacSummaryReport/create', [SacSummaryReportController::class, 'create']);
             // Route::get('/SacSummaryReport/{id}/edit', [SacSummaryReportController::class, 'edit']);
-            
+
             Route::get('/SallesRegister', [SallesRegisterController::class, 'first']);
             Route::get('/SallesRegister/index', [SallesRegisterController::class, 'index']);
             Route::get('/SallesRegister/create', [SallesRegisterController::class, 'create']);
             Route::get('/SallesRegister/{id}/edit', [SallesRegisterController::class, 'edit']);
-            
+
             Route::get('/GstPayableReport', [GstPayableReportController::class, 'first']);
             Route::get('/GstPayableReport/index', [GstPayableReportController::class, 'index']);
             Route::get('/GstPayableReport/create', [GstPayableReportController::class, 'create']);
             Route::get('/GstPayableReport/{id}/edit', [GstPayableReportController::class, 'edit']);
-            
+
             Route::get('/PurchaseRegister', [PurchaseRegisterController::class, 'first']);
             Route::get('/PurchaseRegister/index', [PurchaseRegisterController::class, 'index']);
             Route::get('/PurchaseRegister/create', [PurchaseRegisterController::class, 'create']);
             Route::get('/PurchaseRegister/{id}/edit', [PurchaseRegisterController::class, 'edit']);
-            
+
             Route::get('/ProductivityReport', [ProductivityReportController::class, 'first']);
             // Route::get('/ProductivityReport/index', [ProductivityReportController::class, 'index']);
             // Route::get('/ProductivityReport/create', [ProductivityReportController::class, 'create']);
             // Route::get('/ProductivityReport/{id}/edit', [ProductivityReportController::class, 'edit']);
-            
+
             Route::get('/DeliveryAdviceReport', [DeliveryAdviceReportController::class, 'first']);
             Route::get('/DeliveryAdviceReport/index', [DeliveryAdviceReportController::class, 'index']);
             Route::get('/DeliveryAdviceReport/create', [DeliveryAdviceReportController::class, 'create']);
@@ -529,16 +529,16 @@ Route::middleware('auth')->group(function () {
             Route::get('/receipt-ledger', [ReceiptLedgerController::class, 'index']);
             Route::match(['get', 'post'], '/receipt-ledger/preview', [ReceiptLedgerController::class, 'preview'])->name('receipt-ledger.preview');
             Route::get('/receipt-ledger/download/{format}', [ReceiptLedgerController::class, 'download'])->name('receipt-ledger.download');
-            
+
             Route::get('/purchase-ledger', [PurchaseLedgerController::class, 'index']);
             Route::match(['get', 'post'], '/purchase-ledger/preview', [PurchaseLedgerController::class, 'preview'])->name('purchase-ledger.preview');
             Route::get('/purchase-ledger/download/{format}', [PurchaseLedgerController::class, 'download'])->name('purchase-ledger.download');
-            
+
             Route::get('/Sales', [SalesController::class, 'first']);
             // Route::get('/Sales/index', [SalesController::class, 'index']);
             // Route::get('/Sales/create', [SalesController::class, 'create']);
             // Route::get('/Sales/{id}/edit', [SalesController::class, 'edit']);
-            
+
             Route::get('/Purchase', [PurchaseController::class, 'first']);
             // Route::get('/Purchase/index', [PurchaseController::class, 'index']);
             // Route::get('/Purchase/create', [PurchaseController::class, 'create']);
@@ -551,20 +551,20 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['permission:members'])->group(function(){
         Route::prefix('admin')->group(function(){
             Route::resource('users', MemberUserController::class);
-            
+
             Route::get('/user-role', [MembersUserRoleController::class, 'index']);
             Route::get('/user-role/create', [MembersUserRoleController::class, 'create']);
             Route::post('/user-role/store', [MembersUserRoleController::class, 'store'])->name('user-role.store');
             Route::get('/user-role/{id}/edit', [MembersUserRoleController::class, 'edit']);
             Route::put('/user-role/{id}', [MembersUserRoleController::class, 'update'])->name('user-role.update');
             Route::delete('/user-role/{id}', [MembersUserRoleController::class, 'destroy'])->name('user-role.delete');
-            
-            
+
+
             Route::get('/shipper-verification-party', [MembersPartyVerificationController::class, 'shipperIndex'])->name('shipper.verification.party');
             Route::post('/shipper-store', [MembersPartyVerificationController::class, 'shipperStore'])->name('party.varification.store');
             Route::get('/other-verification-party', [MembersPartyVerificationController::class, 'otherIndex'])->name('other.verification.party');
             Route::post('/other-party-store', [MembersPartyVerificationController::class, 'otherPartyStore'])->name('other.party.varification.store');
-            
+
             Route::post('/party-approval-permission/{id}', [MembersPartyVerificationController::class, 'partyApprovalPermission'])->name('party.approval.permission');
             Route::get(
                 '/party/document/download/{id}',
@@ -573,8 +573,8 @@ Route::middleware('auth')->group(function () {
 
             Route::get('/all-sales-person', [TotalSalesByPersonController::class, 'listUsers'])->name('salesPerson.listUsers');
             Route::post('/sales-person-report', [TotalSalesByPersonController::class, 'salesPersonReport'])->name('sales.person.report');
-            
-        });        
+
+        });
     });
 
     // (6) company setting routes
@@ -583,9 +583,9 @@ Route::middleware('auth')->group(function () {
             Route::get('company-settings', [CompanySettingController::class, 'edit'])->name('company-settings.edit');
             Route::put('company-settings/{id}', [CompanySettingController::class, 'update'])->name('company-settings.update');
             Route::resource('branches', CompanyBranchController::class);
-        });  
+        });
     });
-    
+
     // Job-card
     Route::middleware(['permission:job-card'])->group(function(){
         Route::prefix('admin')->group(function(){
@@ -593,12 +593,12 @@ Route::middleware('auth')->group(function () {
             Route::get('air-job-card', [JobCardController::class, 'airJobCard'])->name('airJobCard');
             Route::post('air-job-card/print', [JobCardController::class, 'printAirJobCard'])->name('airJobCard.print');
             //sea
-            Route::get('sea-job-card', [JobCardController::class, 'seaJobCard'])->name('seaJobCard');            
+            Route::get('sea-job-card', [JobCardController::class, 'seaJobCard'])->name('seaJobCard');
             Route::post('sea-job-card/print', [JobCardController::class, 'printSeaJobCard'])->name('seaJobCard.print');
-                      
-        });  
+
+        });
     });
-    
+
 });
 
 require __DIR__.'/auth.php';

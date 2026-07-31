@@ -34,8 +34,8 @@
                     <h4 class="card-title mb-2">Job Master Details</h4>
                 </div>
                 <div class="card-header d-block pb-2">
-                    <form class="row align-items-end" action="{{route('job-masters.index')}}" method="get"> 
-                        
+                    <form class="row align-items-end" action="{{route('job-masters.index')}}" method="get">
+
                         <!--<div class="col-xl-3 col-sm-6 col-lg-4 mb-3">-->
                         <!--    <label class="form-label">search by job date</label>-->
                         <!--    <div class="d-flex">-->
@@ -61,7 +61,7 @@
                                 <option value="SEAEXP.NVOCC">SEAEXP.NVOCC</option>
                             </select>
                         </div>
-                        
+
                         <div class="col-md-2 mb-1">
                             <label class="form-label">Job Number</label>
                             <div class="">
@@ -73,9 +73,9 @@
                                         @endforeach
                                     </select>
                                 </div>
-                            </div>                        
+                            </div>
                         </div>
-                        
+
                         <div class="col-md-2 mb-1">
                             <label class="form-label">Search by Shipper Party Name</label>
                             <div class="">
@@ -87,7 +87,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                            </div>                        
+                            </div>
                         </div>
                         <div class="col-md-2 mb-1">
                             <label class="form-label">Search by Consignee Party Name</label>
@@ -100,18 +100,18 @@
                                         @endforeach
                                     </select>
                                 </div>
-                            </div>                        
+                            </div>
                         </div>
                         <div class="col-md-2 mb-1">
                             <label class="form-label">Start Date</label>
                             <input type="date" placeholder="dd/mm/yy" class="form-control" name="start_date" value="{{ request('start_date') }}">
                         </div>
-                        
+
                         <div class="col-md-2 mb-1">
                             <label class="form-label">End Date</label>
                             <input type="date" placeholder="dd/mm/yy" class="form-control" name="end_date" value="{{ request('end_date') }}">
                         </div>
-                        
+
                         <div class="col-md-2 mb-1">
                             <button id="applyFilter" class="btn btn-primary" type="submit">Apply</button>
                             <a href="{{route('job-masters.index')}}" id="resetFilter" class="btn btn-danger light ms-2" type="button">Reset</a>
@@ -127,7 +127,7 @@
                                     <th>REF ID</th>
                                     <th>Job No</th>
                                     <th>Job Date</th>
-                                    
+
                                     <th>Activity</th>
                                     <th>Party Name</th>
                                     <th>Single_Multi</th>
@@ -138,7 +138,7 @@
                                     <th>Updated By</th>
                                     <th>Action</th>
                                 </tr>
-                            </thead> 
+                            </thead>
                             <tbody>
                                 @foreach ($job_masters as $job_master)
                                     @php
@@ -158,11 +158,11 @@
                                                 ENQUIRY
                                             @else
                                                {{ $job_master->issued_by }}
-                                            @endif                                            
+                                            @endif
                                         </td>
-                                        <td>{{$job_master->job_no ?? ''}}</td> 
+                                        <td>{{$job_master->job_no ?? ''}}</td>
                                         <td>{{$job_master->job_date ?? ''}}</td>
-                                        
+
                                         <td>{{$job_master->job_activity ?? ''}}</td>
                                         <td>{{$party_name}}</td>
                                         <td>
@@ -177,7 +177,7 @@
                                         <td>{!! $job_master->cargo_ready_date ? $job_master->cargo_ready_date : '<small class="text-danger">Pending</small>' !!}</td>
                                         <td>{{$job_master->pickup_date ?? ''}}</td>
                                         <td>{{$job_master->user->name ?? ''}}</td>
-                                    
+
                                         <td>
                                             @if($job_master->job_status == 'O')
                                                 <a class="badge badge-info light border-0" href="{{url('admin/job-masters/'.$job_master->id.'/edit')}}">Edit</a>
@@ -206,7 +206,7 @@
     <script>
         $(document).on('click', '.delete-jobs', function(e) {
             e.preventDefault();
-            if (!confirm('Are you sure you want to delete this port record?')) return;
+            if (!confirm('Are you sure you want to delete this job record?')) return;
 
             const jobId = $(this).data('id');
 
@@ -226,7 +226,7 @@
                 }
             });
         });
-        
+
         $('.select2').select2({
                 placeholder: "Select Job Party",
                 allowClear: true,
