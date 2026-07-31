@@ -36,7 +36,7 @@ class AirExportController extends Controller
         });
     }
 
-    
+
     /**
      * Display a listing of the resource.
      */
@@ -48,7 +48,7 @@ class AirExportController extends Controller
             $q->whereNull('operation_complate')
               ->orWhere('operation_complate', 0);
         });
-        
+
 
         $query->when($request->filled('booking_no'), function ($q) use ($request) {
             $q->where('booking_no', 'LIKE', '%' . $request->booking_no . '%');
@@ -65,11 +65,11 @@ class AirExportController extends Controller
         $query->when($request->filled('mawb_no'), function ($q) use ($request) {
             $q->where('mawb_no', 'LIKE', '%' . $request->mawb_no . '%');
         });
-    
+
         $query->when($request->filled('shipper_id'), function ($q) use ($request) {
             $q->where('shipper_id', 'LIKE', '%' . $request->shipper_id . '%');
         });
-        
+
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereBetween('created_at', [
                 $request->start_date . ' 00:00:00',
@@ -86,7 +86,7 @@ class AirExportController extends Controller
         $uploadedJobs = OperationAllFileUpload::pluck('job_no')->toArray();
 
         $filter_records = OperationAirExport::where('company_id', $this->company_id)->orderBy('created_at', 'desc')->get();
-        
+
         return view('admin-main.admin.airExport.index', compact('page_title','air_exports', 'filter_records','uploadedJobs'));
     }
 
@@ -104,17 +104,17 @@ class AirExportController extends Controller
         $exportParites = MasterExportParty::where('company_id', $this->company_id)->get();
         $partyTypes = MasterParty::whereNotIn('party_type', [9, 6, 8])->get();
         $salePersons  = OperationSalesPerson::where('company_id', $this->company_id)->get();
-        
+
         $forwarders = MasterForwarder::where('company_id', $this->company_id)->get();
-    
+
         $files = OperationAllFileUpload::where('company_id', $this->company_id)->where('file_related', 'air_export')->orderBy('created_at', 'desc')->get();
-        
+
         return view('admin-main.admin.airExport.create', compact('page_title','exportParites', 'partyTypes' , 'ports', 'job_numbers', 'parties', 'files', 'party_lists', 'packages', 'salePersons', 'forwarders'));
     }
     /**
      * Store a newly created resource in storage.
      */
-     
+
     public function store(Request $request)
     {
         $checkJobNumberExist = OperationAirExport::where('job_no', $request->job_no)->first();
@@ -160,7 +160,7 @@ class AirExportController extends Controller
             'accountNo' => 'nullable|string',
             'accountingInformation' => 'nullable|string',
             'sobDate' => 'nullable|date',
-            
+
             'shipper_id' => 'required|integer',
             'consignee_id' => 'required|integer',
             'lata_agent' => 'nullable|integer',
@@ -175,7 +175,7 @@ class AirExportController extends Controller
             'receipt_port_id' => 'nullable|integer',
             'delivery_port_id' => 'nullable|integer',
             'destination_port_id' => 'nullable|integer',
-            
+
             'freight' => 'required|string',
             'by_first_carrier' => 'nullable|string',
             'currency' => 'nullable|string',
@@ -191,7 +191,7 @@ class AirExportController extends Controller
             'shipper_agent' => 'nullable|string',
             'other_charges' => 'nullable|string',
             'routing_destination' => 'nullable|string',
- 
+
             'insurance' => 'nullable|string',
             'fpa_amount' => 'nullable|numeric',
             'transportation' => 'nullable|string',
@@ -202,7 +202,7 @@ class AirExportController extends Controller
             'goods_description' => 'required|string',
             'handling_information' => 'nullable|string',
             'dimention' => 'nullable|string',
-            
+
             'leo_date' => 'nullable|string',
             'cartining_date' => 'nullable|string',
             'check_list_date' => 'nullable|string',
@@ -217,16 +217,17 @@ class AirExportController extends Controller
 
         $data['company_id'] = $this->company_id;
         $data['user_id'] = $this->user_id;
+        $data['branch_id'] = Auth::user()->branch_id;
         $data['uuid'] = Str::uuid();
-        
+
         $airExport = OperationAirExport::create($data);
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Air Export Form details saved successfully!',
             'data' => $airExport
         ]);
-        
+
         // return redirect()->back()->with('success', 'Air Export Record Created Successfully.');
     }
 
@@ -255,7 +256,7 @@ class AirExportController extends Controller
         $exportParites = MasterExportParty::where('company_id', $this->company_id)->get();
         $partyTypes = MasterParty::whereNotIn('party_type', [9, 6, 8])->get();
         $salePersons  = OperationSalesPerson::where('company_id', $this->company_id)->get();
-        
+
         $forwarders = MasterForwarder::where('company_id', $this->company_id)->get();
 
         return view('admin-main.admin.airExport.edit', compact('page_title','salePersons', 'forwarders', 'partyTypes', 'exportParites', 'air_export', 'ports', 'job_numbers', 'parties', 'files', 'packages', 'party_lists'));
@@ -309,7 +310,7 @@ class AirExportController extends Controller
             'notify2_id' => 'nullable|integer',
             'forwarder_id' => 'nullable|integer',
             'cha_party_id' => 'nullable|integer',
-            
+
             'accountNo' => 'nullable|string',
             'accountingInformation' => 'nullable|string',
             'sobDate' => 'nullable|date',
@@ -319,7 +320,7 @@ class AirExportController extends Controller
             'receipt_port_id' => 'nullable|integer',
             'delivery_port_id' => 'nullable|integer',
             'destination_port_id' => 'nullable|integer',
-            
+
             'freight' => 'required|string',
             'by_first_carrier' => 'nullable|string',
             'currency' => 'nullable|string',
@@ -335,7 +336,7 @@ class AirExportController extends Controller
             'shipper_agent' => 'nullable|string',
             'other_charges' => 'nullable|string',
             'routing_destination' => 'nullable|string',
-            
+
             'insurance' => 'nullable|string',
             'fpa_amount' => 'nullable|numeric',
             'transportation' => 'nullable|string',
@@ -346,7 +347,7 @@ class AirExportController extends Controller
             'goods_description' => 'required|string',
             'handling_information' => 'nullable|string',
             'dimention' => 'nullable|string',
-            
+
             'leo_date' => 'nullable|string',
             'cartining_date' => 'nullable|string',
             'check_list_date' => 'nullable|string',
@@ -359,9 +360,10 @@ class AirExportController extends Controller
             'by_third' => 'nullable|string',
         ]);
         $data['user_id'] = $this->user_id;
+        $data['branch_id'] = Auth::user()->branch_id;
 
         $air_export->update($data);
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Air Export Form details updated successfully!',
@@ -380,19 +382,19 @@ class AirExportController extends Controller
 
         return response()->json(['success' => 'Air Export record deleted successfully']);
     }
-    
+
     public function jobMasterPartyNameJobNumberWise(Request $request)
     {
         $jobMasterTableData = OperationJobMaster::where('job_no', $request->job_no)->first();
-        
+
         return response()->json([
             'status' => true,
             'data' => $jobMasterTableData,
-       
+
         ]);
-    
+
     }
-    
+
     public function awbDraftOption(Request $request, $id)
     {
         $page_title = 'Air Export AWB';
@@ -407,7 +409,7 @@ class AirExportController extends Controller
         ])->findOrFail($id);
         return view('admin-main/admin/airExport/awb-draft-option', compact('id','page_title','airExportDraftData'));
     }
-    
+
     public function hawbDraftOption(Request $request, $id)
     {
         $page_title = 'Air Export HAWB';
@@ -422,7 +424,7 @@ class AirExportController extends Controller
         ])->findOrFail($id);
         return view('admin-main/admin/airExport/hawb-draft-option', compact('id','page_title','airExportDraftData'));
     }
-    
+
     public function generateDraft(Request $request, $id)
     {
         $billType = $request->awb_type;
@@ -438,22 +440,22 @@ class AirExportController extends Controller
             'dischargePortName',
             'loadingPortName'
         ])->findOrFail($id);
-        
+
         $company = Company::where('id', $this->company_id)->first();
         $logoUrl = $company->logo
             ? public_path('uploads/company_logo/' . $company->logo)
             : public_path('images/default-logo.png');
-    
+
         $html = view(
             'admin-main.admin.airExport.airWayBill-airExport',
             compact('id', 'airExportDraftData', 'request','hbl_type','executedDate','freightPayable', 'company', 'billType', 'logoUrl')
         )->render();
-    
+
         return response()->json([
             'html' => $html
         ]);
     }
-    
+
     public function hawbGenerateDraft(Request $request, $id)
     {
         $billType = $request->awb_type;
@@ -469,32 +471,32 @@ class AirExportController extends Controller
             'dischargePortName',
             'loadingPortName'
         ])->findOrFail($id);
-        
+
         $company = Company::where('id', $this->company_id)->first();
         $logoUrl = $company->logo
             ? public_path('uploads/company_logo/' . $company->logo)
             : public_path('images/default-logo.png');
-            
+
         $logoPath = $company->logo
             ? public_path('uploads/company_logo/' . $company->logo)
             : public_path('images/default-logo.png');
-        
+
         $logoType = pathinfo($logoPath, PATHINFO_EXTENSION);
-        
+
         $logoData = file_get_contents($logoPath);
-        
+
         $companyLogo = 'data:image/' . $logoType . ';base64,' . base64_encode($logoData);
-    
+
         $html = view(
             'admin-main.admin.airExport.hawb-airWayBill-airExport',
             compact('id', 'airExportDraftData', 'request','hbl_type','executedDate','freightPayable', 'company', 'billType', 'logoUrl', 'companyLogo')
         )->render();
-    
+
         return response()->json([
             'html' => $html
         ]);
     }
-    
+
     public function chargableWeightTotal(Request $request)
     {
         $totalChargableWeight = OperationAirExport::whereBetween(
@@ -504,13 +506,13 @@ class AirExportController extends Controller
                 $request->end_date
             ]
         )->sum('chargable_weight');
-    
+
         return response()->json([
             'status' => true,
             'total' => $totalChargableWeight
         ]);
     }
-    
+
     // export restrictions
     public function confirmMawbDownload(Request $request)
     {
@@ -518,42 +520,42 @@ class AirExportController extends Controller
             'job_no'    => 'required|integer',
             'copy_type' => 'required|string',
         ]);
-    
+
         $this->downloadService->recordDownload(
             $request->job_no,
             'air_export',
             'mawb',
             $request->copy_type
         );
-    
+
         return response()->json([
             'status' => true
         ]);
     }
-    
+
     public function checkMawbDownloadPermission(Request $request)
     {
         $request->validate([
             'job_no'    => 'required|integer',
             'copy_type' => 'required|string',
         ]);
-    
+
         $result = $this->downloadService->canDownload(
             $request->job_no,
             'air_export',
             'mawb',
             $request->copy_type
         );
-    
+
         if (!$result['status']) {
-    
+
             return response()->json([
                 'status' => false,
                 'message' => $result['message']
             ],403);
-    
+
         }
-    
+
         return response()->json([
             'status'=>true,
             'remaining'=>$this->downloadService->remainingDownloads(
@@ -564,49 +566,49 @@ class AirExportController extends Controller
             )
         ]);
     }
-    
+
     public function confirmHawbDownload(Request $request)
     {
         $request->validate([
             'job_no'    => 'required|integer',
             'copy_type' => 'required|string',
         ]);
-    
+
         $this->downloadService->recordDownload(
             $request->job_no,
             'air_export',
             'hawb',
             $request->copy_type
         );
-    
+
         return response()->json([
             'status'=>true
         ]);
     }
-    
+
     public function checkHawbDownloadPermission(Request $request)
     {
         $request->validate([
             'job_no'    => 'required|integer',
             'copy_type' => 'required|string',
         ]);
-    
+
         $result = $this->downloadService->canDownload(
             $request->job_no,
             'air_export',
             'hawb',
             $request->copy_type
         );
-    
+
         if(!$result['status']){
-    
+
             return response()->json([
                 'status'=>false,
                 'message'=>$result['message']
             ],403);
-    
+
         }
-    
+
         return response()->json([
             'status'=>true,
             'remaining'=>$this->downloadService->remainingDownloads(
@@ -618,5 +620,5 @@ class AirExportController extends Controller
         ]);
     }
     // export restirctions end
-    
+
 }

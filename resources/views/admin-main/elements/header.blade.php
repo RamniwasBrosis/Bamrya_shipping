@@ -578,8 +578,8 @@
                     <!--        </div>-->
                     <!--    </div>-->
                     <!--</li>-->
-                    
-                    
+
+
                     <li class="nav-item dropdown notification_dropdown">
                         <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown">
                             <div style="position: relative;">
@@ -598,7 +598,7 @@
                         </a>
 
                         {{-- Dropdown --}}
-                       
+
                         <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notificationDropdown" style="width: 300px; max-height: 400px; overflow-y: auto;">
                             <li class="dropdown-header fw-bold">Notifications</li>
                             @forelse(auth()->user()->unreadNotifications as $notification)
@@ -636,8 +636,8 @@
                             <!--<li><a href="{{ route('admin.notification.all') }}" class="dropdown-item text-center text-primary small">View All</a></li>-->
                         </ul>
                     </li>
-                    
-                    
+
+
                     <!--<li class="nav-item dropdown notification_dropdown">-->
                     <!--    <a class="nav-link bell-link" href="javascript:void(0);">-->
                     <!--    <svg width="20" height="22" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">-->
@@ -663,13 +663,13 @@
                                     <div class="header-info d-flex">
                                         <h6 class="mx-2">
                                             @if($admin)
-                                                <p>CompanyName,</p> 
+                                                <p>CompanyName,</p>
                                                 <small>{{ $admin->company->company_name ?? '' }}</small>
                                             @endif
                                         </h6>
                                         <h6 class="pb-2 mx-2">
                                             @if($admin)
-                                               <p>UserName,</p> 
+                                               <p>UserName,</p>
                                                 <small>{{ $admin->name ?? '' }}</small>
                                             @endif
                                         </h6>
@@ -695,7 +695,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     @if($admin->role == 'super-admin')
                                     <div class="card-body px-0 py-2">
                                         <a href="{{ url('profile-edit') }}" class="dropdown-item ai-icon ">
@@ -729,7 +729,7 @@
                                         </a>
                                     </div>
                                     @endif
-                                    
+
                                     <div class="card-footer px-0 py-2">
                                         <a href="javascript:void(0);" class="dropdown-item ai-icon ">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -750,6 +750,13 @@
                             </div>
                         </div>
                     </li>
+                    @if($admin->role != 'super-admin')
+                    <li class="nav-item dropdown notification_dropdown">
+                        <a class="text-white nav-link"  href="javascript:void(0);" style="font-size: 1rem;">
+                            {{ $admin->branch->branch_name ?? '' }}
+                        </a>
+                    </li>
+                    @endif
                 </ul>
             </div>
         </nav>

@@ -33,7 +33,7 @@
                         <!--        @endforeach-->
                         <!--    </select>-->
                         <!--</div>-->
-                        
+
                         <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
                         <!--    <label class="form-label">Search By MAWB No.</label>-->
                         <!--    <select id="departmentFilter" class="form-control  select2" name="mawb_no">-->
@@ -65,7 +65,7 @@
                             <label class="form-label">Start Date</label>
                             <input type="date" placeholder="dd/mm/yy" class="form-control" name="start_date" value="{{ request('start_date') }}">
                         </div>
-                        
+
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">End Date</label>
                             <input type="date" placeholder="dd/mm/yy" class="form-control" name="end_date" value="{{ request('end_date') }}">
@@ -75,7 +75,7 @@
                             <a href="{{route('air-exports.index')}}" id="resetFilter" class="btn btn-danger light ms-2" type="button">Reset</a>
                         </div>
                     </form>
-                </div>  
+                </div>
                 <div class="card-body p-0">
                     <div class="table-responsive active-projects style-1">
                         <table id="empoloyees-tblwrapper" class="table">
@@ -85,10 +85,10 @@
                                     <th>Job No</th>
                                     <th>Booking No</th>
                                     <th>Shipper Name</th>
-                                    
+
                                     <th>Packages</th>
                                     <th>Chargeable weight</th>
-                                    
+
                                     <th>Invoice</th>
                                     <th>AWB No</th>
                                     <th>Flight Status</th>
@@ -97,13 +97,14 @@
                                     <th>S Bill No/Dt</th>
                                     <th>LEO</th>
                                     <th>Updated By</th>
+                                    <th>Branch</th>
                                     <th>Documents</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($air_exports as $air_export)
-                                 
+
                                     <tr>
                                         <td>{{ $loop->iteration}}</td>
                                         <td>{{ $air_export->jobMaster?->job_no ?? ''}}</td>
@@ -111,18 +112,18 @@
                                         <td>{{$air_export->shipperName->party_name ?? 'N/A'}}</td>
                                         <td>{{$air_export->package ?? ''}}</td>
                                         <td>{{$air_export->chargable_weight ?? ''}}</td>
-                                        
+
                                         <td>{{$air_export->customer_inv_no ?? ''}}</td>
                                         <td>{{$air_export->mawb_no ?? ''}}</td>
                                         <td>
                                             <span class="flight-status short-text">
                                                 {{ Str::limit($air_export->flight_status, 15, '...') }}
                                             </span>
-                                        
+
                                             <span class="flight-status full-text d-none">
                                                 {{ $air_export->flight_status }}
                                             </span>
-                                        
+
                                             @if(strlen($air_export->flight_status ?? '') > 15)
                                                 <a href="javascript:void(0)" class="toggle-flight-status">
                                                     More
@@ -134,6 +135,7 @@
                                         <td>{{$air_export->sbill_no ?? ''}}</td>
                                         <td>{{$air_export->leo_date ?? ''}}</td>
                                         <td>{{$air_export->user->name ?? ''}}</td>
+                                        <td>{{$air_export->branch->branch_name ?? '-'}}</td>
                                         <td>
                                             @if(in_array($air_export->job_no, $uploadedJobs))
                                                 Yes
@@ -141,7 +143,7 @@
                                                 No
                                             @endif
                                         </td>
-                                        
+
                                         <td>
                                             @if($air_export->jobMaster->job_status == 'O')
                                                 <a class="badge badge-info light border-0" href="{{url('admin/air-exports/'.$air_export->uuid.'/edit')}}">Edit</a>
@@ -151,7 +153,7 @@
                                             @endif
                                         </td>
                                     </tr>
-                                @endforeach                                
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -161,19 +163,19 @@
                 </div>
                 <div class="card mt-4">
                     <div class="card-body">
-                
+
                         <div class="row">
-                
+
                             <div class="col-md-3">
                                 <label>Start Date</label>
                                 <input type="date" id="start_date" class="form-control">
                             </div>
-                
+
                             <div class="col-md-3">
                                 <label>End Date</label>
                                 <input type="date" id="end_date" class="form-control">
                             </div>
-                
+
                             <div class="col-md-2">
                                 <label>&nbsp;</label>
                                 <button id="showChargableWeight"
@@ -181,16 +183,16 @@
                                     Show
                                 </button>
                             </div>
-                
+
                         </div>
-                
+
                         <hr>
-                
+
                         <h5>
                             Total Cargo Weight:
                             <span id="chargableWeightTotal">0</span>
                         </h5>
-                
+
                     </div>
                 </div>
             </div>
@@ -203,12 +205,12 @@
 @push('scripts')
     <script>
         $(document).on('click', '.toggle-flight-status', function () {
-    
+
             let td = $(this).closest('td');
-        
+
             td.find('.short-text').toggleClass('d-none');
             td.find('.full-text').toggleClass('d-none');
-        
+
             if ($(this).text() === 'Show More') {
                 $(this).text('Show More');
             } else {
@@ -242,7 +244,7 @@
                 }
             });
         });
-        
+
         $(document).ready(function() {
             $('.select2').select2({
                 placeholder: 'Select a value',
@@ -250,38 +252,38 @@
                 width: '100%'
             })
         })
-        
+
     </script>
     <!--get the sum of the gross weight -->
     <script>
         $('#showChargableWeight').on('click', function() {
-    
+
             let startDate = $('#start_date').val();
             let endDate = $('#end_date').val();
-        
+
             $.ajax({
                 url: "{{ route('air-exports.chargableWeightTotal') }}",
                 type: "POST",
-        
+
                 data: {
                     _token: "{{ csrf_token() }}",
                     start_date: startDate,
                     end_date: endDate
                 },
-        
+
                 success: function(response) {
-        
+
                     $('#chargableWeightTotal').text(response.total+' kg');
-        
+
                 },
-        
+
                 error: function() {
-        
+
                     alert('Error fetching weight total');
-        
+
                 }
             });
-        
+
         });
     </script>
 @endpush

@@ -52,33 +52,33 @@ class AirImportController extends Controller
                 $q->whereNull('operation_complate')
                   ->orWhere('operation_complate', 0);
             });
-    
+
         if ($request->filled('job_no')) {
             $query->where('job_no', 'LIKE', "%{$request->job_no}%");
         }
-    
+
         if ($request->filled('hbl_no')) {
             $query->where('hbl_no', 'LIKE', "%{$request->hbl_no}%");
         }
-    
+
         if ($request->filled('mbl')) {
             $query->where('mbl_no', 'LIKE', "%{$request->mbl}%");
         }
-    
+
         if ($request->filled('consignee_id')) {
             $query->where('consignee_id', $request->consignee_id);
         }
-        
+
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereBetween('created_at', [
                 $request->start_date . ' 00:00:00',
                 $request->end_date . ' 23:59:59'
             ]);
         }
-    
+
         $airImports = $query->orderBy('job_no', 'desc')->paginate(25);
         $uploadedJobs = OperationAllFileUpload::pluck('job_no')->toArray();
-    
+
         return view('admin-main.admin.airImport.index', compact('airImports','page_title','uploadedJobs'));
     }
 
@@ -117,13 +117,13 @@ class AirImportController extends Controller
                 'message' => "An entry for this Job Number already exists, so you cannot create another entry with the same Job No.!",
             ], 201);
         }
-        
+
         $validations = [
              'job_no' => 'required|integer',
             'full_job_no' => 'nullable|string|max:255',
             'booking_no' => 'nullable|string',
             'booking_date' => 'nullable|date',
-            
+
             'airLineName' => 'nullable|string|max:255',
             'flight_no' => 'nullable|string|max:255',
             'flight_date' => 'nullable|date',
@@ -135,49 +135,50 @@ class AirImportController extends Controller
             'etd_date' => 'nullable|date',
             'movement' => 'nullable|string|max:255',
             'remarks' => 'required|string|max:255',
-            
+
             'airLineName2' => 'nullable|string|max:255',
             'flight_no2' => 'nullable|string|max:255',
             'flight_date2' => 'nullable|date',
             'airLineName3' => 'nullable|string|max:255',
             'flight_no3' => 'nullable|string|max:255',
             'flight_date3' => 'nullable|date',
-            
+
             'loading_port_id' => 'required|string|max:255',
             'destination_port_id' => 'required|string|max:255',
             'delivery_port_id' => 'nullable|string|max:255',
             'discharge_port_id' => 'required|string|max:255',
-            
+
             'shipment' => 'nullable|in:1,2,3',
             'package' => 'nullable|integer',
             'package_id' => 'nullable|integer',
             'weight' => 'nullable|numeric|min:0|max:99999999.99',
             'gross_weight' => 'nullable|string|max:255',
             'net_weight' => 'required|string',
-            
+
             'username' => 'nullable|string|max:255',
             'nature_qty_goods' => 'nullable|string',
-            
+
             'forwarder_id' => 'nullable|integer',
         ];
-        
+
         if($request->mawb_no == ''){
             $validations['hbl_no'] = 'required|string|max:35';
             $validations['hbl_date'] = 'required|date';
         }else{
-            
+
             $validations['mawb_no'] = 'required|string|max:35';
             $validations['mawb_date'] = 'required|date';
         }
-        
+
         $validated = $request->validate($validations);
-    
+
         $validated['uuid'] = Str::uuid();
         $validated['company_id'] = $this->company_id;
         $validated['user_id'] = $this->user_id;
-    
+        $validated['branch_id'] = Auth::user()->branch_id;
+
         $airImport = OperationAirImport::create($validated);
-        
+
         if($airImport){
             return response()->json([
                 'status' => true,
@@ -207,18 +208,18 @@ class AirImportController extends Controller
     {
         $page_title = 'Air Import Edit';
         $airImport = OperationAirImport::with('jobMaster')->where('uuid', $uuid)->firstOrFail();
-        
+
         $ports = MasterPort::where('company_id', $this->company_id)->get();
         $jobNumbers = OperationJobMaster::where('company_id', $this->company_id)->get();
         $parties = MasterImportParty::where('company_id', $this->company_id)->get();
         $salePersons = OperationSalesPerson::where('company_id', $this->company_id)->get();
         $party_lists = MasterParty::all();
-        
+
         $files = OperationAllFileUpload::where('company_id', $this->company_id)
             ->where(['file_related' => 'air_import', 'job_no' => $airImport->job_no])
             ->orderBy('created_at', 'desc')
             ->get();
-            
+
         $packages = MasterPackage::where('company_id', $this->company_id)->get();
         $exportParites = MasterExportParty::where('company_id', $this->company_id)->get();
         $partyTypes = MasterParty::whereNotIn('party_type', [9, 6, 8])->get();
@@ -244,12 +245,12 @@ class AirImportController extends Controller
             'igm_date' => 'nullable|date',
             'movement' => 'nullable|string',
             'remarks' => 'required|string',
-            
+
             'loading_port_id' => 'required|integer',
             'destination_port_id' => 'required|integer',
             'delivery_port_id' => 'nullable|integer',
             'discharge_port_id' => 'required|integer',
-            
+
             'shipment' => 'nullable|in:1,2,3',
             'package' => 'nullable|integer',
             'package_id' => 'nullable|integer',
@@ -266,7 +267,7 @@ class AirImportController extends Controller
             'forwarder_id' => 'nullable|integer',
             'booking_no' => 'nullable|string',
             'booking_date' => 'nullable|date',
-            
+
             'airLineName2' => 'nullable|string|max:255',
             'flight_no2' => 'nullable|string|max:255',
             'flight_date2' => 'nullable|date',
@@ -277,7 +278,7 @@ class AirImportController extends Controller
             'job_no' => 'integer',
             'hbl_no' => 'nullable|string|max:255',
             'hbl_date' => 'nullable|date',
-            
+
 
             'freight' => 'nullable|string|max:255',
             'currency' => 'nullable|string|max:10',
@@ -299,15 +300,15 @@ class AirImportController extends Controller
             'clearance' => 'nullable|string|max:255',
             'notify_id' => 'nullable|integer',
             'notify2_id' => 'nullable|integer',
-            
+
             'agent_id' => 'nullable|exists:master_import_parties,id',
             'iata_code' => 'nullable|string|max:255',
             'account_no' => 'nullable|string|max:255',
             'accounting_information' => 'nullable|string|max:255',
-            
+
             'issued_by' => 'nullable|string|max:255',
             'handling_information' => 'nullable|string|max:255',
-           
+
             'by_first_carrier' => 'nullable|string',
             'by_second' => 'nullable|string',
             'to_air_sec' => 'nullable|string',
@@ -325,9 +326,9 @@ class AirImportController extends Controller
             'shipper_agent' => 'nullable|string',
             'other_charges' => 'nullable|string',
             'routing_destination' => 'nullable|string',
-            
+
             'customer_inv_no' => 'nullable|string',
-            
+
             'check_list_date' => 'nullable|date',
             'bill_of_entry_date' => 'nullable|string',
             'destuffing_date' => 'nullable|date',
@@ -335,6 +336,7 @@ class AirImportController extends Controller
             'out_off_charge_date' => 'nullable|date',
         ]);
         $validated['user_id'] = $this->user_id;
+        $validated['branch_id'] = Auth::user()->branch_id;
         $airImport->update($validated);
 
         return redirect()->back()->with('success', 'Air Import Updated Successful');
@@ -357,11 +359,11 @@ class AirImportController extends Controller
     //     if (!$request->filled('mawb_id')) {
     //         return response()->json(['status' => false, 'message' => 'Please before submit first HAWB Detail form, Ya update (Edit) this form.']);
     //     }
-        
+
     //     $import = OperationAirImport::find($request->mawb_id);
 
     //     $validated = $request->validate([
-            
+
     //         'hawb_loading_port_id' => 'required|integer',
     //         'hawb_destination_port_id' => 'nullable|integer',
     //         'hawb_discharge_port_id' => 'required|integer',
@@ -385,12 +387,12 @@ class AirImportController extends Controller
     //         // 'enquiry_reference_no' => $validated['enquiry_reference_no'] ,
     //         'descriptions' => $validated['descriptions'],
     //     ]);
-        
+
     //     if($import){
     //         return response()->json(['status' => true, 'message' => 'HAWB details updated!']);
     //     }else{
     //         return response()->json(['status' => false, 'message' => 'HAWB details not updated!']);
-            
+
     //     }
     // }
 
@@ -408,12 +410,12 @@ class AirImportController extends Controller
             'chargable_weight' => 'nullable|numeric',
             'iata_code' => 'nullable|string|max:255',
             'issued_by' => 'nullable|string|max:255',
-            
+
             'handling_information' => 'nullable|string|max:255',
             'accounting_information' => 'nullable|string|max:255',
             'account_no' => 'nullable|string|max:255',
             'agent_id' => 'nullable|exists:master_import_parties,id',
-            
+
             'consignee_id' => 'nullable|exists:master_import_parties,id',
             'shipper_id' => 'nullable|exists:master_export_parties,id',
             'billing_party_id' => 'nullable|exists:master_import_parties,id',
@@ -421,24 +423,24 @@ class AirImportController extends Controller
             'notify_id' => 'nullable|integer',
             'notify2_id' => 'nullable|integer',
             'sales_person_id' => 'nullable|exists:operation_sales_people,id',
-            
+
             'insurance' => 'nullable|string|max:255',
             'transportation' => 'nullable|string|max:255',
             'fpa_amount' => 'nullable|numeric|min:0',
             'transportation_details' => 'nullable|string|max:1000',
             'clearance' => 'nullable|string|max:255',
-            
+
             'cc_perc' => 'nullable|numeric',
             'cc_currency' => 'nullable|string',
             'cc_exch_rate' => 'nullable|numeric',
             'caf_perc' => 'nullable|numeric',
-            
+
             'customer_inv_no' => 'nullable|string',
             'check_list_date' => 'nullable|date',
             'bill_of_entry_date' => 'nullable|string',
             'out_off_charge_date' => 'nullable|date',
             'arrival_date' => 'nullable|date',
-            
+
             'by_first_carrier' => 'nullable|string',
             'by_second' => 'nullable|string',
             'to_air_sec' => 'nullable|string',
@@ -456,9 +458,9 @@ class AirImportController extends Controller
             'shipper_agent' => 'nullable|string',
             'other_charges' => 'nullable|string',
             'routing_destination' => 'nullable|string',
-            
+
         ]);
-        
+
         $import->update($validated);
 
 
@@ -481,7 +483,7 @@ class AirImportController extends Controller
         //     'transportation_details' => $validated['transportation_details'],
         //     'notify_id' => $validated['notify_id'],
         //     'notify2_id' => $validated['notify2_id'],
-            
+
         //     'by_first_carrier' => $validated['by_first_carrier'],
         //     'declared_value_by_carrier' => $validated['declared_value_by_carrier'],
         //     'declared_value_by_customs' => $validated['declared_value_by_customs'],
@@ -495,7 +497,7 @@ class AirImportController extends Controller
         //     'shipper_agent' => $validated['shipper_agent'],
         //     'other_charges' => $validated['other_charges'],
         //     'routing_destination' => $validated['routing_destination'],
-            
+
         //     'customer_inv_no' => $validated['customer_inv_no'],
         //     'check_list_date' => $validated['check_list_date'],
         //     'bill_of_entry_date' => $validated['bill_of_entry_date'],
@@ -507,21 +509,21 @@ class AirImportController extends Controller
         return response()->json(['status' => true, 'message' => 'Other details updated!']);
     }
 
-    
+
     public function awbDraftOption(Request $request, $id)
     {
         $page_title = 'Air Import AWB';
         $airImportDraftData = OperationAirImport::findOrFail($id);
         return view('admin-main/admin/airImport/awb-draft-option', compact('id','page_title','airImportDraftData'));
     }
-    
+
     public function hawbDraftOptionAirImp(Request $request, $id)
     {
         $page_title = 'Air Import HAWB';
         $airImportDraftData = OperationAirImport::findOrFail($id);
         return view('admin-main/admin/airImport/hawb-draft-option', compact('id','page_title','airImportDraftData'));
     }
-    
+
     public function generateDraft(Request $request, $id)
     {
         $billType = $request->awb_type;
@@ -536,19 +538,19 @@ class AirImportController extends Controller
             'dischargePortName',
             'loadingPortName'
         ])->findOrFail($id);
-        
+
         $company = Company::where('id', $this->company_id)->first();
-    
+
         $html = view(
             'admin-main.admin.airImport.airWayBill-airImport',
             compact('id', 'airImportDraftData', 'request','hbl_type','executedDate','issuedPlace', 'company', 'billType')
         )->render();
-    
+
         return response()->json([
             'html' => $html
         ]);
     }
-    
+
     public function hawbGenerateDraft(Request $request, $id)
     {
         $billType = $request->awb_type;
@@ -563,29 +565,29 @@ class AirImportController extends Controller
             'dischargePortName',
             'loadingPortName'
         ])->findOrFail($id);
-        
+
         $company = Company::where('id', $this->company_id)->first();
-        
+
         $logoPath = $company->logo
             ? public_path('uploads/company_logo/' . $company->logo)
             : public_path('images/default-logo.png');
-        
+
         $logoType = pathinfo($logoPath, PATHINFO_EXTENSION);
-        
+
         $logoData = file_get_contents($logoPath);
-        
+
         $companyLogo = 'data:image/' . $logoType . ';base64,' . base64_encode($logoData);
-    
+
         $html = view(
             'admin-main.admin.airImport.hawb-airWayBill-airImport',
             compact('id', 'airImportDraftData', 'request','hbl_type','executedDate','issuedPlace', 'company', 'billType', 'companyLogo')
         )->render();
-    
+
         return response()->json([
             'html' => $html
         ]);
     }
-    
+
     public function chargableWeightTotal(Request $request)
     {
         $totalChargableWeight = OperationAirImport::whereBetween(
@@ -595,13 +597,13 @@ class AirImportController extends Controller
                 $request->end_date
             ]
         )->sum('chargable_weight');
-    
+
         return response()->json([
             'status' => true,
             'total' => $totalChargableWeight
         ]);
     }
-    
+
     // download restrications
     // public function checkDownloadPermission(Request $request)
     // {
@@ -654,38 +656,38 @@ class AirImportController extends Controller
             'job_no'    => 'required|integer',
             'copy_type' => 'required|string',
         ]);
-    
+
         $this->downloadService->recordDownload(
             $request->job_no,
             'air_import',
             'mawb',
             $request->copy_type
         );
-    
+
         return response()->json([
             'status' => true
         ]);
     }
-    
+
     public function confirmHawbDownload(Request $request)
     {
         $request->validate([
             'job_no' => 'required|integer',
             'copy_type' => 'required|string',
         ]);
-    
+
         $this->downloadService->recordDownload(
             $request->job_no,
             'air_import',
             'hawb',
             $request->copy_type
         );
-    
+
         return response()->json([
             'status' => true
         ]);
     }
-    
+
     // for mawb
     public function checkMawbDownloadPermission(Request $request)
     {
@@ -693,21 +695,21 @@ class AirImportController extends Controller
             'job_no'    => 'required|integer',
             'copy_type' => 'required|string',
         ]);
-    
+
         $result = $this->downloadService->canDownload(
             $request->job_no,
             'air_import',
             'mawb',
             $request->copy_type
         );
-    
+
         if (!$result['status']) {
             return response()->json([
                 'status'  => false,
                 'message' => $result['message']
             ], 403);
         }
-    
+
         return response()->json([
             'status'    => true,
             'remaining' => $this->downloadService->remainingDownloads(
@@ -726,21 +728,21 @@ class AirImportController extends Controller
             'job_no'    => 'required|integer',
             'copy_type' => 'required|string',
         ]);
-    
+
         $result = $this->downloadService->canDownload(
             $request->job_no,
             'air_import',
             'hawb',
             $request->copy_type
         );
-    
+
         if (!$result['status']) {
             return response()->json([
                 'status'  => false,
                 'message' => $result['message']
             ], 403);
         }
-    
+
         return response()->json([
             'status'    => true,
             'remaining' => $this->downloadService->remainingDownloads(
@@ -751,5 +753,5 @@ class AirImportController extends Controller
             )
         ]);
     }
-    
+
 }

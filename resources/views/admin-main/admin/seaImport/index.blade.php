@@ -15,7 +15,7 @@
                 </div>
                 <div class="card-header d-block pb-2">
                     <form class="row align-items-end" method="GET" action="{{route('sea-imports.index')}}">
-                  
+
                         <!-- Job No -->
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Job No.</label>
@@ -26,7 +26,7 @@
                                 @endforeach
                             </select>
                         </div>
-                    
+
                         <!-- Booking No -->
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Booking No.</label>
@@ -37,7 +37,7 @@
                                 @endforeach
                             </select>
                         </div>
-                    
+
                         <!-- Shipper Name -->
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Consignee Name.</label>
@@ -54,7 +54,7 @@
                             <label class="form-label">Start Date</label>
                             <input type="date" placeholder="dd/mm/yy" class="form-control" name="start_date" value="{{ request('start_date') }}">
                         </div>
-                        
+
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">End Date</label>
                             <input type="date" placeholder="dd/mm/yy" class="form-control" name="end_date" value="{{ request('end_date') }}">
@@ -76,25 +76,26 @@
                                     <th>Consignee Name</th>
                                     <th>Booking No</th>
                                     <th>CBM</th>
-                                    
+
                                     <th>Invoice</th>
                                     <th>Check List</th>
                                     <th>BOE</th>
                                     <th>Out Of Charge</th>
                                     <th>Do Date</th>
                                     <th>Updated By</th>
+                                    <th>Branch</th>
                                     <th>Documents</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                             @php $i = 1; @endphp
-                            
+
                             @foreach ($sea_imports as $sea_import)
-                            
+
                                 {{-- CASE 1: Containers exist --}}
                                 @if ($sea_import->container->count() > 0)
-                            
+
                                     @foreach ($sea_import->container as $cont)
                                         <tr>
                                             <td>{{ $i++ }}</td>
@@ -108,6 +109,7 @@
                                             <td>{{ $cont->out_off_charge_date ?? 'N/A' }}</td>
                                             <td>{{ $cont->do_date ?? 'N/A' }}</td>
                                             <td>{{ $sea_import->user->name ?? '' }}</td>
+                                            <td>{{ $sea_import->branch->branch_name ?? '-' }}</td>
                                             <td>
                                                 @if(in_array($sea_import->job_no, $uploadedJobs))
                                                     Yes
@@ -132,20 +134,28 @@
                                             </td>
                                         </tr>
                                     @endforeach
-                            
+
                                 {{-- CASE 2: NO container --}}
                                 @else
-                            
+
                                     <tr>
                                         <td>{{ $i++ }}</td>
                                         <td>{{ $sea_import->jobMaster->job_no ?? 'N/A' }}</td>
                                         <td>{{ $sea_import->ConsigneeName->party_name ?? 'N/A' }}</td>
                                         <td>{{ $sea_import->booking_no ?? 'N/A' }}</td>
-                            
-                                        <td colspan="8" class="text-center text-muted">
+
+                                        <td colspan="6" class="text-center text-muted">
                                             No container added
                                         </td>
-                            
+                                        <td>{{ $sea_import->user->name ?? '' }}</td>
+                                        <td>{{ $sea_import->branch->branch_name ?? '-' }}</td>
+                                        <td>
+                                            @if(in_array($sea_import->job_no, $uploadedJobs))
+                                                Yes
+                                            @else
+                                                No
+                                            @endif
+                                        </td>
                                         <td>
                                             <a class="badge badge-info light border-0"
                                                href="{{ url('admin/sea-imports/'.$sea_import->uuid.'/edit') }}">
@@ -158,9 +168,9 @@
                                             </a>
                                         </td>
                                     </tr>
-                            
+
                                 @endif
-                            
+
                             @endforeach
                             </tbody>
 
@@ -172,19 +182,19 @@
                 </div>
                 <div class="card mt-4">
                     <div class="card-body">
-                
+
                         <div class="row">
-                
+
                             <div class="col-md-3">
                                 <label>Start Date</label>
                                 <input type="date" id="start_date" class="form-control">
                             </div>
-                
+
                             <div class="col-md-3">
                                 <label>End Date</label>
                                 <input type="date" id="end_date" class="form-control">
                             </div>
-                
+
                             <div class="col-md-2">
                                 <label>&nbsp;</label>
                                 <button id="showGrossWeight"
@@ -192,16 +202,16 @@
                                     Show
                                 </button>
                             </div>
-                
+
                         </div>
-                
+
                         <hr>
-                
+
                         <h5>
                             Total Gross Weight:
                             <span id="grossWeightTotal">0</span>
                         </h5>
-                
+
                     </div>
                 </div>
             </div>
@@ -241,7 +251,7 @@
             }
             });
         });
-        
+
         $(document).ready(function() {
             $('.select2').select2({
                 placeholder: 'Select a value',
@@ -253,33 +263,33 @@
     <!--get the sum of the gross weight -->
     <script>
         $('#showGrossWeight').on('click', function() {
-    
+
             let startDate = $('#start_date').val();
             let endDate = $('#end_date').val();
-        
+
             $.ajax({
                 url: "{{ route('sea-exports.grossWeightTotal') }}",
                 type: "POST",
-        
+
                 data: {
                     _token: "{{ csrf_token() }}",
                     start_date: startDate,
                     end_date: endDate
                 },
-        
+
                 success: function(response) {
-        
+
                     $('#grossWeightTotal').text(response.total+' kg');
-        
+
                 },
-        
+
                 error: function() {
-        
+
                     alert('Error fetching gross weight total');
-        
+
                 }
             });
-        
+
         });
     </script>
 @endpush

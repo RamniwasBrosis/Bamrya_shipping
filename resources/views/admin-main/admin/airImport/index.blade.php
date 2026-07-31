@@ -15,7 +15,7 @@
                 </div>
                 <div class="card-header d-block pb-2">
                     <form class="row align-items-end" method="get" action="{{route('air-imports.index')}}">
-                    
+
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Job No.</label>
                             <select id="" class="form-control  select2" name="job_no">
@@ -25,7 +25,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        
+
                         <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
                         <!--    <label class="form-label">Search By Booking No.</label>-->
                         <!--    <select id="" class="form-control  select2" name="booking_no">-->
@@ -35,7 +35,7 @@
                         <!--        @endforeach-->
                         <!--    </select>-->
                         <!--</div>-->
-                        
+
                         <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
                         <!--    <label class="form-label">Search By MBL No.</label>-->
                         <!--    <select id="" class="form-control  select2" name="hbl_no">-->
@@ -45,7 +45,7 @@
                         <!--        @endforeach -->
                         <!--    </select>-->
                         <!--</div>-->
-                        
+
                         <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
                         <!--    <label class="form-label">Search By HBL No.</label>-->
                         <!--    <select id="departmentFilter" class="form-control select2" name="hbl_no">-->
@@ -55,27 +55,27 @@
                         <!--        @endforeach                              -->
                         <!--    </select>-->
                         <!--</div>  -->
-                        
+
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Consignee Party.</label>
                             <select id="" class="form-control  select2" name="consignee_id">
-                                <option value="">select</option> 
+                                <option value="">select</option>
                                 @foreach ($airImports as $airImport)
                                     <option value="{{$airImport->consignee_id}}">{{$airImport->ConsigneeName->party_name ?? ''}}</option>
-                                @endforeach                              
+                                @endforeach
                             </select>
                         </div>
-                        
+
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Start Date</label>
                             <input type="date" placeholder="dd/mm/yy" class="form-control" name="start_date" value="{{ request('start_date') }}">
                         </div>
-                        
+
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">End Date</label>
                             <input type="date" placeholder="dd/mm/yy" class="form-control" name="end_date" value="{{ request('end_date') }}">
-                        </div> 
-                        
+                        </div>
+
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <button id="applyFilter" class="btn btn-primary" type="submit">Apply</button>
                             <a href="{{route('air-imports.index')}}" class="btn btn-danger light ms-2" type="button">Reset</a>
@@ -101,8 +101,9 @@
                                     <th>Out Of Charge</th>
                                     <th>Arrival Date</th>
                                     <th>Updated By</th>
+                                    <th>Branch</th>
                                     <th>Documents</th>
-                                    
+
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -122,7 +123,7 @@
                                             default:
                                                 $shipment_type = '';
                                         }
-                                        
+
                                     @endphp
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
@@ -131,18 +132,18 @@
                                         <td>{{$airImport->ConsigneeName->party_name ?? 'N/A'}}</td>
                                         <td>{{$airImport->package ?? 'N/A'}}</td>
                                         <td>{{$airImport->chargable_weight ?? 'N/A'}}</td>
-                                   
+
                                         <td>{{$airImport->customer_inv_no ?? 'N/A'}}</td>
                                         <td>{{$airImport->mawb_no ?? 'N/A'}}</td>
                                         <td>
                                             <span class="flight-status short-text">
                                                 {{ Str::limit($airImport->flight_status, 15, '...') }}
                                             </span>
-                                        
+
                                             <span class="flight-status full-text d-none">
                                                 {{ $airImport->flight_status }}
                                             </span>
-                                        
+
                                             @if(strlen($airImport->flight_status ?? '') > 15)
                                                 <a href="javascript:void(0)" class="toggle-flight-status">
                                                     More
@@ -154,6 +155,7 @@
                                         <td>{{$airImport->out_off_charge_date ?? 'N/A'}}</td>
                                         <td>{{$airImport->arrival_date ?? 'N/A'}}</td>
                                         <td>{{$airImport->user->name ?? '-'}}</td>
+                                        <td>{{$airImport->branch->branch_name ?? '-'}}</td>
                                         <td>
                                             @if(in_array($airImport->job_no, $uploadedJobs))
                                                 Yes
@@ -180,19 +182,19 @@
                 </div>
                 <div class="card mt-4">
                     <div class="card-body">
-                
+
                         <div class="row">
-                
+
                             <div class="col-md-3">
                                 <label>Start Date</label>
                                 <input type="date" id="start_date" class="form-control">
                             </div>
-                
+
                             <div class="col-md-3">
                                 <label>End Date</label>
                                 <input type="date" id="end_date" class="form-control">
                             </div>
-                
+
                             <div class="col-md-2">
                                 <label>&nbsp;</label>
                                 <button id="showChargableWeight"
@@ -200,16 +202,16 @@
                                     Show
                                 </button>
                             </div>
-                
+
                         </div>
-                
+
                         <hr>
-                
+
                         <h5>
                             Total Cargo Weight:
                             <span id="chargableWeightTotal">0</span>
                         </h5>
-                        
+
                     </div>
                 </div>
             </div>
@@ -223,12 +225,12 @@
 @push('scripts')
     <script>
         $(document).on('click', '.toggle-flight-status', function () {
-    
+
             let td = $(this).closest('td');
-        
+
             td.find('.short-text').toggleClass('d-none');
             td.find('.full-text').toggleClass('d-none');
-        
+
             if ($(this).text() === 'Show More') {
                 $(this).text('Show More');
             } else {
@@ -262,7 +264,7 @@
                 }
             });
         });
-        
+
         $(document).ready(function() {
             $('.select2').select2({
                 placeholder: 'Select a value',
@@ -274,33 +276,33 @@
     <!--get the sum of the gross weight -->
     <script>
         $('#showChargableWeight').on('click', function() {
-    
+
             let startDate = $('#start_date').val();
             let endDate = $('#end_date').val();
-        
+
             $.ajax({
                 url: "{{ route('air-imports.chargableWeightTotal') }}",
                 type: "POST",
-        
+
                 data: {
                     _token: "{{ csrf_token() }}",
                     start_date: startDate,
                     end_date: endDate
                 },
-        
+
                 success: function(response) {
-        
+
                     $('#chargableWeightTotal').text(response.total+' kg');
-        
+
                 },
-        
+
                 error: function() {
-        
+
                     alert('Error fetching gross weight total');
-        
+
                 }
             });
-        
+
         });
     </script>
 

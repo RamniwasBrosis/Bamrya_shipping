@@ -12,6 +12,7 @@ use App\Models\Operations\OperationSeaExport;
 use App\Models\Operations\OperationAirImport;
 use App\Models\Operations\OperationAirExport;
 use App\Models\User;
+use App\Models\CompanyBranch;
 
 class OperationJobMaster extends Model
 {
@@ -74,6 +75,10 @@ class OperationJobMaster extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+    public function branch()
+    {
+        return $this->belongsTo(CompanyBranch::class);
     }
 
     // public function import_job_party(){

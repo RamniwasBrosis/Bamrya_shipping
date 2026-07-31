@@ -13,29 +13,30 @@ use App\Models\MasterExportParty;
 use App\Models\MasterForwarder;
 use App\Models\MasterPackage;
 use App\Models\User;
+use App\Models\CompanyBranch;
 
 class OperationAirImport extends Model
 {
     use HasFactory;
 
      protected $guarded = [];
-    
+
     public function salesPerson(){
         return $this->belongsTo(OperationSalesPerson::class, 'sales_person_id', 'id');
     }
-    
+
     public function ChaName(){
         return $this->belongsTo(MasterImportParty::class, 'cha_party_id');
     }
-    
+
     public function shipperName(){
         return $this->belongsTo(MasterExportParty::class, 'shipper_id');
     }
-    
+
     public function ConsigneeName(){
         return $this->belongsTo(MasterImportParty::class, 'consignee_id');
     }
-    
+
     // ports
     public function loadingPortName(){
         return $this->belongsTo(MasterPort::class, 'loading_port_id');
@@ -43,38 +44,38 @@ class OperationAirImport extends Model
     public function destinationPortName(){
         return $this->belongsTo(MasterPort::class, 'destination_port_id', 'id');
     }
-    
+
     public function packageName()
     {
         return $this->belongsTo(MasterPackage::class, 'package_id', 'id');
     }
-    
+
     public function dischargePortName(){
         return $this->belongsTo(MasterPort::class, 'discharge_port_id', 'id');
     }
     public function deliveryPortName(){
         return $this->belongsTo(MasterPort::class, 'delivery_port_id', 'id');
     }
-    
+
     // public function shippingLine(){
     //     return $this->belongsTo(shipping_line_id::class, 'sales_person_id');
     // }
-    
+
     public function partyName()
     {
         return $this->belongsTo(MasterImportParty::class, 'billing_party_id');
     }
-    
+
     public function NotifyParty()
     {
         return $this->belongsTo(MasterImportParty::class, 'notify_id');
     }
-    
+
     public function iataAgent()
     {
         return $this->belongsTo(MasterImportParty::class, 'agent_id');
     }
-    
+
     public function jobMaster()
     {
         return $this->belongsTo(OperationJobMaster::class, 'job_no', 'id');
@@ -85,5 +86,9 @@ class OperationAirImport extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+    public function branch()
+    {
+        return $this->belongsTo(CompanyBranch::class);
     }
 }

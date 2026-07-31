@@ -44,14 +44,14 @@ class SeaImportController extends Controller
             return $next($request);
         });
     }
-    
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         $page_title = 'Sea Import';
-        $query = OperationSeaImport::with(['ConsigneeName', 'jobMaster', 'container'])
+        $query = OperationSeaImport::with(['ConsigneeName', 'jobMaster', 'container','branch'])
         ->where('company_id', $this->company_id)
         ->where(function ($q) {
             $q->whereNull('operation_complate')
@@ -62,15 +62,15 @@ class SeaImportController extends Controller
         if ($request->filled('full_job_no')) {
             $query->where('full_job_no', 'LIKE', '%' . $request->full_job_no . '%');
         }
-    
+
         if ($request->filled('job_no')) {
             $query->where('job_no', 'LIKE',  $request->job_no );
         }
-    
+
         if ($request->filled('booking_no')) {
             $query->where('booking_no', 'LIKE', '%' . $request->booking_no . '%');
         }
-    
+
         if ($request->filled('consignee_id')) {
             $query->where('consignee_id', $request->consignee_id); // Use = not LIKE
         }
@@ -80,16 +80,16 @@ class SeaImportController extends Controller
                 $request->end_date . ' 23:59:59'
             ]);
         }
- 
+
         $sea_imports = $query->orderBy('job_no', 'desc')->paginate(25);
         $uploadedJobs = OperationAllFileUpload::pluck('job_no')->toArray();
-        
+
         $job_nums = $sea_imports->unique()->filter()->values();
         $booking_nums = $sea_imports->pluck('booking_no')->unique()->filter()->values();
         $shipperIds = $sea_imports->pluck('consignee_id')->unique()->filter();
         $consigneeNames = \App\Models\MasterImportParty::whereIn('id', $shipperIds)->get();
-        
-        
+
+
         return view('admin-main.admin.seaImport.index', compact('page_title','sea_imports', 'job_nums', 'booking_nums', 'consigneeNames','uploadedJobs'));
     }
 
@@ -128,7 +128,7 @@ class SeaImportController extends Controller
                 'message' => "An entry for this Job Number already exists, so you cannot create another entry with the same Job No.!",
             ], 201);
         }
-        
+
         $validator = Validator::make($request->all(), [
             'bl_issue_by' => 'required',
             'job_no' => 'required|integer',
@@ -157,7 +157,7 @@ class SeaImportController extends Controller
             'net_weight' => 'required|string',
             'ex_work' => 'nullable|string',
             'inv_ref_no' => 'nullable|string',
- 
+
             'cargo' => 'nullable|string',
             'is_hazardous' => 'nullable|boolean',
             'delivery_type' => 'nullable|string',
@@ -167,7 +167,7 @@ class SeaImportController extends Controller
             'hbl_type' => 'nullable|integer',
             'fpa_amount' => 'nullable|numeric',
             'transportation_details' => 'nullable|string',
-        
+
             'delivery_order_date' => 'nullable|date',
             'loading_port_id' => 'required|integer',
             'discharge_port_id' => 'required|integer',
@@ -187,14 +187,14 @@ class SeaImportController extends Controller
             'notify2_id' => 'nullable|integer',
             'cha_id' => 'nullable|integer',
             'forwarder_id' => 'nullable|integer',
-            
+
             'obl_no' => 'nullable|string',
             'obl_date' => 'nullable|date',
             'ref_no' => 'nullable|string',
-            
+
             'surveyor_id' => 'nullable|integer',
             'validity_date' => 'nullable|date',
-            
+
             'transportation' => 'nullable|string',
             'insurance' => 'nullable|string',
             'clearance' => 'nullable|string',
@@ -207,7 +207,7 @@ class SeaImportController extends Controller
             'sob_date' => 'nullable|date',
             'reg_no' => 'nullable|string',
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
@@ -215,11 +215,12 @@ class SeaImportController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-        
+
         $validated = $validator->validated();
 
         $validated['company_id'] = $this->company_id;
         $validated['user_id'] = $this->user_id;
+        $validated['branch_id'] = Auth::user()->branch_id;
         $validated['uuid'] = Str::uuid();
 
         $sea_export_id = OperationSeaImport::create($validated);
@@ -254,7 +255,7 @@ class SeaImportController extends Controller
     {
         $page_title = 'Sea Import Edit';
         $sea_import = OperationSeaImport::with('container')->where('uuid', $uuid)->firstOrFail();
-        
+
         $ports = MasterPort::where('company_id', $this->company_id)->get();
         $vessels = MasterVessel::where('company_id', $this->company_id)->get();
         $packages = MasterPackage::where('company_id', $this->company_id)->get();
@@ -264,12 +265,12 @@ class SeaImportController extends Controller
         $salePersons  = OperationSalesPerson::where('company_id', $this->company_id)->get();
         $shippingLines = MasterShipping::all();
         $forwarders = MasterForwarder::where('company_id', $this->company_id)->get();
-        
+
         $files = OperationAllFileUpload::where('company_id', $this->company_id)->where(['file_related' => 'sea_import', 'job_no' => $sea_import->job_no])->orderBy('created_at', 'desc')->get();
         $exportParites = MasterExportParty::where('company_id', $this->company_id)->get();
         $partyTypes = MasterParty::whereNotIn('party_type', [9, 6, 8])->get();
         $master_bl_types = MasterBlType::where(['company_id' => $this->company_id, 'status' => '1'])->orderBy('created_at', 'desc')->get();
-        
+
         $sea_import_containers = OperationSeaImportCont::where('company_id', $this->company_id)->where('sea_import_id', $sea_import->id)->get();
 
         return view('admin-main.admin.seaImport.edit', compact('page_title','sea_import_containers', 'shippingLines','forwarders', 'partyTypes','exportParites','sea_import', 'ports', 'jobNumbers', 'parties', 'vessels', 'files', 'packages', 'party_lists', 'salePersons', 'master_bl_types'));
@@ -309,7 +310,7 @@ class SeaImportController extends Controller
             'net_weight' => 'nullable|string',
             'ex_work' => 'nullable|string',
             'inv_ref_no' => 'nullable|string',
-          
+
             'cargo' => 'nullable|string',
             'is_hazardous' => 'nullable|boolean',
             'delivery_type' => 'nullable|string',
@@ -319,7 +320,7 @@ class SeaImportController extends Controller
             'hbl_type' => 'nullable|integer',
             'fpa_amount' => 'nullable|numeric',
             'transportation_details' => 'nullable|string',
-        
+
             'delivery_order_date' => 'nullable|date',
             'loading_port_id' => 'required|integer',
             'discharge_port_id' => 'required|integer',
@@ -339,11 +340,11 @@ class SeaImportController extends Controller
             'notify2_id' => 'nullable|integer',
             'cha_id' => 'nullable|integer',
             'forwarder_id' => 'nullable|integer',
-            
+
             'obl_no' => 'nullable|string',
             'obl_date' => 'nullable|date',
             'ref_no' => 'nullable|string',
-       
+
             'surveyor_id' => 'nullable|integer',
             'validity_date' => 'nullable|date',
 
@@ -358,9 +359,10 @@ class SeaImportController extends Controller
             'movement' => 'nullable|string',
             'sob_date' => 'nullable|date',
             'reg_no' => 'nullable|string',
-            
+
         ]);
         $validated['user_id'] = $this->user_id;
+        $validated['branch_id'] = Auth::user()->branch_id;
 
         $sea_import->update($validated);
 
@@ -378,15 +380,15 @@ class SeaImportController extends Controller
 
         return response()->json(['success' => 'Sea Import Entry Deleted Successfully']);
     }
-    
+
     public function getContainerDetail($id)
     {
         $chargeDetail = OperationSeaImportCont::find($id);
-    
+
         if (!$chargeDetail) {
             return response()->json(['error' => 'Charge not found'], 404);
         }
-    
+
         return response()->json($chargeDetail);
     }
 
@@ -400,7 +402,7 @@ class SeaImportController extends Controller
                 'message' => 'Please submit the general details form first. Otherwise, edit this form!'
             ], 200);
         }
-        
+
 
         $validator = Validator::make($request->all(), [
             'sea_import_id'   => 'required|integer|required',
@@ -437,14 +439,14 @@ class SeaImportController extends Controller
             'net_weight' => 'nullable|string',
             'ex_rate' => 'nullable',
             'rate' => 'nullable',
-            
+
             'check_list_date' => 'nullable|date',
             'destuffing_date' => 'nullable|date',
             'out_off_charge_date' => 'nullable|date',
             'do_date' => 'nullable|date',
             'cust_seal_no' => 'nullable|string',
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
@@ -452,7 +454,7 @@ class SeaImportController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-        
+
         $validated = $validator->validated();
 
 
@@ -474,14 +476,14 @@ class SeaImportController extends Controller
     public function updateContainer(Request $request, int $id)
     {
         $container = OperationSeaImportCont::find($id);
-    
+
         if (!$container) {
             return response()->json([
                 'status' => false,
                 'message' => 'Container not found'
             ], 404);
         }
-    
+
         $validator = Validator::make($request->all(), [
             'cont_hbl'        => 'nullable|string|max:255',
             'container_no'    => 'required|string|max:20',
@@ -515,7 +517,7 @@ class SeaImportController extends Controller
             'customer_inv_no' => 'nullable|string',
             'net_weight' => 'nullable|string',
             'cust_seal_no' => 'nullable|string',
-            
+
             'check_list_date' => 'nullable|date',
             'do_date' => 'nullable|date',
             'destuffing_date' => 'nullable|date',
@@ -523,7 +525,7 @@ class SeaImportController extends Controller
             'ex_rate' => 'nullable',
             'rate' => 'nullable',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
@@ -531,9 +533,9 @@ class SeaImportController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-    
+
         $container->update($validator->validated());
-    
+
         return response()->json([
             'status' => true,
             'message' => 'Container details updated successfully!',
@@ -541,7 +543,7 @@ class SeaImportController extends Controller
         ]);
     }
 
-    
+
     public function deleteContainer($id)
     {
         $container = OperationSeaImportCont::find($id);
@@ -586,7 +588,7 @@ class SeaImportController extends Controller
                 return back()->with('error', 'Invalid file category.');
         }
 
-        
+
         $originalName = $file->getClientOriginalName();
         $file_type  = $file->getClientOriginalExtension();
         $file_related = $request->file_related;
@@ -600,19 +602,19 @@ class SeaImportController extends Controller
         $file_upload->file_type = $file_type;
         $file_upload->file_related = $file_related;
 
-        $file_upload->save(); 
-        
+        $file_upload->save();
+
         return back()->with('success', 'File uploaded successfully.');
     }
 
     public function searchFile(Request $request)
-    {        
+    {
         $request->validate([
             'search_query' => 'required'
         ]);
 
         $file = OperationAllFileUpload::find($request->search_query);
-       
+
         $html = '
         <div class="table-responsive">
             <table class="table table-bordered">
@@ -652,7 +654,7 @@ class SeaImportController extends Controller
 
         return back()->with('error', 'File not found.');
     }
-    
+
     public function cargoArrivelDetails($id)
     {
         $page_title = 'Sea Import Cargo Arrival';
@@ -660,18 +662,18 @@ class SeaImportController extends Controller
             ->where('company_id', $this->company_id)
             ->where('id', $id)
             ->first();
-            
+
         $company = Company::with(['companySetting', 'companyBranch'])
             ->where('id', $this->company_id)
             ->first();
-            
+
         return view('admin-main/admin/seaImport/arrival-cargo-details', [
                 'seaImport' => $seaImport,
                 'company' => $company,
                 'page_title'=>$page_title
             ]);
     }
-    
+
     //mourya
     public function cargoArrivelDetailsExport($id)
     {
@@ -679,36 +681,36 @@ class SeaImportController extends Controller
             ->where('company_id', $this->company_id)
             ->where('id', $id)
             ->first();
-            
+
         $company = Company::with(['companySetting', 'companyBranch'])
             ->where('id', $this->company_id)
             ->first();
-    
+
         $format = request('format', 'pdf');
-    
+
         if ($format === 'pdf') {
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
                 'admin-main.admin.seaImport.arrival-cargo-details-pdf',
                 compact('seaImport', 'company')
             )->setPaper('A4', 'portrait');
-    
+
             return $pdf->download('cargo-arrival-' . $seaImport->id . '.pdf');
         }
-       
+
         if ($format === 'word') {
 
             $fileName = 'Cargo_Arrival_Notice_'.$seaImport->id.'.doc';
 
             $content = view('admin-main.admin.seaImport.arrival-cargo-details-word', compact('seaImport', 'company'))->render();
-        
+
             return response($content)
                 ->header('Content-Type', 'application/msword')
                 ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"');
         }
 
-        
+
     }
-    
+
     //mourya
     public function freightCertificateDetails($id)
     {
@@ -717,18 +719,18 @@ class SeaImportController extends Controller
             ->where('company_id', $this->company_id)
             ->where('id', $id)
             ->first();
-            
+
         $company = Company::with(['companySetting', 'companyBranch'])
             ->where('id', $this->company_id)
             ->first();
-            
+
         return view('admin-main/admin/seaImport/freight-details', [
                 'seaImport' => $seaImport,
                 'company'   => $company,
                 'page_title'=>$page_title
             ]);
     }
-    
+
     //mourya
     public function freightCertificateExport($id)
     {
@@ -738,36 +740,36 @@ class SeaImportController extends Controller
         ])
         ->where('company_id', $this->company_id)
         ->findOrFail($id);
-        
+
         $company = Company::with(['companySetting', 'companyBranch'])
             ->where('id', $this->company_id)
             ->first();
-    
+
         $format = request('format', 'pdf');
-    
+
         if ($format === 'pdf') {
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
                 'admin-main.admin.seaImport.freight-certificate-pdf',
                 compact('seaImport', 'company')
             )->setPaper('A4', 'portrait');
-    
+
             return $pdf->download('freight-certificate-' . $seaImport->id . '.pdf');
         }
-    
+
         if ($format === 'word') {
             $fileName = 'freight-certificate-' . $seaImport->id . '.doc';
-    
+
             $content = view('admin-main.admin.seaImport.freight-certificate-word', compact('seaImport', 'company'))->render();
-    
+
             return response($content)
                 ->header('Content-Type', 'application/msword')
                 ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"');
         }
-    
+
         return redirect()->back()->with('error', 'Invalid export format selected.');
     }
 
-    
+
     public function blDraftOption(Request $request, $id)
     {
         $page_title = 'Sea Import BL';
@@ -781,22 +783,22 @@ class SeaImportController extends Controller
         // Get all the necessary data
         $seaImportDraftData = OperationSeaImport::with([
             'ConsigneeName', 'blType', 'shipperName', 'deliveryPortName',
-            'loadingPortName', 'dischargePortName', 'receiptPortName',  
-            'container', 'agentName', 'deliveryAgentName', 'shippingLine', 
+            'loadingPortName', 'dischargePortName', 'receiptPortName',
+            'container', 'agentName', 'deliveryAgentName', 'shippingLine',
             'packageName', 'notifyName'
         ])->find($id);
-        
+
         $company = Company::with(['companySetting', 'companyBranch'])
             ->where('id', $this->company_id)
             ->first();
-        
+
         // Get BL type from request
         $blType = $request->hbl_type ?? 'DRAFT';
-        
+
         // Get issue date from request or use current date
         $issueDate = $request->issue_date ?? date('d/m/Y');
         $freightPayable = $request->freight_payable ?? '';
-        
+
         // Check if we're returning HTML for AJAX or full page
         if ($request->ajax() || $request->wantsJson()) {
             // Load the sea-way-bill view and return as HTML
@@ -807,10 +809,10 @@ class SeaImportController extends Controller
                 'issueDate',
                 'freightPayable'
             ))->render();
-            
+
             return response()->json(['html' => $html]);
         }
-        
+
         // Return full page view
         return view('admin-main.admin.seaImport.sea-way-bill', compact(
             'seaImportDraftData',
@@ -821,7 +823,7 @@ class SeaImportController extends Controller
             'page_title'
         ));
     }
-    
+
     public function grossWeightTotal(Request $request)
     {
         $totalGrossWeight = OperationSeaImport::whereBetween(
@@ -831,13 +833,13 @@ class SeaImportController extends Controller
                 $request->end_date
             ]
         )->sum('gross_weight');
-    
+
         return response()->json([
             'status' => true,
             'total' => $totalGrossWeight
         ]);
     }
-    
+
     //export restrictions
     public function checkSeaImportBlPermission(Request $request)
     {
@@ -845,65 +847,65 @@ class SeaImportController extends Controller
             'job_no' => 'required|integer',
             'copy_type' => 'required|string',
         ]);
-    
+
         $result = $this->downloadService->canDownload(
             $request->job_no,
             'sea_import',
             'mbl',
             $request->copy_type
         );
-    
+
         if (!$result['status']) {
             return response()->json([
                 'status' => false,
                 'message' => $result['message']
             ],403);
         }
-    
+
         return response()->json([
             'status'=>true
         ]);
     }
-    
+
     public function confirmSeaImportBlDownload(Request $request)
     {
         $request->validate([
             'job_no'=>'required|integer',
             'copy_type'=>'required|string',
         ]);
-    
+
         $this->downloadService->recordDownload(
             $request->job_no,
             'sea_import',
             'mbl',
             $request->copy_type
         );
-    
+
         return response()->json([
             'status'=>true
         ]);
     }
-    
+
     // public function generateDraft(Request $request, $id)
     // {
     //     $seaImportDraftData = OperationSeaImport::with(['ConsigneeName','blType', 'shipperName', 'deliveryPortName', 'loadingPortName', 'dischargePortName', 'receiptPortName',  'container', 'agentName'])->find($id);
-        
+
     //     $company = Company::with(['companySetting', 'companyBranch'])
     //         ->where('id', $this->company_id)
     //         ->first();
-        
+
     //     $draftHtml = '';
-        
-    //     $logoUrl = $company->logo 
+
+    //     $logoUrl = $company->logo
     //         ? asset('public/uploads/company_logo/' . $company->logo)
     //         : asset('images/default-logo.png'); // fallback
-        
+
     //     if($seaImportDraftData->freight === 'C'){
     //         $freightFullValue = 'COLLECT';
     //     }else{
     //         $freightFullValue = 'PREPAID';
     //     }
-        
+
     //     if($request->hbl_type == 'DRAFT'){
     //         if ($seaImportDraftData) {
     //             $draftHtml = '
@@ -920,26 +922,26 @@ class SeaImportController extends Controller
     //                                         '.($seaImportDraftData->shipperName->address_line1 ?? '').'<br>
     //                                         '.($seaImportDraftData->shipperName->address_line2 ?? '').'
     //                                         '.($seaImportDraftData->shipperName->city ?? '').'<br>
-                                            
-    //                                         '.($seaImportDraftData->shipperName->contact_person 
-    //                                             ? '<b>Contact Person: </b>'.$seaImportDraftData->shipperName->contact_person 
+
+    //                                         '.($seaImportDraftData->shipperName->contact_person
+    //                                             ? '<b>Contact Person: </b>'.$seaImportDraftData->shipperName->contact_person
     //                                             : '').'
-                                            
-    //                                         '.($seaImportDraftData->shipperName->tel_no 
-    //                                             ? ' <b>Contact No: </b>'.$seaImportDraftData->shipperName->tel_no 
+
+    //                                         '.($seaImportDraftData->shipperName->tel_no
+    //                                             ? ' <b>Contact No: </b>'.$seaImportDraftData->shipperName->tel_no
     //                                             : '').'<br>
-                                            
-    //                                         '.($seaImportDraftData->shipperName->pincode 
-    //                                             ? '<b>Pincode: </b>'.$seaImportDraftData->shipperName->pincode 
+
+    //                                         '.($seaImportDraftData->shipperName->pincode
+    //                                             ? '<b>Pincode: </b>'.$seaImportDraftData->shipperName->pincode
     //                                             : '').'<br>
-                                            
-    //                                         '.($seaImportDraftData->shipperName->gstin 
-    //                                             ? '<b>GSTIN No: </b>'.$seaImportDraftData->shipperName->gstin 
+
+    //                                         '.($seaImportDraftData->shipperName->gstin
+    //                                             ? '<b>GSTIN No: </b>'.$seaImportDraftData->shipperName->gstin
     //                                             : '').'
     //                                     </td>
     //                                 </tr>
     //                             </table>
-        
+
     //                             <table style="width:100%; min-height:150px; border:1px solid #000; border-top:none; border-right:none; border-collapse:collapse; vertical-align:top;">
     //                                 <tr><td style="padding:1px 3px;"><b>Consignee (or order)</b></td></tr>
     //                                 <tr>
@@ -948,58 +950,58 @@ class SeaImportController extends Controller
     //                                         '.($seaImportDraftData->ConsigneeName->address_line1 ?? '').'<br>
     //                                         '.($seaImportDraftData->ConsigneeName->address_line2 ?? '').'
     //                                         '.($seaImportDraftData->ConsigneeName->city ?? '').'<br>
-           
-    //                                         '.($seaImportDraftData->ConsigneeName->contact_person 
-    //                                             ? '<b>Contact Person: </b>'.$seaImportDraftData->ConsigneeName->contact_person 
+
+    //                                         '.($seaImportDraftData->ConsigneeName->contact_person
+    //                                             ? '<b>Contact Person: </b>'.$seaImportDraftData->ConsigneeName->contact_person
     //                                             : '').'
-                                            
-    //                                         '.($seaImportDraftData->ConsigneeName->tel_no 
-    //                                             ? ' <b>Contact No: </b>'.$seaImportDraftData->ConsigneeName->tel_no 
+
+    //                                         '.($seaImportDraftData->ConsigneeName->tel_no
+    //                                             ? ' <b>Contact No: </b>'.$seaImportDraftData->ConsigneeName->tel_no
     //                                             : '').'<br>
-                                            
-    //                                         '.($seaImportDraftData->ConsigneeName->pincode 
-    //                                             ? '<b>Pincode: </b>'.$seaImportDraftData->ConsigneeName->pincode 
+
+    //                                         '.($seaImportDraftData->ConsigneeName->pincode
+    //                                             ? '<b>Pincode: </b>'.$seaImportDraftData->ConsigneeName->pincode
     //                                             : '').'<br>
-                                            
-    //                                         '.($seaImportDraftData->ConsigneeName->gstin 
-    //                                             ? '<b>GSTIN No: </b>'.$seaImportDraftData->ConsigneeName->gstin 
+
+    //                                         '.($seaImportDraftData->ConsigneeName->gstin
+    //                                             ? '<b>GSTIN No: </b>'.$seaImportDraftData->ConsigneeName->gstin
     //                                             : '').'
-                                            
+
     //                                     </td>
     //                                 </tr>
     //                             </table>
-        
+
     //                             <table style="width:100%; min-height:160px; border-left:1px solid #000; border-collapse:collapse; vertical-align:top;">
     //                                 <tr><td style="padding:1px 3px;"><b>Notify Party</b></td></tr>
     //                                 <tr>
-    //                                     <td style="padding:0 3px; font-size:9px;">  
+    //                                     <td style="padding:0 3px; font-size:9px;">
     //                                         '.($seaImportDraftData->notifyName->party_name ?? '').'<br>
     //                                         '.($seaImportDraftData->notifyName->address_line1 ?? '').'<br>
     //                                         '.($seaImportDraftData->notifyName->address_line2 ?? '').'<br>
     //                                         '.($seaImportDraftData->notifyName->city ?? '').'<br>
-                                            
-    //                                         '.($seaImportDraftData->notifyName->contact_person 
-    //                                             ? '<b>Contact Person: </b>'.$seaImportDraftData->notifyName->contact_person 
+
+    //                                         '.($seaImportDraftData->notifyName->contact_person
+    //                                             ? '<b>Contact Person: </b>'.$seaImportDraftData->notifyName->contact_person
     //                                             : '').'
-                                            
-    //                                         '.($seaImportDraftData->notifyName->tel_no 
-    //                                             ? ' <b>Contact No: </b>'.$seaImportDraftData->notifyName->tel_no 
+
+    //                                         '.($seaImportDraftData->notifyName->tel_no
+    //                                             ? ' <b>Contact No: </b>'.$seaImportDraftData->notifyName->tel_no
     //                                             : '').'<br>
-                                            
-    //                                         '.($seaImportDraftData->notifyName->pincode 
-    //                                             ? '<b>Pincode: </b>'.$seaImportDraftData->notifyName->pincode 
+
+    //                                         '.($seaImportDraftData->notifyName->pincode
+    //                                             ? '<b>Pincode: </b>'.$seaImportDraftData->notifyName->pincode
     //                                             : '').'<br>
-                                            
-    //                                         '.($seaImportDraftData->notifyName->gstin 
-    //                                             ? '<b>GSTIN No: </b>'.$seaImportDraftData->notifyName->gstin 
+
+    //                                         '.($seaImportDraftData->notifyName->gstin
+    //                                             ? '<b>GSTIN No: </b>'.$seaImportDraftData->notifyName->gstin
     //                                             : '').'
-                                                
-                                                
+
+
     //                                     </td>
     //                                 </tr>
     //                             </table>
     //                         </td>
-        
+
     //                         <!-- RIGHT SIDE: BL Info -->
     //                         <td style="width:50%; vertical-align:top;">
     //                             <table style="width:100%; min-height:170px; border:1px solid #000; border-collapse:collapse; padding:20px 0px;">
@@ -1011,7 +1013,7 @@ class SeaImportController extends Controller
     //                                     <b>'.($company->company_name).'</b>
     //                                 </td></tr>
     //                             </table>
-        
+
     //                             <table style="width:100%; min-height:210px; border:1px solid #000; border-top: none; border-collapse:collapse; padding:15px 0px; text-align:start;">
     //                                 <tr>
     //                                     <td style="padding:3px; vertical-align:top;">
@@ -1021,28 +1023,28 @@ class SeaImportController extends Controller
     //                                         '.($seaImportDraftData->deliveryAgentName->address_line2 ?? '').'
     //                                         '.($seaImportDraftData->deliveryAgentName->address_line3 ?? '').'
     //                                         '.($seaImportDraftData->deliveryAgentName->city ?? '').'<br>
-                    
-    //                                         '.($seaImportDraftData->deliveryAgentName->contact_person 
-    //                                             ? '<b>Contact Person: </b>'.$seaImportDraftData->deliveryAgentName->contact_person 
+
+    //                                         '.($seaImportDraftData->deliveryAgentName->contact_person
+    //                                             ? '<b>Contact Person: </b>'.$seaImportDraftData->deliveryAgentName->contact_person
     //                                             : '').'
-                                            
-    //                                         '.($seaImportDraftData->deliveryAgentName->tel_no 
-    //                                             ? ' <b>Contact No: </b>'.$seaImportDraftData->deliveryAgentName->tel_no 
+
+    //                                         '.($seaImportDraftData->deliveryAgentName->tel_no
+    //                                             ? ' <b>Contact No: </b>'.$seaImportDraftData->deliveryAgentName->tel_no
     //                                             : '').'<br>
-                                            
-    //                                         '.($seaImportDraftData->deliveryAgentName->pincode 
-    //                                             ? '<b>Pincode: </b>'.$seaImportDraftData->deliveryAgentName->pincode 
+
+    //                                         '.($seaImportDraftData->deliveryAgentName->pincode
+    //                                             ? '<b>Pincode: </b>'.$seaImportDraftData->deliveryAgentName->pincode
     //                                             : '').'<br>
-                                            
-    //                                         '.($seaImportDraftData->deliveryAgentName->gstin 
-    //                                             ? '<b>GSTIN No: </b>'.$seaImportDraftData->deliveryAgentName->gstin 
+
+    //                                         '.($seaImportDraftData->deliveryAgentName->gstin
+    //                                             ? '<b>GSTIN No: </b>'.$seaImportDraftData->deliveryAgentName->gstin
     //                                             : '').'
-                                                
+
     //                                     </td>
     //                                 </tr>
     //                                 <tr style="width:100%; border:1px solid #000; vertical-align:top; padding:3px;">
     //                                     <td style="padding: 3px;">
-    //                                         <b>SHIPPING LINE:</b><br> 
+    //                                         <b>SHIPPING LINE:</b><br>
     //                                         '.($seaImportDraftData->shippingLine->shipping_line_name ?? ''). '<br>
     //                                         ' .($seaImportDraftData->shippingLine->address_line_1 ?? ''). ',
     //                                         ' .($seaImportDraftData->shippingLine->address_line_2 ?? ''). ',<br>
@@ -1057,23 +1059,23 @@ class SeaImportController extends Controller
     //                                     </td>
     //                                 </tr>
     //                             </table>
-        
+
     //                             <table style="width:100%; padding:3px; min-height:40px; border:1px solid #000; border-top:none; border-bottom:none; border-collapse:collapse;">
     //                                 <tr>
     //                                     <td style="padding: 3px;">
     //                                         <b>Number of Original MTD:</b> <small style="font-size:11px;">'.($seaImportDraftData->mbl_no ?? '').'</small>
     //                                     </td>
-                                        
+
     //                                     <td>
     //                                         <b>Place of Delivery:</b> <small style="font-size:11px;">'.($seaImportDraftData->deliveryPortName->port_name ?? 'N/A').'</small>
     //                                     </td>
     //                                 </tr>
     //                             </table>
-        
+
     //                         </td>
     //                     </tr>
     //                 </table>
-        
+
     //                 <!-- FULL-WIDTH SECTION -->
     //                 <table style="width:100%; border-collapse:collapse; margin-top:1px;">
     //                     <tr>
@@ -1083,23 +1085,23 @@ class SeaImportController extends Controller
     //                                     <td style="padding: 3px;">
     //                                         <b>Ocean Vessel:</b> <small style="font-size:9px;">'.($seaImportDraftData->vessel_name ?? 'N/A').'</small>
     //                                     </td>
-                                        
+
     //                                     <td>
     //                                         <b>Voyage No:</b> <small style="font-size:9px;">'.($seaImportDraftData->voyage_no ?? 'N/A').'</small>
     //                                     </td>
     //                                 </tr>
     //                             </table>
     //                         </td>
-                            
+
     //                         <td style="width:50%; vertical-align:top;">
     //                             <table style="width:100%; min-height:40px; border:1px solid #000; border-bottom:none; border-collapse:collapse;">
     //                                 <tr>
     //                                     <td>
-                                            
+
     //                                     </td>
-                                        
+
     //                                     <td>
-                                            
+
     //                                     </td>
     //                                 </tr>
     //                             </table>
@@ -1122,7 +1124,7 @@ class SeaImportController extends Controller
     //                         </div>
     //                     </tr>
     //                 </table>
-        
+
     //                 <!-- BOTTOM SECTION SAME AS BEFORE -->
     //                 <table style="width:100%; min-height:300px; border-collapse:collapse;">
     //                     <tr>
@@ -1132,13 +1134,13 @@ class SeaImportController extends Controller
     //                         <th style="border:1px solid #000; padding:5px; width:20%;">Net Weight</th>
     //                         <th style="border:1px solid #000; padding:5px; width:20%;">Measurement</th>
     //                     </tr>';
-                        
-    //                         foreach($seaImportDraftData->container as $container){   
-                                
+
+    //                         foreach($seaImportDraftData->container as $container){
+
     //                         $draftHtml .=   '<tr style="min-height:285px; height:285px; vertical-align:top;">
     //                             <td style="border:1px solid #000; padding:6px; position:relative;">
     //                                 '.($container->mark_and_numbers ?? '').'
-                                    
+
     //                                 <div style="position:absolute; bottom:0px;">
     //                                     <small><b>Container No:</b> '.($container->container_no ?? '').'</small><br>
     //                                     <small><b>A/Seal No:</b> '.($container->agentSealNo ?? '').'</small><br>
@@ -1151,8 +1153,8 @@ class SeaImportController extends Controller
     //                                 Package Type : '.($seaImportDraftData->packageName->package_code ?? '').'<br>
     //                                 Cus Inv. No: '.($container->customer_inv_no ?? '').'<br>
     //                                 Freight : '.(
-    //                                         $seaImportDraftData->freight == 'P' 
-    //                                             ? 'Prepaid' 
+    //                                         $seaImportDraftData->freight == 'P'
+    //                                             ? 'Prepaid'
     //                                             : ($seaImportDraftData->freight == 'C' ? 'Collect' : '')
     //                                     ).'<br>
     //                                 <div style="position:absolute; bottom:0px;">
@@ -1161,21 +1163,21 @@ class SeaImportController extends Controller
     //                             </td>
     //                         <td style="border:1px solid #000; padding:6px; position:relative;">
     //                             '.($container->gross_weight ?? '0').' KGS
-                                
+
     //                             <div style="position:absolute; bottom:0px;">
     //                                 <small><b>Size:</b> '.($container->size ?? '').'</small><br>
     //                             </div>
     //                         </td>
     //                         <td style="border:1px solid #000; padding:6px;">'.($container->net_weight ?? '0').' KGS</td>
-                            
+
     //                         <td style="border:1px solid #000; padding:6px; position:relative;">
     //                             '.($container->cbm ?? '0').' CBM
-                                
+
     //                         </td>
     //                     </tr>';
     //                 }
     //                 $draftHtml .= '</table>
-        
+
     //                 <table style="width:100%; border:1px solid #000; border-top:none; border-collapse:collapse; margin-top:10px;">
     //                     <tr>
     //                         <td style="padding:5px;">
@@ -1183,7 +1185,7 @@ class SeaImportController extends Controller
     //                         </td>
     //                     </tr>
     //                 </table>
-        
+
     //                 <table style="width:100%; border:1px solid #000; border-top:none; border-collapse:collapse;">
     //                     <tr>
     //                         <td style="padding:5px; text-align:end;">'.($seaImportDraftData->container->pluck('fcl_lcl')->implode(', ') ?? '').' / '.($seaImportDraftData->container->pluck('fcl_lcl')->implode(', ') ?? '').'</td>
@@ -1198,15 +1200,15 @@ class SeaImportController extends Controller
     //                 </table>
     //             </div>';
     //         }
-        
+
     //         return response()->json(['html' => $draftHtml]);
     //     }
     //     elseif($request->hbl_type == 'ORIGINAL' || $request->hbl_type == '1st ORIGINAL' || $request->hbl_type == '2nd ORIGINAL' || $request->hbl_type == '3rd ORIGINAL' || $request->hbl_type == 'NON-NEGOTIABLE' || $request->hbl_type == 'SEA WAY B/L')
     //     {
     //         if ($seaImportDraftData) {
-                
+
     //             $termsAndConditions = view('admin-main.admin.seaImport.term-condition')->render();
-                
+
     //             $draftHtml = '
     //             <style>
     //                 @media print {
@@ -1228,7 +1230,7 @@ class SeaImportController extends Controller
     //                         page-break-inside: avoid;
     //                     }
     //                 }
-                    
+
     //                 .bill-of-lading {
     //                     width: 210mm;
     //                     min-height: 297mm;
@@ -1241,24 +1243,24 @@ class SeaImportController extends Controller
     //                     box-sizing: border-box;
     //                     position: relative;
     //                 }
-                    
+
     //                 .back-side {
     //                     transform-origin: start;
     //                 }
     //             </style>';
-        
+
     //             $containerCount = count($seaImportDraftData->container);
     //             $containerIndex = 0;
-        
+
     //             foreach($seaImportDraftData->container as $container) {
     //                 $containerIndex++;
-                    
+
     //                 $shipper   = $seaImportDraftData->shipperName;
     //                 $consignee = $seaImportDraftData->ConsigneeName;
     //                 $notify    = $seaImportDraftData->notifyName;
     //                 $deliveryAgent    = $seaImportDraftData->deliveryAgentName;
     //                 $shippingLine    = $seaImportDraftData->shippingLine;
-                
+
     //                 // First container = FRONT PAGE
     //                 if($containerIndex == 1) {
     //                     $draftHtml .= '
@@ -1275,25 +1277,25 @@ class SeaImportController extends Controller
     //                                                 '.(optional($shipper)->address_line1 ?? '').'<br>
     //                                                 '.(optional($shipper)->address_line2 ?? '').'<br>
     //                                                 '.(optional($shipper)->city ?? '').'<br>
-                                                    
-    //                                                 '.(optional($shipper)->contact_person 
-    //                                                     ? '<b>Contact Person: </b>'.optional($shipper)->contact_person 
+
+    //                                                 '.(optional($shipper)->contact_person
+    //                                                     ? '<b>Contact Person: </b>'.optional($shipper)->contact_person
     //                                                     : '').'
-                                                    
-    //                                                 '.(optional($shipper)->tel_no 
-    //                                                     ? ' <b>Contact No: </b>'.optional($shipper)->tel_no 
+
+    //                                                 '.(optional($shipper)->tel_no
+    //                                                     ? ' <b>Contact No: </b>'.optional($shipper)->tel_no
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($shipper)->pincode 
-    //                                                     ? '<b>Pincode: </b>'.optional($shipper)->pincode 
+
+    //                                                 '.(optional($shipper)->pincode
+    //                                                     ? '<b>Pincode: </b>'.optional($shipper)->pincode
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($shipper)->gstin 
-    //                                                     ? '<b>GSTIN No: </b>'.optional($shipper)->gstin 
+
+    //                                                 '.(optional($shipper)->gstin
+    //                                                     ? '<b>GSTIN No: </b>'.optional($shipper)->gstin
     //                                                     : '').'
     //                                             </div>
     //                                         </div>
-                    
+
     //                                         <!-- Consignee -->
     //                                         <div style="border-bottom:1px solid #000; min-height:150px; padding:3px;">
     //                                             <div style="font-weight:bold; color:#000000; font-size:10px; margin-bottom: 15px;">Consignee (or order)</div>
@@ -1302,51 +1304,51 @@ class SeaImportController extends Controller
     //                                                 '.(optional($consignee)->address_line1 ?? '').'<br>
     //                                                 '.(optional($consignee)->address_line2 ?? '').'<br>
     //                                                 '.(optional($consignee)->city ?? '').'<br>
-    //                                                 '.(optional($consignee)->contact_person 
-    //                                                     ? '<b>Contact Person: </b>'.optional($consignee)->contact_person 
+    //                                                 '.(optional($consignee)->contact_person
+    //                                                     ? '<b>Contact Person: </b>'.optional($consignee)->contact_person
     //                                                     : '').'
-                                                    
-    //                                                 '.(optional($consignee)->tel_no 
-    //                                                     ? ' <b>Contact No: </b>'.optional($consignee)->tel_no 
+
+    //                                                 '.(optional($consignee)->tel_no
+    //                                                     ? ' <b>Contact No: </b>'.optional($consignee)->tel_no
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($consignee)->pincode 
-    //                                                     ? '<b>Pincode: </b>'.optional($consignee)->pincode 
+
+    //                                                 '.(optional($consignee)->pincode
+    //                                                     ? '<b>Pincode: </b>'.optional($consignee)->pincode
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($consignee)->gstin 
-    //                                                     ? '<b>GSTIN No: </b>'.optional($consignee)->gstin 
+
+    //                                                 '.(optional($consignee)->gstin
+    //                                                     ? '<b>GSTIN No: </b>'.optional($consignee)->gstin
     //                                                     : '').'
     //                                             </div>
     //                                         </div>
-                    
+
     //                                         <!-- Notify Party -->
     //                                         <div style="border-bottom:1px solid #000; min-height:120px; padding:3px;">
     //                                             <div style="font-weight:bold; color:#000000; font-size:10px; margin-bottom: 15px;">Notify Party</div>
-    //                                             <div style="font-size:11px; color:#000000;">  
+    //                                             <div style="font-size:11px; color:#000000;">
     //                                                 '.(optional($notify)->party_name ?? '').'<br>
     //                                                 '.(optional($notify)->address_line1 ?? '').'<br>
     //                                                 '.(optional($notify)->address_line2 ?? '').'<br>
     //                                                 '.(optional($notify)->city ?? '').'<br>
-                                                    
-    //                                                 '.(optional($notify)->contact_person 
-    //                                                     ? '<b>Contact Person: </b>'.optional($notify)->contact_person 
+
+    //                                                 '.(optional($notify)->contact_person
+    //                                                     ? '<b>Contact Person: </b>'.optional($notify)->contact_person
     //                                                     : '').'
-                                                    
-    //                                                 '.(optional($notify)->tel_no 
-    //                                                     ? ' <b>Contact No: </b>'.optional($notify)->tel_no 
+
+    //                                                 '.(optional($notify)->tel_no
+    //                                                     ? ' <b>Contact No: </b>'.optional($notify)->tel_no
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($notify)->pincode 
-    //                                                     ? '<b>Pincode: </b>'.optional($notify)->pincode 
+
+    //                                                 '.(optional($notify)->pincode
+    //                                                     ? '<b>Pincode: </b>'.optional($notify)->pincode
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($notify)->gstin 
-    //                                                     ? '<b>GSTIN No: </b>'.optional($notify)->gstin 
+
+    //                                                 '.(optional($notify)->gstin
+    //                                                     ? '<b>GSTIN No: </b>'.optional($notify)->gstin
     //                                                     : '').'
     //                                             </div>
     //                                         </div>
-                                            
+
     //                                         <!-- Place of Acceptance & Vessel -->
     //                                         <table style="width:100%; border-collapse:collapse;">
     //                                             <tr>
@@ -1363,7 +1365,7 @@ class SeaImportController extends Controller
     //                                             </tr>
     //                                         </table>
     //                                     </td>
-                    
+
     //                                     <!-- RIGHT SIDE: BL Info -->
     //                                     <td style="width:50%; vertical-align:top;">
     //                                         <!-- BL Header -->
@@ -1387,7 +1389,7 @@ class SeaImportController extends Controller
     //                                                 </tr>
     //                                             </table>
     //                                         </div>
-                                            
+
     //                                         <!-- Company Logo & Info -->
     //                                         <div style="border-bottom:1px solid #000; min-height:200px; padding:20px 10px; text-align:center;">
     //                                             <div style="margin-bottom:5px;">
@@ -1404,14 +1406,14 @@ class SeaImportController extends Controller
     //                                                 <small style="font-size:10px;"><span style="text-decoration:underline;">Email: '.(optional($company->companySetting)->email).'</span></small><br>
     //                                             </div>
     //                                         </div>
-                                            
+
     //                                         <!-- MTO Clause -->
     //                                         <div style="border-bottom:1px solid #000; min-height:100px; padding:3px 10px;">
     //                                             <small style="color:#000000; font-size:9px; line-height:1.2;">
     //                                                 Taken in charge in apparently goods condition herein at the place of receipt for transport & delivery as mentioned above, unless otherwise stated. The MTO in accordance with the provision contained in the MTD undertakes to perform or to procure the performance of the multimodal transport from the place at which the goods are taken in charge to the place designed for delivery and assumes responsibility for such transport. One of the MTD(s) must be surrendered, duly endorsed in exchange for the goods. In witness where of the original MTD all of this tenor and date have been signed in the number indicated below one of which being accomplished the other(s) to be void.
     //                                             </small>
     //                                         </div>
-                    
+
     //                                         <!-- Delivery Agent -->
     //                                         <div style="padding:3px 10px; min-height:60px;">
     //                                             <b style="font-size:9px;">Delivery Agent:</b><br>
@@ -1421,27 +1423,27 @@ class SeaImportController extends Controller
     //                                                 '.(optional($deliveryAgent)->address_line2 ?? '').'
     //                                                 '.(optional($deliveryAgent)->address_line3 ?? '').'
     //                                                 '.(optional($deliveryAgent)->city ?? '').'<br>
-    //                                                 '.(optional($deliveryAgent)->contact_person 
-    //                                                     ? '<b>Contact Person: </b>'.optional($deliveryAgent)->contact_person 
+    //                                                 '.(optional($deliveryAgent)->contact_person
+    //                                                     ? '<b>Contact Person: </b>'.optional($deliveryAgent)->contact_person
     //                                                     : '').'
-                                                    
-    //                                                 '.(optional($deliveryAgent)->tel_no 
-    //                                                     ? ' <b>Contact No: </b>'.optional($deliveryAgent)->tel_no 
+
+    //                                                 '.(optional($deliveryAgent)->tel_no
+    //                                                     ? ' <b>Contact No: </b>'.optional($deliveryAgent)->tel_no
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($deliveryAgent)->pincode 
-    //                                                     ? '<b>Pincode: </b>'.optional($deliveryAgent)->pincode 
+
+    //                                                 '.(optional($deliveryAgent)->pincode
+    //                                                     ? '<b>Pincode: </b>'.optional($deliveryAgent)->pincode
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($deliveryAgent)->gstin 
-    //                                                     ? '<b>GSTIN No: </b>'.optional($deliveryAgent)->gstin 
+
+    //                                                 '.(optional($deliveryAgent)->gstin
+    //                                                     ? '<b>GSTIN No: </b>'.optional($deliveryAgent)->gstin
     //                                                     : '').'
     //                                             </div>
     //                                         </div>
     //                                     </td>
     //                                 </tr>
     //                             </table>
-                                
+
     //                             <!--PORT INFO -->
     //                             <table style="width:100%; border-collapse:collapse; color:#000000; border:1px solid #000; border-top: none;">
     //                                 <tr>
@@ -1463,7 +1465,7 @@ class SeaImportController extends Controller
     //                                     </td>
     //                                 </tr>
     //                             </table>';
-                                
+
     //                         // FIRST CONTAINER DETAILS (FRONT PAGE)
     //                         $draftHtml .= '
     //                             <!-- CARGO DETAILS FOR FIRST CONTAINER -->
@@ -1478,7 +1480,7 @@ class SeaImportController extends Controller
     //                                 <tr style="min-height:260px; height:350px; vertical-align:top;">
     //                                     <td style="border:1px solid #000; padding:4px; position:relative;">
     //                                         '.($container->mark_number ?? '').'
-                                            
+
     //                                         <div style="position:absolute; bottom:0px; width:95%; font-size:9px;">
     //                                             <small><b>Container No:</b> '.($container->container_no ?? '').'</small><br>
     //                                             <small><b>A/Seal No:</b> '.($container->agent_seal_no ?? '').'</small><br>
@@ -1491,14 +1493,14 @@ class SeaImportController extends Controller
     //                                         Package Type : '.($seaImportDraftData->packageName->package_code ?? '').'<br>
     //                                         Cus Inv. No: '.($container->customer_inv_no ?? '').'<br>
     //                                         FREIGHT : '.($seaImportDraftData->freight ?? '').'<br>
-                                            
+
     //                                         <div style="position:absolute; bottom:0px; width:95%; font-size:9px;">
     //                                             <small><b>SOB Date:</b> '.($seaImportDraftData->sob_date ?? '').'</small><br>
     //                                         </div>
     //                                     </td>
     //                                     <td style="border:1px solid #000; padding:4px; position:relative;">
     //                                         '.($container->gross_weight ?? '0').' KGS
-                                            
+
     //                                         <div style="position:absolute; bottom:0px; width:95%; font-size:8px;">
     //                                             <small><b>Size:</b> '.($container->size ?? '').'</small><br>
     //                                         </div>
@@ -1536,7 +1538,7 @@ class SeaImportController extends Controller
     //                                     </td>
     //                                 </tr>
     //                             </table>
-                    
+
     //                             <!-- FOOTER SECTION -->
     //                             <table style="width:100%; border-collapse:collapse; border:1px solid #000; border-top: none;">
     //                                 <tr>
@@ -1560,8 +1562,8 @@ class SeaImportController extends Controller
     //                                 </tr>
     //                             </table>
     //                         </div>';
-                      
-                            
+
+
     //                         if($containerCount == 1) {
     //                             // Single container - terms on back of same page
     //                             $draftHtml .= '
@@ -1592,9 +1594,9 @@ class SeaImportController extends Controller
     //                                     <div style="font-size:10px;">(Back Side of Bill of Lading)</div>
     //                                 </div>';
     //                         }
-                            
-                            
-                            
+
+
+
     //                     }
     //                     // Additional containers = BACK PAGE
     //                     elseif($containerIndex > 1) {
@@ -1646,7 +1648,7 @@ class SeaImportController extends Controller
     //                                     </tr>
     //                                 </table>
     //                             </div>';
-                                
+
     //                         // Close back-side div after last container
     //                         if($containerIndex == $containerCount) {
     //                             $draftHtml .= '
@@ -1668,15 +1670,15 @@ class SeaImportController extends Controller
     //                         }
     //                     }
     //                 }
-            
+
     //             // If only one container, close properly
     //             if($containerCount == 1) {
     //                 $draftHtml .= '</div>';
     //             }
     //         }
-        
+
     //         return response()->json(['html' => $draftHtml]);
     //     }
     // }
-    
+
 }

@@ -53,11 +53,11 @@ class SeaExportController extends Controller
             return $next($request);
         });
     }
-    
+
     public function index(Request $request)
     {
         $page_title = 'Sea Export';
-        
+
         $query = OperationSeaExport::with(['shipperName', 'jobMaster', 'container'])
         ->where('company_id', $this->company_id)
         ->where(function ($q) {
@@ -65,28 +65,28 @@ class SeaExportController extends Controller
               ->orWhere('operation_complate', 0);
         });
 
-    
+
         // Use only where(), not orWhere()
         if ($request->filled('full_job_no')) {
             $query->where('full_job_no', 'LIKE', '%' . $request->full_job_no . '%');
         }
-    
+
         if ($request->filled('job_no')) {
             $query->where('job_no', 'LIKE',  $request->job_no );
         }
-    
+
         if ($request->filled('booking_no')) {
             $query->where('booking_no', 'LIKE', '%' . $request->booking_no . '%');
         }
-    
+
         if ($request->filled('shipper_id')) {
             $query->where('shipper_id', $request->shipper_id); // Use = not LIKE
         }
-        
+
         if ($request->filled('start_date') || $request->filled('end_date')) {
 
             $query->whereHas('jobMaster', function ($q) use ($request) {
-        
+
                 if ($request->filled('start_date') && $request->filled('end_date')) {
 
                     $q->whereBetween('job_date', [
@@ -99,25 +99,25 @@ class SeaExportController extends Controller
                 } elseif ($request->filled('end_date')) {
                     $q->where('job_date', '<=', $request->end_date);
                 }
-        
+
             });
         }
-    
+
         $sea_exports = $query->orderBy('job_no', 'desc')->distinct()->paginate(25);
         $uploadedJobs = OperationAllFileUpload::pluck('job_no')->toArray();
-        
+
         // For dropdowns
         $all_exports = OperationSeaExport::with('jobMaster')->where('company_id', $this->company_id)->get();
-    
+
         $full_job_nums = $all_exports->pluck('full_job_no')->unique()->filter()->values();
         $job_nums = $all_exports->unique()->filter()->values();
-        
+
         $booking_nums = $all_exports->pluck('booking_no')->unique()->filter()->values();
-    
+
         // Fetch distinct shippers
         $shipperIds = $all_exports->pluck('shipper_id')->unique()->filter();
         $shipperNames = \App\Models\MasterExportParty::whereIn('id', $shipperIds)->get();
-    
+
         return view('admin-main.admin.seaExport.index', compact(
             'sea_exports', 'full_job_nums', 'job_nums', 'booking_nums', 'shipperNames', 'page_title','uploadedJobs'
         ));
@@ -139,7 +139,7 @@ class SeaExportController extends Controller
             // ->orWhere('job_activity', 'SEAEXP.NVOCC')
             ->orderBy('created_at', 'desc')
             ->get();
-             
+
         $parties = MasterImportParty::where('company_id', $this->company_id)->get();
         $forwarders = MasterForwarder::where('company_id', $this->company_id)->get();
         $party_lists  = MasterParty::all();
@@ -150,9 +150,9 @@ class SeaExportController extends Controller
 
         $sea_exports = OperationSeaExport::select('id')->where('company_id', $this->company_id)->orderBy('full_job_no', 'asc')->get();
         $master_bl_types = MasterBlType::where(['company_id' => $this->company_id, 'status' => '1'])->orderBy('created_at', 'desc')->get();
-    
+
         $files = OperationAllFileUpload::where('company_id', $this->company_id)->where('file_related', 'sea_export')->orderBy('created_at', 'desc')->get();
-        
+
         return view('admin-main.admin.seaExport.create', compact('page_title','forwarders','shipping_lines', 'partyTypes','exportParites','ports', 'job_numbers', 'parties', 'vessels', 'sea_exports', 'files', 'party_lists', 'packages', 'salePersons', 'master_bl_types'));
     }
 
@@ -168,7 +168,7 @@ class SeaExportController extends Controller
                 'message' => "An entry for this Job Number already exists, so you cannot create another entry with the same Job No.!",
             ], 201);
         }
-        
+
         $validator = Validator::make($request->all(), [
             'entry_by' => 'required|in:Packinglist,nominated',
             'job_no' => 'required|integer',
@@ -193,7 +193,7 @@ class SeaExportController extends Controller
             'eta_date' => 'nullable|date',
             'etd_date' => 'nullable|date',
             'cbm' => 'nullable|numeric',
-            
+
             'port_cutoff' => 'nullable|date',
             'si_cutoff' => 'nullable|date',
             'document_cutoff' => 'nullable|date',
@@ -231,7 +231,7 @@ class SeaExportController extends Controller
             'clearance' => 'nullable|string',
             'goods_description' => 'nullable|string',
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
@@ -239,15 +239,16 @@ class SeaExportController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-        
+
         $validated = $validator->validated();
 
         $validated['company_id'] = $this->company_id;
         $validated['user_id'] = $this->user_id;
+        $validated['branch_id'] = Auth::user()->branch_id;
         $validated['uuid'] = Str::uuid();
 
         $sea_export_id = OperationSeaExport::create($validated);
-        
+
         if($sea_export_id){
             return response()->json([
                 'status'  => true,
@@ -273,7 +274,7 @@ class SeaExportController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-     
+
     public function edit(string $uuid)
     {
         $page_title = 'Sea Export Edit';
@@ -285,24 +286,24 @@ class SeaExportController extends Controller
         $jobNumbers = OperationJobMaster::where('company_id', $this->company_id)->get();
         $parties = MasterImportParty::where('company_id', $this->company_id)->get();
         $forwarders = MasterForwarder::where('company_id', $this->company_id)->get();
-        
+
         $party_lists  = MasterParty::whereNotIn('party_type', [9, 6, 8])->get();
         $salePersons  = OperationSalesPerson::where('company_id', $this->company_id)->get();
 
         $full_job_nums = OperationSeaExport::where('company_id', $this->company_id)->orderBy('full_job_no', 'asc')->get();
         $files = OperationAllFileUpload::where('company_id', $this->company_id)->where(['file_related' => 'sea_export', 'job_no' => $sea_export->job_no])->orderBy('created_at', 'desc')->get();
-        
+
         $exportParites = MasterExportParty::where('company_id', $this->company_id)->get();
         $partyTypes = MasterParty::whereNotIn('party_type', [9, 6, 8])->get();
         $shipping_lines = MasterShipping::where('company_id', $this->company_id)->get();
         $master_bl_types = MasterBlType::where(['company_id' => $this->company_id, 'status' => '1'])->orderBy('created_at', 'desc')->get();
-        
+
         $sea_export_containers = OperationSeaExportCont::where('company_id', $this->company_id)->where('sea_export_id', $sea_export->id)->get();
         $sea_export_shipment_line = OperationSeaExportShipmentLine::where('company_id', $this->company_id)->where('sea_export_id', $sea_export->id)->get();
 
         return view('admin-main.admin.seaExport.edit', compact('sea_export_shipment_line','page_title','shipping_lines', 'partyTypes','exportParites','sea_export', 'ports', 'jobNumbers', 'parties', 'vessels', 'files', 'packages', 'salePersons', 'party_lists', 'forwarders', 'master_bl_types', 'sea_export_containers'));
     }
-     
+
 
     /**
      * Update the specified resource in storage.
@@ -310,7 +311,7 @@ class SeaExportController extends Controller
     public function update(Request $request, int $id)
     {
         $sea_export = OperationSeaExport::find($id);
-   
+
         $validated = $request->validate([
             'entry_by' => 'required|in:Packinglist,nominated',
             'job_no' => 'required|integer',
@@ -322,7 +323,7 @@ class SeaExportController extends Controller
             'mbl_no' => 'nullable|string',
             'hbl_no' => 'nullable|string',
             'enquiry_ref_no' => 'nullable|string',
-            
+
             'quantity' => 'nullable|string',
             'package_id' => 'nullable|integer',
             'freight' => 'nullable|string',
@@ -336,7 +337,7 @@ class SeaExportController extends Controller
             'eta_date' => 'nullable|date',
             'etd_date' => 'nullable|date',
             'cbm' => 'nullable|numeric',
-            
+
             'port_cutoff' => 'nullable|date',
             'si_cutoff' => 'nullable|date',
             'document_cutoff' => 'nullable|date',
@@ -346,7 +347,7 @@ class SeaExportController extends Controller
             'delivery_agent_id' => 'nullable|integer',
             'bl_type' => 'nullable|integer',
             'issue_place' => 'nullable|string',
-            
+
             'no_of_origin' => 'nullable|integer',
             'place_of_acceptance' => 'nullable|string',
             'sales_person_id' => 'nullable|integer',
@@ -382,9 +383,10 @@ class SeaExportController extends Controller
             'cartining_date' => 'nullable|date',
             'commodity' => 'nullable|string',
             'goods_description' => 'nullable|string',
-            
+
         ]);
         $validated['user_id'] = $this->user_id;
+        $validated['branch_id'] = Auth::user()->branch_id;
 
         $sea_export->update($validated);
 
@@ -402,7 +404,7 @@ class SeaExportController extends Controller
 
         return response()->json(['success' => 'Sea Export Entry Deleted Successfully. !']);
     }
-    
+
     public function addContainer(Request $request)
     {
 
@@ -412,8 +414,8 @@ class SeaExportController extends Controller
                     'message' => 'Please submit the general details form first. Otherwise, edit this form!'
                 ], 200);
             }
-       
-    
+
+
             $validator = Validator::make($request->all(), [
                 'sea_export_id' => 'required|integer',
                 'cont_hbl'        => 'nullable|string|max:100',
@@ -441,20 +443,20 @@ class SeaExportController extends Controller
                 'uno_no'          => 'nullable|string|max:50',
                 'detent_date'     => 'nullable|date',
                 'prev_days'       => 'nullable|numeric|min:0',
-                
+
                 'mark_number' => 'required|string',
                 'goods_description' => 'required|string',
                 'customer_inv_no' => 'nullable|string',
                 'sbill_no' => 'nullable|string',
                 'commodity' => 'nullable|string',
                 'stuffingDate' => 'nullable|date',
-                
+
                 'leo_date' => 'nullable|string',
                 'sob_date' => 'nullable|date',
                 'cartining_date' => 'nullable|string',
                 'check_list_date' => 'nullable|string',
             ]);
-            
+
             if ($validator->fails()) {
                 return response()->json([
                     'status' => false,
@@ -462,25 +464,25 @@ class SeaExportController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             }
-            
+
             $validated = $validator->validated();
-    
+
             $validated['company_id'] = $this->company_id;
             $validated['uuid'] = Str::uuid();
-    
+
             $container = OperationSeaExportCont::create($validated);
-    
+
             return response()->json([
                 'status'  => true,
                 'message' => 'Container details added successfully!',
                 'data'    => $container
             ], 201);
-        
+
     }
 
     public function updateContainer(Request $request, int $id)
     {
-    
+
         $validator = Validator::make($request->all(), [
             'cont_hbl'        => 'nullable|string|max:100',
             'gross_weight'    => 'required|nullable|string|max:50',
@@ -507,20 +509,20 @@ class SeaExportController extends Controller
             'uno_no'          => 'nullable|string|max:50',
             'detent_date'     => 'nullable|date',
             'prev_days'       => 'nullable|numeric|min:0',
-        
+
             'mark_number' => 'required|string',
             'goods_description' => 'required|string',
             'customer_inv_no' => 'nullable|string',
             'sbill_no' => 'nullable|string',
             'commodity' => 'nullable|string',
             'stuffingDate' => 'nullable|date',
-            
+
             'leo_date' => 'nullable|string',
             'sob_date' => 'nullable|date',
             'cartining_date' => 'nullable|string',
             'check_list_date' => 'nullable|string',
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
@@ -528,12 +530,12 @@ class SeaExportController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-        
+
         $validated = $validator->validated();
-            
-        
+
+
         $sea_export_cont = OperationSeaExportCont::where('id', $request->sea_export_cont_id)->first();
-        
+
         if($sea_export_cont){
             $sea_export_cont->update($validated);
         }else{
@@ -543,22 +545,22 @@ class SeaExportController extends Controller
             OperationSeaExportCont::create($validated);
         }
 
-        
+
 
         return redirect()->back()->with('success', 'Container Details Updated Sucessfully. !');
     }
-    
+
     public function getContainerDetail($id)
     {
         $chargeDetail = OperationSeaExportCont::find($id);
-    
+
         if (!$chargeDetail) {
             return response()->json(['error' => 'Charge not found'], 404);
         }
-    
+
         return response()->json($chargeDetail);
     }
-    
+
     public function deleteContainer($id)
     {
         $container = OperationSeaExportCont::find($id);
@@ -599,7 +601,7 @@ class SeaExportController extends Controller
                 return back()->with('error', 'Invalid file category.');
         }
 
-        
+
         $originalName = $file->getClientOriginalName();
         $file_type  = $file->getClientOriginalExtension();
         $file_related = $request->file_related;
@@ -613,18 +615,18 @@ class SeaExportController extends Controller
         $file_upload->file_type = $file_type;
         $file_upload->file_related = $file_related;
 
-        $file_upload->save(); 
+        $file_upload->save();
         return back()->with('success', 'File uploaded successfully.');
     }
 
     public function searchFile(Request $request)
-    {        
+    {
         $request->validate([
             'search_query' => 'required'
         ]);
 
         $file = OperationAllFileUpload::find($request->search_query);
-       
+
         $html = '
         <div class="table-responsive">
             <table class="table table-bordered">
@@ -664,36 +666,36 @@ class SeaExportController extends Controller
 
         return back()->with('error', 'File not found.');
     }
-    
-    
+
+
     public function blDraftOption(Request $request, $id)
     {
         $page_title = 'Sea Export BL';
         return view('admin-main/admin/seaExport/bl-draft-option', compact('id', 'page_title'));
     }
-    
+
     // mourya
     public function showSeaWayBill(Request $request, $id)
     {
         // Get all the necessary data
         $seaExportDraftData = OperationSeaExport::with([
-            'ConsigneeName', 'blType', 'shipperName', 'deliveryPortName', 
-            'loadingPortName', 'dischargePortName', 'receiptPortName',  
-            'container', 'agentName', 'deliveryAgentName', 'shippingLine', 
+            'ConsigneeName', 'blType', 'shipperName', 'deliveryPortName',
+            'loadingPortName', 'dischargePortName', 'receiptPortName',
+            'container', 'agentName', 'deliveryAgentName', 'shippingLine',
             'packageName', 'notify'
         ])->find($id);
-        
+
         $company = Company::with(['companySetting', 'companyBranch'])
             ->where('id', $this->company_id)
             ->first();
-        
+
         // Get BL type from request
         $blType = $request->hbl_type ?? 'DRAFT';
-        
+
         // Get issue date from request or use current date
         $issueDate = $request->issue_date ?? date('d/m/Y');
         $freightPayable = $request->freight_payable ?? '';
-        
+
         // Check if we're returning HTML for AJAX or full page
         if ($request->ajax() || $request->wantsJson()) {
             // Load the sea-way-bill view and return as HTML
@@ -704,10 +706,10 @@ class SeaExportController extends Controller
                 'issueDate',
                 'freightPayable'
             ))->render();
-            
+
             return response()->json(['html' => $html]);
         }
-        
+
         // Return full page view
         return view('admin-main.admin.seaExport.sea-way-bill', compact(
             'seaExportDraftData',
@@ -717,13 +719,13 @@ class SeaExportController extends Controller
             'freightPayable'
         ));
     }
-    
+
     // mourya change bl using blade
     public function generateDraft(Request $request, $id)
     {
         //
-    }   
-    
+    }
+
     public function downloadSeaWayBillDocx(Request $request, $id)
     {
         try {
@@ -736,22 +738,22 @@ class SeaExportController extends Controller
                 'container', 'agentName', 'deliveryAgentName', 'shippingLine',
                 'packageName', 'notify',
             ])->find($id);
-     
+
             if (!$seaExportDraftData) {
                 return response()->json(['error' => 'Data not found'], 404);
             }
-     
+
             $company = Company::with(['companySetting', 'companyBranch'])
                 ->where('id', $this->company_id)
                 ->first();
-     
+
             $blType             = $request->hbl_type      ?? 'DRAFT';
             $issueDate          = $request->issue_date     ?? date('Y-m-d');
             $freightPayable     = $request->freight_payable ?? '';
             $formattedIssueDate = strtotime($issueDate)
                 ? date('d/m/Y', strtotime($issueDate))
                 : $issueDate;
-     
+
             /* ══════════════════════════════════════════════════════════
                2. SANITIZER
                IMPORTANT: NO htmlspecialchars() here.
@@ -763,51 +765,51 @@ class SeaExportController extends Controller
                 if ($v === null) {
                     return '';
                 }
-            
+
                 $v = (string) $v;
-            
+
                 // Fix UTF-8
                 $v = mb_convert_encoding($v, 'UTF-8', 'UTF-8');
-            
+
                 // Remove illegal XML control chars
                 $v = preg_replace(
                     '/[^\P{C}\n\r\t]+/u',
                     '',
                     $v
                 );
-            
+
                 return trim($v);
             };
             // Safe property getter
             $get = function ($obj, $prop, $default = '') use ($clean) {
 
                 try {
-            
+
                     if (!$obj) {
                         return $default;
                     }
                     $val = data_get($obj, $prop);
-            
+
                     if ($val === null) {
                         return $default;
                     }
-            
+
                     $val = trim((string)$val);
-            
+
                     if ($val === '') {
                         return $default;
                     }
-            
+
                     return $clean($val);
-            
+
                 } catch (\Throwable $e) {
-            
+
                     \Log::warning("Property read failed: {$prop}");
-            
+
                     return $default;
                 }
             };
-     
+
             /* ══════════════════════════════════════════════════════════
                3. DISPLAY VARIABLES  (mirrors blade @php block)
                ══════════════════════════════════════════════════════════ */
@@ -821,21 +823,21 @@ class SeaExportController extends Controller
                 'SEA WAY B/L'    => 'SEA WAY BILL',
             ];
             $blTypeDisplay  = $blTypeMap[$blType] ?? 'DRAFT';
-     
+
             $companyName    = $get($company, 'company_name');
             $companyAddress = $get($company, 'address');
             $companySet     = optional($company->companySetting);
-     
+
             $shipper      = $seaExportDraftData->shipperName;
             $consignee    = $seaExportDraftData->ConsigneeName;
             $notify       = $seaExportDraftData->notify;
             $delivAgent   = $seaExportDraftData->deliveryAgentName;
             $containers   = $seaExportDraftData->container;
             $hasCont      = $containers && count($containers) > 0;
-     
+
             $blNo         = $clean($seaExportDraftData->mbl_no ?? $seaExportDraftData->hbl_no ?? '-');
             $bookingNo    = $get($seaExportDraftData, 'booking_no', '-');
-        
+
             /* ══════════════════════════════════════════════════════════
                4. PHPWORD BOOTSTRAP
                ══════════════════════════════════════════════════════════ */
@@ -843,44 +845,44 @@ class SeaExportController extends Controller
             \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(true);
             $phpWord->setDefaultFontName('Times New Roman');
             $phpWord->setDefaultFontSize(9);
-     
+
             $section = $phpWord->addSection([
                 'marginTop'    => 500,
                 'marginBottom' => 500,
                 'marginLeft'   => 600,
                 'marginRight'  => 600,
             ]);
-     
+
             // ── Alignment shortcuts ──────────────────────────────────
             $aC = ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER];
             $aR = ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::END];
             $aB = ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::BOTH];
-     
+
             // ── Safe addText closure ─────
             // Always call this instead of $cell->addText() directly.
             $tx = function ($element, $text, $font = [], $para = []) {
                 try {
-            
+
                     if ($text === null) {
                         return;
                     }
-            
+
                     $text = trim((string)$text);
-            
+
                     if ($text === '') {
                         return;
                     }
-            
+
                     $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
-            
+
                     $element->addText(
                         $text,
                         $font ?: [],
                         $para ?: []
                     );
-            
+
                 } catch (\Throwable $e) {
-            
+
                     \Log::error('PHPWord text error: ' . $e->getMessage());
                 }
             };
@@ -895,9 +897,9 @@ class SeaExportController extends Controller
                ──────────────────────────────────────────────────────────
                A4 page (11 906 twips) – margins 600 each side = 10 706 usable.
                We use 10 700 twips split into 4 columns:
-     
+
                  C1=2400  C2=2400  C3=2950  C4=2950  →  Total = 10 700
-     
+
                Common gridSpan combos:
                  Header  row : [C1+C2+C3 = 7750] [C4 = 2950]
                  2-col   row : [C1+C2    = 4800] [C3+C4 = 5900]  ← 45 % | 55 %
@@ -915,10 +917,10 @@ class SeaExportController extends Controller
             $phpWord->addTableStyle('mainTable', $borderStyle);
             $main = $section->addTable('mainTable');
             // ── ROW: HEADER ─────────────────────────────────────────
-     
+
             // ── ROW: SHIPPER (left 45%) | BL INFO + COMPANY (right 55%) ──
             $main->addRow(1400);
-     
+
             // Left – Consignor / Shipper
             $shipCell = $main->addCell($C1 + $C2, ['gridSpan' => 2]);
             $shipCell->addText('Consignor / Shipper', ['bold' => true, 'size' => 8]);
@@ -928,9 +930,9 @@ class SeaExportController extends Controller
                 $get($shipper, 'address_line2'),
                 $get($shipper, 'city'),
             ];
-            
+
             foreach ($shipperLines as $line) {
-            
+
                 if (!empty(trim((string)$line))) {
                     $tx($shipCell, $line, ['size' => 9]);
                 }
@@ -943,10 +945,10 @@ class SeaExportController extends Controller
                 $tx($shipCell, 'Pincode: ' . $v, ['size' => 8]);
             if ($v = $get($shipper, 'gstin'))
                 $tx($shipCell, 'GSTIN No: ' . $v, ['size' => 8]);
-     
+
             // Right – Booking / BL No. + Company
             $blCell = $main->addCell($C3 + $C4, ['gridSpan' => 2]);
-            
+
             $tx(
                 $blCell,
                 'Booking No. - ' . $bookingNo,
@@ -955,9 +957,9 @@ class SeaExportController extends Controller
             );
             // $tx($blCell, 'BL Number', ['size' => 8], $aC);
             // $tx($blCell, $blNo, ['bold' => true, 'size' => 9], $aC);
-            
+
             $blCell->addTextBreak(1);
-            
+
             if ($companyName)
                 $tx($blCell, $companyName, ['bold' => true, 'size' => 13], $aC);
             if ($companyAddress)
@@ -970,10 +972,10 @@ class SeaExportController extends Controller
                 $tx($blCell, 'Website: ' . $v, ['size' => 8], $aC);
             if ($v = $get($companySet, 'reg_no'))
                 $tx($blCell, 'MTO Reg. No. ' . $v, ['bold' => true, 'size' => 10], $aC);
-                
+
             // ── ROW: CONSIGNEE (left 45%) | COMPANY TERMS TEXT (right 55%) ──
             $main->addRow(1400);
-     
+
             $consCell = $main->addCell($C1 + $C2, ['gridSpan' => 2]);
             $consCell->addText("Consignee (if 'To Order' as indicated)", ['bold' => true, 'size' => 8]);
             foreach (array_filter([
@@ -992,7 +994,7 @@ class SeaExportController extends Controller
                 $consCell->addText('Pincode: ' . $v, ['size' => 8]);
             if ($v = $get($consignee, 'gstin'))
                 $consCell->addText('GSTIN No: ' . $v, ['size' => 8]);
-     
+
             $termsCell = $main->addCell($C3 + $C4, ['gridSpan' => 2]);
             $termsCell->addText(
                 'Taken in charge in apparently good condition herein at the place of receipt for transport and delivery as mentioned above, unless otherwise stated. The MTO in accordance with the provisions contained in the MTD undertakes to perform or to procure the performance of the multimodal transport from the place at which the goods are taken in charge, to the place designated for delivery and assumes responsibility for such transport.',
@@ -1003,10 +1005,10 @@ class SeaExportController extends Controller
                 'One of the MTD(s) must be surrendered, duly endorsed in exchange for the goods, in witness whereof the original MTD all of this tenor and date have been signed in the number indicated below, one of which being accomplished, the other(s) to be void.',
                 ['size' => 7], $aB
             );
-        
+
             // ── ROW: NOTIFY ADDRESS | PLACE OF DELIVERY ───────────
             $main->addRow();
-            
+
             // LEFT CELL (spans col1+col2)
             $notCell = $main->addCell($C1 + $C2, ['gridSpan' => 2]);
             $notCell->addText(
@@ -1027,7 +1029,7 @@ class SeaExportController extends Controller
             } else {
                 $tx($notCell, 'Same as consignee', ['italic' => true, 'size' => 9]);
             }
-            
+
             // RIGHT CELL (spans col3+col4)
             $routeCell = $main->addCell($C3 + $C4, ['gridSpan' => 2]);
             $routeCell->addText('Route/Place of Transhipment (if any)', ['bold' => true, 'size' => 8]);
@@ -1035,22 +1037,22 @@ class SeaExportController extends Controller
 
             // ── ROW: PLACE OF ACCEPTANCE | PORT OF LOADING ─────────
             $main->addRow();
-            
+
             $placeCell = $main->addCell($C1 + $C2, ['gridSpan' => 2]);
             $placeCell->addText('Place Of Acceptance', ['bold' => true, 'size' => 8]);
             $tx($placeCell, $get($seaExportDraftData, 'place_of_acceptance', ''), ['size' => 9]);
-            
+
             $loadCell = $main->addCell($C3 + $C4, ['gridSpan' => 2]);
             $loadCell->addText('Port Of Loading', ['bold' => true, 'size' => 8]);
             $tx($loadCell, $get($seaExportDraftData->loadingPortName, 'port_name', ''), ['size' => 9]);
             // Label row
             // ── ROW: PORT OF DISCHARGE | ROUTE ─────────────────────
             $main->addRow();
-            
+
             $dischargeCell = $main->addCell($C1 + $C2, ['gridSpan' => 2]);
             $dischargeCell->addText('Port Of Discharge', ['bold' => true, 'size' => 8]);
             $tx($dischargeCell, $get($seaExportDraftData->dischargePortName, 'port_name', 'N/A'), ['size' => 9]);
-        
+
             $deliveryCell = $main->addCell($C3 + $C4, ['gridSpan' => 2]);
             $deliveryCell->addText('Place Of Delivery', ['bold' => true, 'size' => 8]);
             $tx(
@@ -1058,7 +1060,7 @@ class SeaExportController extends Controller
                 $get($seaExportDraftData->deliveryPortName, 'port_name', ''),
                 ['size' => 9]
             );
-     
+
             // ── ROWS: VESSEL & TRANSPORT (3-col-B pattern) ───────────
             // Label row
             $main->addRow(220);
@@ -1073,7 +1075,7 @@ class SeaExportController extends Controller
             $tx($main->addCell($C1 + $C2, ['gridSpan' => 2]), $vesText, ['size' => 9]);
             $main->addCell($C3)->addText('Sea', ['size' => 9]);
             $tx($main->addCell($C4), $get($seaExportDraftData, 'transhipment_port', ''), ['size' => 9]);
-    
+
             /* ══════════════════════════════════════════════════════════
                ▌ TABLE 2 – GOODS
                Columns: Container(2700) | Description(4800) | Weight(2000) | CBM(1200)
@@ -1081,7 +1083,7 @@ class SeaExportController extends Controller
             $phpWord->addTableStyle('goodsTable', $borderStyle);
             $gTbl = $section->addTable('goodsTable');
             $G1 = 2700; $G2 = 4800; $G3 = 2000; $G4 = 1200;
-     
+
             // Header row
             $gTbl->addRow(300);
             $gTbl->addCell($G1)->addText('Container No.(s) / Marks and Numbers', ['bold' => true, 'size' => 8]);
@@ -1092,15 +1094,15 @@ class SeaExportController extends Controller
             $centerParagraph = [
                 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER
             ];
-     
+
             if ($hasCont) {
                 foreach ($containers as $idx => $cont) {
                     $qty = (int) $get($cont, 'total_package', 0);
                     $formatter = new \NumberFormatter('en', \NumberFormatter::SPELLOUT);
                     $qtyInWords = ucfirst($formatter->format($qty));
-                    
+
                     $gTbl->addRow(2800, ['exactHeight' => false]);
-    
+
                     // ── Container / Marks cell ───────────────────────
                     $cCell = $gTbl->addCell($G1);
                     $cCell->addText(
@@ -1118,7 +1120,7 @@ class SeaExportController extends Controller
                     if ($fcl)
                         $cCell->addText($fcl . ' / ' . $fcl . ', ' . $mov, ['size' => 8]);
                     $cCell->addText('ALL DESTINATION CHARGES ON CONSIGNEE ACCOUNT', ['size' => 7]);
-     
+
                     // List additional container numbers (mirrors blade's nested loop)
                     if ($idx === 0 && count($containers) > 1) {
                         $cCell->addTextBreak(1);
@@ -1131,7 +1133,7 @@ class SeaExportController extends Controller
                             }
                         }
                     }
-        
+
                     // ── Description cell ─────────────────────────────
                     $dCell = $gTbl->addCell($G2);
                     $qty     = $get($cont, 'total_package', '0');
@@ -1156,7 +1158,7 @@ class SeaExportController extends Controller
                     if ($sob = $get($cont, 'sob_date'))
                         $dCell->addText('SHIPPED ONBOARD DATE: ' . $sob, ['bold' => true, 'size' => 8], $aR);
                         $dCell->addTextBreak(1);
-     
+
                     // ── Weight cell ──────────────────────────────────
                     $wCell = $gTbl->addCell($G3);
                     $tx($wCell, $get($seaExportDraftData, 'gross_weight', '0'), ['bold' => true, 'size' => 10], $aC);
@@ -1165,7 +1167,7 @@ class SeaExportController extends Controller
                     $wCell->addText('Net Weight', ['bold' => true, 'size' => 8], $aC);
                     $tx($wCell, $get($seaExportDraftData, 'net_weight', '0'), ['size' => 9], $aC);
                     $wCell->addText('KGS', ['size' => 8], $aC);
-     
+
                     // ── CBM cell ─────────────────────────────────────
                     $cbmCell = $gTbl->addCell($G4);
                     $tx($cbmCell, $get($seaExportDraftData, 'cbm', '0'), ['bold' => true, 'size' => 10], $aC);
@@ -1174,7 +1176,7 @@ class SeaExportController extends Controller
             } else {
                 // ── No-container fallback (mirrors blade @else block) ─
                 $gTbl->addRow(2800);
-     
+
                 $ncCell = $gTbl->addCell($G1);
                 $ncCell->addText('NO CONTAINER', ['bold' => true, 'size' => 9]);
                 $ncCell->addText(
@@ -1187,7 +1189,7 @@ class SeaExportController extends Controller
                     $tx($ncCell, $marks, ['size' => 8]);
                 }
                 $ncCell->addText('ALL DESTINATION CHARGES ON CONSIGNEE ACCOUNT', ['size' => 7]);
-     
+
                 $ndCell = $gTbl->addCell($G2);
                 $ndCell->addText(
                     'Total Packages: ' . $get($seaExportDraftData, 'quantity', '0') . ' ' .
@@ -1200,7 +1202,7 @@ class SeaExportController extends Controller
                     $ndCell->addText('INVOICE NO: ' . $inv, ['size' => 8],$centerParagraph);
                 if ($sb = $get($seaExportDraftData, 'sbill_no'))
                     $ndCell->addText('SB. NO: ' . $sb, ['size' => 8],$centerParagraph);
-     
+
                 $nwCell = $gTbl->addCell($G3);
                 $tx($nwCell, $get($seaExportDraftData, 'gross_weight', '0'), ['bold' => true, 'size' => 10], $aC);
                 $nwCell->addText('KGS', ['size' => 8], $aC);
@@ -1208,51 +1210,51 @@ class SeaExportController extends Controller
                 $nwCell->addText('Net Weight', ['bold' => true, 'size' => 8], $aC);
                 $tx($nwCell, $get($seaExportDraftData, 'net_weight', '0'), ['size' => 9], $aC);
                 $nwCell->addText('KGS', ['size' => 8], $aC);
-     
+
                 $ncbmCell = $gTbl->addCell($G4);
                 $tx($ncbmCell, $get($seaExportDraftData, 'cbm', '0'), ['bold' => true, 'size' => 10], $aC);
                 $ncbmCell->addText('CBM', ['size' => 8], $aC);
             }
-     
+
             /* ══════════════════════════════════════════════════════════
                ▌ TABLE 3 – FREIGHT ROW  (full-width single cell)
                ══════════════════════════════════════════════════════════ */
             $phpWord->addTableStyle('freightTable', $borderStyle);
 
             $fTbl = $section->addTable('freightTable');
-            
+
             $fTbl->addRow();
-            
-            
+
+
             // LEFT CELL = FREIGHT
             $freightCell = $fTbl->addCell(5350);
-            
+
             $freightType = strtoupper(
                 $get($seaExportDraftData, 'freight', 'PREPAID')
             );
-            
+
             $tx(
                 $freightCell,
                 'FREIGHT : ' . $freightType,
                 ['bold' => false, 'size' => 11],
                 $aC
             );
-            
-            
+
+
             // RIGHT CELL = MOVEMENT
             $movementCell = $fTbl->addCell(5350);
-            
+
             $movement = strtoupper(
                 $get($seaExportDraftData, 'movement', 'N/A')
             );
-            
+
             $tx(
                 $movementCell,
                 'MOVEMENT : ' . $movement,
                 ['bold' => false, 'size' => 11],
                 $aC
             );
-        
+
             /* ══════════════════════════════════════════════════════════
                6. SAVE & RETURN
                ══════════════════════════════════════════════════════════ */
@@ -1262,16 +1264,16 @@ class SeaExportController extends Controller
                 mkdir($tempPath, 0777, true);
             }
             $tempFile = $tempPath . '/' . $fileName;
-     
+
             $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
             $objWriter->save($tempFile);
-     
+
             if (!file_exists($tempFile) || filesize($tempFile) === 0) {
                 throw new \Exception('Generated Word document is empty.');
             }
-     
+
             return response()->download($tempFile, $fileName)->deleteFileAfterSend(true);
-     
+
         } catch (\Exception $e) {
             \Log::error('Word download error: ' . $e->getMessage());
             \Log::error($e->getTraceAsString());
@@ -1281,7 +1283,7 @@ class SeaExportController extends Controller
             );
         }
     }
-    
+
     // public function downloadSeaWayBillDocx(Request $request, $id)
     // {
     //     $seaExportDraftData = OperationSeaExport::with([
@@ -1299,19 +1301,19 @@ class SeaExportController extends Controller
     //         'packageName',
     //         'notify'
     //     ])->find($id);
-    
+
     //     $company = Company::with(['companySetting', 'companyBranch'])
     //         ->where('id', $this->company_id)
     //         ->first();
-    
+
     //     $blType = $request->hbl_type ?? 'DRAFT';
-    
+
     //     $issueDate = $request->issue_date ?? date('d/m/Y');
-    
+
     //     $freightPayable = $request->freight_payable ?? '';
-    
+
     //     $phpWord = new PhpWord();
-    
+
     //     $section = $phpWord->addSection([
     //         'marginTop' => 300,
     //         'marginBottom' => 300,
@@ -1320,138 +1322,138 @@ class SeaExportController extends Controller
     //         'pageSizeW' => 11906,
     //         'pageSizeH' => 16838,
     //     ]);
-    
+
     //     $phpWord->addTableStyle('mainTable', [
     //         'borderSize' => 6,
     //         'borderColor' => '000000',
     //         'cellMargin' => 50,
     //         'alignment' => Jc::CENTER,
     //     ]);
-    
+
     //     $table = $section->addTable('mainTable');
-    
+
     //     // HEADER
     //     $table->addRow();
-    
+
     //     $table->addCell(9000)->addText(
     //         'MULTIMODAL TRANSPORT DOCUMENT',
     //         ['bold' => true, 'size' => 14],
     //         ['align' => 'center']
     //     );
-    
+
     //     $table->addCell(2500)->addText(
     //         $blType,
     //         ['bold' => true, 'size' => 10],
     //         ['align' => 'center']
     //     );
-    
+
     //     // SHIPPER
     //     $table->addRow(1200);
-    
+
     //     $shipperText =
     //         optional($seaExportDraftData->shipperName)->party_name . "\n" .
     //         optional($seaExportDraftData->shipperName)->address_line1 . "\n" .
     //         optional($seaExportDraftData->shipperName)->city;
-    
+
     //     $table->addCell(5000)->addText($shipperText);
-    
+
     //     $blNo =
     //         $seaExportDraftData->mbl_no ??
     //         $seaExportDraftData->hbl_no ??
     //         'N/A';
-    
+
     //     $table->addCell(6500)->addText(
     //         "BL NO : " . $blNo,
     //         ['bold' => true]
     //     );
-    
+
     //     // CONSIGNEE
     //     $table->addRow(1200);
-    
+
     //     $consigneeText =
     //         optional($seaExportDraftData->ConsigneeName)->party_name . "\n" .
     //         optional($seaExportDraftData->ConsigneeName)->address_line1 . "\n" .
     //         optional($seaExportDraftData->ConsigneeName)->city;
-    
+
     //     $table->addCell(5000)->addText($consigneeText);
-    
+
     //     $table->addCell(6500)->addText(
     //         $company->company_name . "\n" .
     //         $company->address
     //     );
-    
+
     //     // GOODS TABLE
     //     $table->addRow();
-    
+
     //     $table->addCell(3000)->addText(
     //         'Container Details',
     //         ['bold' => true]
     //     );
-    
+
     //     $table->addCell(5000)->addText(
     //         'Goods Description',
     //         ['bold' => true]
     //     );
-    
+
     //     $table->addCell(2000)->addText(
     //         'Weight',
     //         ['bold' => true]
     //     );
-    
+
     //     $table->addCell(1500)->addText(
     //         'CBM',
     //         ['bold' => true]
     //     );
-    
+
     //     foreach ($seaExportDraftData->container as $container) {
-    
+
     //         $table->addRow(2500);
-    
+
     //         $table->addCell(3000)->addText(
     //             $container->container_no . '/' . $container->size
     //         );
-    
+
     //         $table->addCell(5000)->addText(
     //             $container->goods_description
     //         );
-    
+
     //         $table->addCell(2000)->addText(
     //             $container->gross_weight . ' KGS'
     //         );
-    
+
     //         $table->addCell(1500)->addText(
     //             $container->cbm . ' CBM'
     //         );
     //     }
-    
+
     //     // FOOTER
     //     $section->addTextBreak(2);
-    
+
     //     $section->addText(
     //         'FOR ' . $company->company_name,
     //         ['bold' => true],
     //         ['align' => 'right']
     //     );
-    
+
     //     $section->addTextBreak(3);
-    
+
     //     $section->addText(
     //         'Authorised Signatory',
     //         [],
     //         ['align' => 'right']
     //     );
-    
+
     //     $fileName = 'SeaWayBill_' . time() . '.docx';
-    
+
     //     $tempFile = storage_path($fileName);
-    
+
     //     $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
-    
+
     //     $objWriter->save($tempFile);
-    
+
     //     return response()->download($tempFile)->deleteFileAfterSend(true);
     // }
-    
+
     //mourya 11 oct
     // public function generateDraft(Request $request, $id)
     // {
@@ -1459,12 +1461,12 @@ class SeaExportController extends Controller
     //     $company = Company::with(['companySetting', 'companyBranch'])
     //         ->where('id', $this->company_id)
     //         ->first();
-            
-    //     $logoUrl = $company->logo 
+
+    //     $logoUrl = $company->logo
     //         ? asset('public/uploads/company_logo/' . $company->logo)
     //         : asset('images/default-logo.png');
     //     $draftHtml = '';
-        
+
     //     if($request->hbl_type == 'DRAFT'){
     //         if ($seaExportDraftData) {
     //             $containerCount = count($seaExportDraftData->container);
@@ -1490,7 +1492,7 @@ class SeaExportController extends Controller
     //                         page-break-inside: avoid;
     //                     }
     //                 }
-                    
+
     //                 .draft-container {
     //                     width: 210mm;
     //                     min-height: 297mm;
@@ -1504,12 +1506,12 @@ class SeaExportController extends Controller
     //                     position: relative;
     //                     border: 1px dashed #ccc;
     //                 }
-                    
+
     //                 .back-page {
     //                     margin-top: 10px;
     //                     border: 1px dashed #999;
     //                 }
-                    
+
     //                 .watermark {
     //                     position: absolute;
     //                     top: 40%;
@@ -1520,12 +1522,12 @@ class SeaExportController extends Controller
     //                     z-index: 0;
     //                 }
     //             </style>';
-                
+
     //             $containerIndex = 0;
-                
+
     //             foreach($seaExportDraftData->container as $container) {
-                    
-                    
+
+
     //                 $shipper   = $seaExportDraftData->shipperName;
     //                 $consignee = $seaExportDraftData->ConsigneeName;
     //                 $notify    = $seaExportDraftData->notifyName;
@@ -1533,7 +1535,7 @@ class SeaExportController extends Controller
     //                 $shippingLine    = $seaExportDraftData->shippingLine;
 
     //                 $containerIndex++;
-                    
+
     //                 // FIRST CONTAINER - FRONT PAGE
     //                 if($containerIndex == 1) {
     //                 $draftHtml .= '
@@ -1551,28 +1553,28 @@ class SeaExportController extends Controller
     //                                                 '.(optional($shipper)->address_line1 ?? '').'<br>
     //                                                 '.(optional($shipper)->address_line2 ?? '').'<br>
     //                                                 '.(optional($shipper)->city ?? '').'<br>
-                                                    
-    //                                                 '.(optional($shipper)->contact_person 
-    //                                                     ? '<b>Contact Person: </b>'.optional($shipper)->contact_person 
+
+    //                                                 '.(optional($shipper)->contact_person
+    //                                                     ? '<b>Contact Person: </b>'.optional($shipper)->contact_person
     //                                                     : '').'
-                                                    
-    //                                                 '.(optional($shipper)->tel_no 
-    //                                                     ? ' <b>Contact No: </b>'.optional($shipper)->tel_no 
+
+    //                                                 '.(optional($shipper)->tel_no
+    //                                                     ? ' <b>Contact No: </b>'.optional($shipper)->tel_no
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($shipper)->pincode 
-    //                                                     ? '<b>Pincode: </b>'.optional($shipper)->pincode 
+
+    //                                                 '.(optional($shipper)->pincode
+    //                                                     ? '<b>Pincode: </b>'.optional($shipper)->pincode
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($shipper)->gstin 
-    //                                                     ? '<b>GSTIN No: </b>'.optional($shipper)->gstin 
+
+    //                                                 '.(optional($shipper)->gstin
+    //                                                     ? '<b>GSTIN No: </b>'.optional($shipper)->gstin
     //                                                     : '').'
-                                                
-                                                
+
+
     //                                             </td>
     //                                         </tr>
     //                                     </table>
-                
+
     //                                     <table style="width:100%; min-height:140px; border:1px solid #000; border-top:none; border-right: none; border-collapse:collapse; vertical-align:top;">
     //                                         <tr><td style="padding:1px 3px; font-size:10px;"><b>Consignee (or order)</b></td></tr>
     //                                         <tr>
@@ -1581,56 +1583,56 @@ class SeaExportController extends Controller
     //                                                 '.(optional($consignee)->address_line1 ?? '').'<br>
     //                                                 '.(optional($consignee)->address_line2 ?? '').'<br>
     //                                                 '.(optional($consignee)->city ?? '').'<br>
-    //                                                 '.(optional($consignee)->contact_person 
-    //                                                     ? '<b>Contact Person: </b>'.optional($consignee)->contact_person 
+    //                                                 '.(optional($consignee)->contact_person
+    //                                                     ? '<b>Contact Person: </b>'.optional($consignee)->contact_person
     //                                                     : '').'
-                                                    
-    //                                                 '.(optional($consignee)->tel_no 
-    //                                                     ? ' <b>Contact No: </b>'.optional($consignee)->tel_no 
+
+    //                                                 '.(optional($consignee)->tel_no
+    //                                                     ? ' <b>Contact No: </b>'.optional($consignee)->tel_no
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($consignee)->pincode 
-    //                                                     ? '<b>Pincode: </b>'.optional($consignee)->pincode 
+
+    //                                                 '.(optional($consignee)->pincode
+    //                                                     ? '<b>Pincode: </b>'.optional($consignee)->pincode
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($consignee)->gstin 
-    //                                                     ? '<b>GSTIN No: </b>'.optional($consignee)->gstin 
+
+    //                                                 '.(optional($consignee)->gstin
+    //                                                     ? '<b>GSTIN No: </b>'.optional($consignee)->gstin
     //                                                     : '').'
     //                                             </td>
     //                                         </tr>
     //                                     </table>
-                
+
     //                                     <table style="width:100%; min-height:130px; border:1px solid #000; border-top:none; border-right: none; border-collapse:collapse; vertical-align:top;">
     //                                         <tr><td style="padding:1px 3px; font-size:10px;"><b>Notify Party</b></td></tr>
     //                                         <tr>
-    //                                             <td style="padding:0 3px; font-size:9px;">  
+    //                                             <td style="padding:0 3px; font-size:9px;">
     //                                                 '.(optional($notify)->party_name ?? '').'<br>
     //                                                 '.(optional($notify)->address_line1 ?? '').'<br>
     //                                                 '.(optional($notify)->address_line2 ?? '').'<br>
     //                                                 '.(optional($notify)->city ?? '').'<br>
-                                                    
-    //                                                 '.(optional($notify)->contact_person 
-    //                                                     ? '<b>Contact Person: </b>'.optional($notify)->contact_person 
+
+    //                                                 '.(optional($notify)->contact_person
+    //                                                     ? '<b>Contact Person: </b>'.optional($notify)->contact_person
     //                                                     : '').'
-                                                    
-    //                                                 '.(optional($notify)->tel_no 
-    //                                                     ? ' <b>Contact No: </b>'.optional($notify)->tel_no 
+
+    //                                                 '.(optional($notify)->tel_no
+    //                                                     ? ' <b>Contact No: </b>'.optional($notify)->tel_no
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($notify)->pincode 
-    //                                                     ? '<b>Pincode: </b>'.optional($notify)->pincode 
+
+    //                                                 '.(optional($notify)->pincode
+    //                                                     ? '<b>Pincode: </b>'.optional($notify)->pincode
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($notify)->gstin 
-    //                                                     ? '<b>GSTIN No: </b>'.optional($notify)->gstin 
+
+    //                                                 '.(optional($notify)->gstin
+    //                                                     ? '<b>GSTIN No: </b>'.optional($notify)->gstin
     //                                                     : '').'
-                                                        
-                                                        
+
+
     //                                             </td>
     //                                         </tr>
     //                                     </table>
     //                                 </td>
-                
+
     //                                 <!-- RIGHT SIDE: BL Info -->
     //                                 <td style="width:50%; vertical-align:top;">
     //                                     <table style="width:100%; min-height:190px; border:1px solid #000; border-collapse:collapse; padding:10px 0px;">
@@ -1643,7 +1645,7 @@ class SeaExportController extends Controller
     //                                             <b>'.($company->company_name).'</b>
     //                                         </td></tr>
     //                                     </table>
-                
+
     //                                     <table style="width:100%; min-height:190px; border:1px solid #000; border-top: none; border-collapse:collapse; padding:10px 0px; text-align:start;">
     //                                         <tr>
     //                                             <td style="padding:3px; vertical-align:top; font-size:9px;">
@@ -1653,26 +1655,26 @@ class SeaExportController extends Controller
     //                                                 '.(optional($deliveryAgent)->address_line2 ?? '').'
     //                                                 '.(optional($deliveryAgent)->address_line3 ?? '').'
     //                                                 '.(optional($deliveryAgent)->city ?? '').'<br>
-    //                                                 '.(optional($deliveryAgent)->contact_person 
-    //                                                     ? '<b>Contact Person: </b>'.optional($deliveryAgent)->contact_person 
+    //                                                 '.(optional($deliveryAgent)->contact_person
+    //                                                     ? '<b>Contact Person: </b>'.optional($deliveryAgent)->contact_person
     //                                                     : '').'
-                                                    
-    //                                                 '.(optional($deliveryAgent)->tel_no 
-    //                                                     ? ' <b>Contact No: </b>'.optional($deliveryAgent)->tel_no 
+
+    //                                                 '.(optional($deliveryAgent)->tel_no
+    //                                                     ? ' <b>Contact No: </b>'.optional($deliveryAgent)->tel_no
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($deliveryAgent)->pincode 
-    //                                                     ? '<b>Pincode: </b>'.optional($deliveryAgent)->pincode 
+
+    //                                                 '.(optional($deliveryAgent)->pincode
+    //                                                     ? '<b>Pincode: </b>'.optional($deliveryAgent)->pincode
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($deliveryAgent)->gstin 
-    //                                                     ? '<b>GSTIN No: </b>'.optional($deliveryAgent)->gstin 
+
+    //                                                 '.(optional($deliveryAgent)->gstin
+    //                                                     ? '<b>GSTIN No: </b>'.optional($deliveryAgent)->gstin
     //                                                     : '').'
     //                                             </td>
     //                                         </tr>
     //                                         <tr style="width:100%; border:1px solid #000; vertical-align:top;">
     //                                             <td style="padding:5px; font-size:9px;">
-    //                                                 <b>SHIPPING LINE:</b><br> 
+    //                                                 <b>SHIPPING LINE:</b><br>
     //                                                 '.(optional($shippingLine)->shipping_line_name ?? ''). '<br>
     //                                                 ' .(optional($shippingLine)->address_line_1 ?? ''). '
     //                                                 ' .(optional($shippingLine)->address_line_2 ?? ''). '<br>
@@ -1687,7 +1689,7 @@ class SeaExportController extends Controller
     //                                             </td>
     //                                         </tr>
     //                                     </table>
-                
+
     //                                     <table style="width:100%; min-height:30px; border:1px solid #000; border-top:none; border-collapse:collapse; font-size:9px;">
     //                                         <tr>
     //                                             <td style="padding:3px;">
@@ -1701,7 +1703,7 @@ class SeaExportController extends Controller
     //                                 </td>
     //                             </tr>
     //                         </table>
-                
+
     //                         <!-- PORT INFO SECTION -->
     //                         <table style="width:100%; border-collapse:collapse; margin-top:5px;">
     //                             <tr>
@@ -1717,7 +1719,7 @@ class SeaExportController extends Controller
     //                                         </tr>
     //                                     </table>
     //                                 </td>
-                                    
+
     //                                 <td style="width:50%; vertical-align:top;">
     //                                     <table style="width:100%; min-height:30px; border:1px solid #000; border-collapse:collapse; font-size:9px;">
     //                                         <tr>
@@ -1732,7 +1734,7 @@ class SeaExportController extends Controller
     //                                 </td>
     //                             </tr>
     //                         </table>
-                
+
     //                         <!-- PORT LOCATIONS -->
     //                         <div style="display:flex; width:100%; font-size:9px;">
     //                             <div style="border:1px solid #000; border-top:none; padding:5px; flex:1; ">
@@ -1748,7 +1750,7 @@ class SeaExportController extends Controller
     //                                 <b>Place of Delivery:</b><br>'.($seaExportDraftData->deliveryPortName->port_name ?? 'N/A').'
     //                             </div>
     //                         </div>
-                
+
     //                         <!-- CARGO DETAILS FOR FIRST CONTAINER -->
     //                         <table style="width:100%; border-collapse:collapse; margin-top:1px;">
     //                             <tr>
@@ -1768,41 +1770,41 @@ class SeaExportController extends Controller
     //                                         <small><b>Cus Seal No:</b> '.($container->cust_seal_no ?? '').'</small>
     //                                     </div>
     //                                 </td>
-                                    
+
     //                                 <td style="border:1px solid #000; border-right:none; padding:4px; position:relative;">
     //                                     '.(!empty($container->total_package) ? "Total {$container->total_package} <br>" : '').'
     //                                     '.($container->goods_description ?? '').'<br>
     //                                     '.(!empty($container->sbill_no) ? "SB NO. : {$container->package_code}<br>" : '').'
     //                                     '.(!empty($container->customer_inv_no) ? "Cus Inv. No: {$container->customer_inv_no}<br>" : '').'
     //                                     '.(!empty($seaExportDraftData->freight) ? "FREIGHT : {$seaExportDraftData->freight}" : '').'
-                                    
+
     //                                     <div style="position:absolute; bottom:0; font-size:8px;">
     //                                         <small><b>SOB Date:</b> '.($seaExportDraftData->sob_date ?? '').'</small>
     //                                     </div>
     //                                 </td>
-                                    
+
     //                                 <td style="border:1px solid #000; border-right:none; padding:4px; position:relative;">
     //                                     '.($container->gross_weight ?? '0').' KGS
     //                                     <div style="position:absolute; bottom:0; font-size:8px;">
     //                                         <small><b>Size:</b> '.($container->size ?? '').'</small>
     //                                     </div>
     //                                 </td>
-                                    
+
     //                                 <td style="border:1px solid #000; border-right:none; padding:4px;">
     //                                     '.($container->net_weight ?? '0').' KGS
     //                                 </td>
-                                    
+
     //                                 <td style="border:1px solid #000; padding:4px; position:relative;">
     //                                     '.($container->cbm ?? '0').' CBM
     //                                     <div style="position:absolute; bottom:0; font-size:8px;">
     //                                         <small><b>Type:</b> '.($container->fcl_lcl ?? '').'</small>
     //                                     </div>
     //                                 </td>
-                                    
+
     //                             </tr>
 
     //                         </table>
-                
+
     //                         <table style="width:100%; border:1px solid #000; border-top:none; border-collapse:collapse; margin-top:5px; font-size:9px;">
     //                             <tr>
     //                                 <td style="padding:4px;">
@@ -1810,7 +1812,7 @@ class SeaExportController extends Controller
     //                                 </td>
     //                             </tr>
     //                         </table>
-                            
+
     //                         <!-- FOOTER -->
     //                         <table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:9px;">
     //                             <tr>
@@ -1825,19 +1827,19 @@ class SeaExportController extends Controller
     //                                 </td>
     //                             </tr>
     //                         </table>
-                            
+
     //                         <!-- PAGE INFO -->
     //                         <div style="text-align:center; margin-top:10px; font-size:8px; color:#666;">
     //                             Page 1 of '.($containerCount > 1 ? 2 : 1).' - Container '.$containerIndex.' of '.$containerCount.'
     //                         </div>
     //                     </div>';
-                        
+
     //                     // If there are more containers, add page break
     //                     if($containerCount > 1) {
     //                         $draftHtml .= '<div class="page-break"></div>';
     //                     }
     //                 }
-                    
+
     //                 // ADDITIONAL CONTAINERS - BACK PAGE
     //                 if($containerIndex > 1) {
     //                     // Start back page for second container
@@ -1849,13 +1851,13 @@ class SeaExportController extends Controller
     //                                 <h3 style="font-size:14px; color:red;">ADDITIONAL CONTAINER DETAILS</h3>
     //                                 <div style="font-size:10px; color:#666;">(Back Side - Draft Bill of Lading)</div>
     //                                 <div style="font-size:9px; margin-top:5px;">
-    //                                     Booking No: '.($seaExportDraftData->booking_no ?? '').' | 
+    //                                     Booking No: '.($seaExportDraftData->booking_no ?? '').' |
     //                                     MBL No: '.($seaExportDraftData->mbl_no ?? '').' |
     //                                     Total Containers: '.$containerCount.'
     //                                 </div>
     //                             </div>';
     //                     }
-                        
+
     //                     // Each additional container
     //                     $draftHtml .= '
     //                     <div style="margin-bottom:20px; border:1px solid #000; padding:10px;">
@@ -1898,15 +1900,15 @@ class SeaExportController extends Controller
     //                             </tr>
     //                             <tr>
     //                                 <td colspan="3" style="border:1px solid #000; padding:4px; font-size:8px;">
-    //                                     <b>Seal Numbers:</b> 
-    //                                     A/Seal: '.($container->agent_seal_no ?? '').' | 
+    //                                     <b>Seal Numbers:</b>
+    //                                     A/Seal: '.($container->agent_seal_no ?? '').' |
     //                                     Cus Seal: '.($container->cust_seal_no ?? '').'<br>
     //                                     <b>SOB Date:</b> '.($seaExportDraftData->sob_date ?? '').'
     //                                 </td>
     //                             </tr>
     //                         </table>
     //                     </div>';
-                        
+
     //                     // Close back page after last container
     //                     if($containerIndex == $containerCount) {
     //                         $draftHtml .= '
@@ -1936,21 +1938,21 @@ class SeaExportController extends Controller
     //                     }
     //                 }
     //             }
-                
+
     //             // If only one container, ensure proper closing
     //             if($containerCount == 1) {
     //                 $draftHtml .= '</div>';
     //             }
-                
+
     //             return response()->json(['html' => $draftHtml]);
     //         }
     //     }
     //     elseif($request->hbl_type == 'ORIGINAL' || $request->hbl_type == '1st ORIGINAL' || $request->hbl_type == '2nd ORIGINAL' || $request->hbl_type == '3rd ORIGINAL' || $request->hbl_type == 'NON-NEGOTIABLE' || $request->hbl_type == 'SEA WAY B/L')
     //     {
     //         if ($seaExportDraftData) {
-                
+
     //             $termsAndConditions = view('admin-main.admin.seaExport.term-condition')->render();
-                
+
     //             $draftHtml = '
     //             <style>
     //                 @media print {
@@ -1972,7 +1974,7 @@ class SeaExportController extends Controller
     //                         page-break-inside: avoid;
     //                     }
     //                 }
-                    
+
     //                 .bill-of-lading {
     //                     width: 210mm;
     //                     min-height: 297mm;
@@ -1985,24 +1987,24 @@ class SeaExportController extends Controller
     //                     box-sizing: border-box;
     //                     position: relative;
     //                 }
-                    
+
     //                 .back-side {
     //                     transform-origin: start;
     //                 }
     //             </style>';
-        
+
     //             $containerCount = count($seaExportDraftData->container);
     //             $containerIndex = 0;
-        
+
     //             foreach($seaExportDraftData->container as $container) {
     //                 $containerIndex++;
-                    
+
     //                 $shipper   = $seaExportDraftData->shipperName;
     //                 $consignee = $seaExportDraftData->ConsigneeName;
     //                 $notify    = $seaExportDraftData->notifyName;
     //                 $deliveryAgent    = $seaExportDraftData->deliveryAgentName;
     //                 $shippingLine    = $seaExportDraftData->shippingLine;
-                
+
     //                 // First container = FRONT PAGE
     //                 if($containerIndex == 1) {
     //                     $draftHtml .= '
@@ -2019,25 +2021,25 @@ class SeaExportController extends Controller
     //                                                 '.(optional($shipper)->address_line1 ?? '').'<br>
     //                                                 '.(optional($shipper)->address_line2 ?? '').'<br>
     //                                                 '.(optional($shipper)->city ?? '').'<br>
-                                                    
-    //                                                 '.(optional($shipper)->contact_person 
-    //                                                     ? '<b>Contact Person: </b>'.optional($shipper)->contact_person 
+
+    //                                                 '.(optional($shipper)->contact_person
+    //                                                     ? '<b>Contact Person: </b>'.optional($shipper)->contact_person
     //                                                     : '').'
-                                                    
-    //                                                 '.(optional($shipper)->tel_no 
-    //                                                     ? ' <b>Contact No: </b>'.optional($shipper)->tel_no 
+
+    //                                                 '.(optional($shipper)->tel_no
+    //                                                     ? ' <b>Contact No: </b>'.optional($shipper)->tel_no
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($shipper)->pincode 
-    //                                                     ? '<b>Pincode: </b>'.optional($shipper)->pincode 
+
+    //                                                 '.(optional($shipper)->pincode
+    //                                                     ? '<b>Pincode: </b>'.optional($shipper)->pincode
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($shipper)->gstin 
-    //                                                     ? '<b>GSTIN No: </b>'.optional($shipper)->gstin 
+
+    //                                                 '.(optional($shipper)->gstin
+    //                                                     ? '<b>GSTIN No: </b>'.optional($shipper)->gstin
     //                                                     : '').'
     //                                             </div>
     //                                         </div>
-                    
+
     //                                         <!-- Consignee -->
     //                                         <div style="border-bottom:1px solid #000; min-height:150px; padding:3px;">
     //                                             <div style="font-weight:bold; color:#000000; font-size:10px;">Consignee (or order)</div>
@@ -2046,51 +2048,51 @@ class SeaExportController extends Controller
     //                                                 '.(optional($consignee)->address_line1 ?? '').'<br>
     //                                                 '.(optional($consignee)->address_line2 ?? '').'<br>
     //                                                 '.(optional($consignee)->city ?? '').'<br>
-    //                                                 '.(optional($consignee)->contact_person 
-    //                                                     ? '<b>Contact Person: </b>'.optional($consignee)->contact_person 
+    //                                                 '.(optional($consignee)->contact_person
+    //                                                     ? '<b>Contact Person: </b>'.optional($consignee)->contact_person
     //                                                     : '').'
-                                                    
-    //                                                 '.(optional($consignee)->tel_no 
-    //                                                     ? ' <b>Contact No: </b>'.optional($consignee)->tel_no 
+
+    //                                                 '.(optional($consignee)->tel_no
+    //                                                     ? ' <b>Contact No: </b>'.optional($consignee)->tel_no
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($consignee)->pincode 
-    //                                                     ? '<b>Pincode: </b>'.optional($consignee)->pincode 
+
+    //                                                 '.(optional($consignee)->pincode
+    //                                                     ? '<b>Pincode: </b>'.optional($consignee)->pincode
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($consignee)->gstin 
-    //                                                     ? '<b>GSTIN No: </b>'.optional($consignee)->gstin 
+
+    //                                                 '.(optional($consignee)->gstin
+    //                                                     ? '<b>GSTIN No: </b>'.optional($consignee)->gstin
     //                                                     : '').'
     //                                             </div>
     //                                         </div>
-                    
+
     //                                         <!-- Notify Party -->
     //                                         <div style="border-bottom:1px solid #000; min-height:120px; padding:3px;">
     //                                             <div style="font-weight:bold; color:#000000; font-size:10px;">Notify Party</div>
-    //                                             <div style="font-size:12px; color:#000000;">  
+    //                                             <div style="font-size:12px; color:#000000;">
     //                                                 '.(optional($notify)->party_name ?? '').'<br>
     //                                                 '.(optional($notify)->address_line1 ?? '').'<br>
     //                                                 '.(optional($notify)->address_line2 ?? '').'<br>
     //                                                 '.(optional($notify)->city ?? '').'<br>
-                                                    
-    //                                                 '.(optional($notify)->contact_person 
-    //                                                     ? '<b>Contact Person: </b>'.optional($notify)->contact_person 
+
+    //                                                 '.(optional($notify)->contact_person
+    //                                                     ? '<b>Contact Person: </b>'.optional($notify)->contact_person
     //                                                     : '').'
-                                                    
-    //                                                 '.(optional($notify)->tel_no 
-    //                                                     ? ' <b>Contact No: </b>'.optional($notify)->tel_no 
+
+    //                                                 '.(optional($notify)->tel_no
+    //                                                     ? ' <b>Contact No: </b>'.optional($notify)->tel_no
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($notify)->pincode 
-    //                                                     ? '<b>Pincode: </b>'.optional($notify)->pincode 
+
+    //                                                 '.(optional($notify)->pincode
+    //                                                     ? '<b>Pincode: </b>'.optional($notify)->pincode
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($notify)->gstin 
-    //                                                     ? '<b>GSTIN No: </b>'.optional($notify)->gstin 
+
+    //                                                 '.(optional($notify)->gstin
+    //                                                     ? '<b>GSTIN No: </b>'.optional($notify)->gstin
     //                                                     : '').'
     //                                             </div>
     //                                         </div>
-                                            
+
     //                                         <!-- Place of Acceptance & Vessel -->
     //                                         <table style="width:100%; border-collapse:collapse;">
     //                                             <tr>
@@ -2107,7 +2109,7 @@ class SeaExportController extends Controller
     //                                             </tr>
     //                                         </table>
     //                                     </td>
-                    
+
     //                                     <!-- RIGHT SIDE: BL Info -->
     //                                     <td style="width:50%; vertical-align:top;">
     //                                         <!-- BL Header -->
@@ -2132,7 +2134,7 @@ class SeaExportController extends Controller
     //                                                 </tr>
     //                                             </table>
     //                                         </div>
-                                            
+
     //                                         <!-- Company Logo & Info -->
     //                                         <div style="border-bottom:1px solid #000; min-height:200px; padding:20px 10px; text-align:center;">
     //                                             <div style="margin-bottom:5px;">
@@ -2149,14 +2151,14 @@ class SeaExportController extends Controller
     //                                                 <small style="font-size:10px;"><span style="text-decoration:underline;">Email: '.(optional($company->companySetting)->email).'</span></small><br>
     //                                             </div>
     //                                         </div>
-                                            
+
     //                                         <!-- MTO Clause -->
     //                                         <div style="border-bottom:1px solid #000; min-height:100px; padding:3px 10px;">
     //                                             <small style="color:#000000; font-size:9px; line-height:1.2;">
     //                                                 Taken in charge in apparently goods condition herein at the place of receipt for transport & delivery as mentioned above, unless otherwise stated. The MTO in accordance with the provision contained in the MTD undertakes to perform or to procure the performance of the multimodal transport from the place at which the goods are taken in charge to the place designed for delivery and assumes responsibility for such transport. One of the MTD(s) must be surrendered, duly endorsed in exchange for the goods. In witness where of the original MTD all of this tenor and date have been signed in the number indicated below one of which being accomplished the other(s) to be void.
     //                                             </small>
     //                                         </div>
-                    
+
     //                                         <!-- Delivery Agent -->
     //                                         <div style="padding:3px 10px; min-height:60px;">
     //                                             <b style="font-size:9px;">Delivery Agent:</b><br>
@@ -2166,27 +2168,27 @@ class SeaExportController extends Controller
     //                                                 '.(optional($deliveryAgent)->address_line2 ?? '').'
     //                                                 '.(optional($deliveryAgent)->address_line3 ?? '').'
     //                                                 '.(optional($deliveryAgent)->city ?? '').'<br>
-    //                                                 '.(optional($deliveryAgent)->contact_person 
-    //                                                     ? '<b>Contact Person: </b>'.optional($deliveryAgent)->contact_person 
+    //                                                 '.(optional($deliveryAgent)->contact_person
+    //                                                     ? '<b>Contact Person: </b>'.optional($deliveryAgent)->contact_person
     //                                                     : '').'
-                                                    
-    //                                                 '.(optional($deliveryAgent)->tel_no 
-    //                                                     ? ' <b>Contact No: </b>'.optional($deliveryAgent)->tel_no 
+
+    //                                                 '.(optional($deliveryAgent)->tel_no
+    //                                                     ? ' <b>Contact No: </b>'.optional($deliveryAgent)->tel_no
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($deliveryAgent)->pincode 
-    //                                                     ? '<b>Pincode: </b>'.optional($deliveryAgent)->pincode 
+
+    //                                                 '.(optional($deliveryAgent)->pincode
+    //                                                     ? '<b>Pincode: </b>'.optional($deliveryAgent)->pincode
     //                                                     : '').'<br>
-                                                    
-    //                                                 '.(optional($deliveryAgent)->gstin 
-    //                                                     ? '<b>GSTIN No: </b>'.optional($deliveryAgent)->gstin 
+
+    //                                                 '.(optional($deliveryAgent)->gstin
+    //                                                     ? '<b>GSTIN No: </b>'.optional($deliveryAgent)->gstin
     //                                                     : '').'
     //                                             </div>
     //                                         </div>
     //                                     </td>
     //                                 </tr>
     //                             </table>
-                                
+
     //                             <!--PORT INFO -->
     //                             <table style="width:100%; border-collapse:collapse; color:#000000; border:1px solid #000; border-top: none;">
     //                                 <tr>
@@ -2208,7 +2210,7 @@ class SeaExportController extends Controller
     //                                     </td>
     //                                 </tr>
     //                             </table>';
-                                
+
     //                         // FIRST CONTAINER DETAILS (FRONT PAGE)
     //                         $draftHtml .= '
     //                             <!-- CARGO DETAILS FOR FIRST CONTAINER -->
@@ -2223,7 +2225,7 @@ class SeaExportController extends Controller
     //                                 <tr style="min-height:260px; height:350px; vertical-align:top;">
     //                                     <td style="border:1px solid #000; padding:4px; position:relative;">
     //                                         '.($container->mark_number ?? '').'
-                                            
+
     //                                         <div style="position:absolute; bottom:0px; width:95%; font-size:9px;">
     //                                             <small><b>Container No:</b> '.($container->container_no ?? '').'</small><br>
     //                                             <small><b>A/Seal No:</b> '.($container->agent_seal_no ?? '').'</small><br>
@@ -2236,14 +2238,14 @@ class SeaExportController extends Controller
     //                                         Package Type : '.($seaExportDraftData->packageName->package_code ?? '').'<br>
     //                                         Cus Inv. No: '.($container->customer_inv_no ?? '').'<br>
     //                                         FREIGHT : '.($seaExportDraftData->freight ?? '').'<br>
-                                            
+
     //                                         <div style="position:absolute; bottom:0px; width:95%; font-size:9px;">
     //                                             <small><b>SOB Date:</b> '.($seaExportDraftData->sob_date ?? '').'</small><br>
     //                                         </div>
     //                                     </td>
     //                                     <td style="border:1px solid #000; padding:4px; position:relative;">
     //                                         '.($container->gross_weight ?? '0').' KGS
-                                            
+
     //                                         <div style="position:absolute; bottom:0px; width:95%; font-size:8px;">
     //                                             <small><b>Size:</b> '.($container->size ?? '').'</small><br>
     //                                         </div>
@@ -2281,7 +2283,7 @@ class SeaExportController extends Controller
     //                                     </td>
     //                                 </tr>
     //                             </table>
-                    
+
     //                             <!-- FOOTER SECTION -->
     //                             <table style="width:100%; border-collapse:collapse; border:1px solid #000; border-top: none;">
     //                                 <tr>
@@ -2305,8 +2307,8 @@ class SeaExportController extends Controller
     //                                 </tr>
     //                             </table>
     //                         </div>';
-                            
-        
+
+
     //                         // if($containerCount > 1) {
     //                         //     $draftHtml .= '
     //                         //     <div class="page-break"></div>
@@ -2316,8 +2318,8 @@ class SeaExportController extends Controller
     //                         //             <div style="font-size:10px;">(Back Side of Bill of Lading)</div>
     //                         //         </div>';
     //                         // }
-                            
-                            
+
+
     //                         if($containerCount == 1) {
     //                             // Single container - terms on back of same page
     //                             $draftHtml .= '
@@ -2348,9 +2350,9 @@ class SeaExportController extends Controller
     //                                     <div style="font-size:10px;">(Back Side of Bill of Lading)</div>
     //                                 </div>';
     //                         }
-                            
-                            
-                            
+
+
+
     //                     }
     //                     // Additional containers = BACK PAGE
     //                     elseif($containerIndex > 1) {
@@ -2402,7 +2404,7 @@ class SeaExportController extends Controller
     //                                     </tr>
     //                                 </table>
     //                             </div>';
-                                
+
     //                         // Close back-side div after last container
     //                         if($containerIndex == $containerCount) {
     //                             $draftHtml .= '
@@ -2424,19 +2426,19 @@ class SeaExportController extends Controller
     //                         }
     //                     }
     //                 }
-            
+
     //             // If only one container, close properly
     //             if($containerCount == 1) {
     //                 $draftHtml .= '</div>';
     //             }
     //         }
-        
+
     //         return response()->json(['html' => $draftHtml]);
     //     }
 
     // }
 
-    
+
     public function loadingConfirmation($id)
     {
         $page_title = 'Sea Export Loading Confirmation';
@@ -2447,15 +2449,15 @@ class SeaExportController extends Controller
             ->where('company_id', $this->company_id)
             ->where('id', $id)
             ->first();
-            
+
         $company = Company::with(['companySetting', 'companyBranch'])
         ->where('id', $this->company_id)
         ->first();
-            
-        $logoUrl = $company->logo 
+
+        $logoUrl = $company->logo
             ? asset('public/uploads/company_logo/' . $company->logo)
             : asset('images/default-logo.png');
-            
+
         return view('admin-main/admin/seaExport/loading-confirmation', [
                 'seaExport' => $seaExport,
                 'company' => $company,
@@ -2474,63 +2476,63 @@ class SeaExportController extends Controller
         ->where('company_id', $this->company_id)
         ->where('id', $id)
         ->firstOrFail();
-        
+
         $company = Company::with(['companySetting', 'companyBranch'])
             ->where('id', $this->company_id)
             ->first();
-        
+
         $logoPath = $company->logo
             ? public_path('uploads/company_logo/' . $company->logo)
             : public_path('images/default-logo.png');
 
-        
+
         $format = request('format', 'pdf');
-    
+
         if ($format === 'pdf') {
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
                 'admin-main.admin.seaExport.loading-confirmation-pdf',
                 compact('seaExport', 'logoPath', 'company')
             )->setPaper('A4', 'portrait');
-    
+
             return $pdf->download("Loading-Confirmation-{$seaExport->id}.pdf");
         }
-        
+
         // ------------------- Excel Export -------------------
         if ($format === 'excel') {
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
             $row = 1;
             $cols = ['A','B','C','D','E','F'];
-        
+
             // ------------------- Company Header -------------------
             $sheet->mergeCells("A{$row}:F{$row}");
             $sheet->setCellValue("A{$row}", $company->address);
             $sheet->getStyle("A{$row}")->getFont()->setBold(true)->setSize(16);
             $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        
+
             $row++;
             $sheet->mergeCells("A{$row}:F{$row}");
             $sheet->setCellValue("A{$row}", $company->company_name);
             $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        
+
             $row++;
             $sheet->mergeCells("A{$row}:F{$row}");
-            $sheet->setCellValue("A{$row}", 
+            $sheet->setCellValue("A{$row}",
                 "PAN: {$company->companySetting->pan_no}   GSTIN: {$company->companySetting->gstin_no}   CIN: {$company->companySetting->cin_no}"
             );
 
             $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-        
+
             $row += 2;
-        
+
             // ------------------- Report Title -------------------
             $sheet->mergeCells("A{$row}:F{$row}");
             $sheet->setCellValue("A{$row}", "LOADING CONFIRMATION REPORT");
             $sheet->getStyle("A{$row}")->getFont()->setBold(true)->setSize(14);
             $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        
+
             $row += 2;
-        
+
             // ------------------- Loading Confirmation Details -------------------
             $details = [
                 'Job No.' => $seaExport->jobMaster->job_no ?? '',
@@ -2547,28 +2549,28 @@ class SeaExportController extends Controller
                 'Load Port' => $seaExport->loadingPortName->port_name ?? '',
                 'ETD / SAIL ON Date' => $seaExport->etd_date ? Carbon::parse($seaExport->etd_date)->format('d/m/Y') : ''
             ];
-        
+
             foreach ($details as $key => $value) {
                 $sheet->setCellValue("A{$row}", $key);
                 $sheet->setCellValue("B{$row}", $value);
-        
+
                 $sheet->getStyle("A{$row}:B{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
                 $sheet->getStyle("A{$row}")->getFont()->setBold(true);
                 $sheet->getStyle("B{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
                 $row++;
             }
-        
+
             $row += 1; // space before container tables
-        
+
             // ------------------- Container Tables -------------------
             if($seaExport->container && $seaExport->container->count()) {
-        
+
                 // Table 1: POL/ETD, POD/ETA, Vessel, Voyage, Stuffing Date
                 $sheet->mergeCells("A{$row}:F{$row}");
                 $sheet->setCellValue("A{$row}", "Container POL / POD / Vessel Info");
                 $sheet->getStyle("A{$row}")->getFont()->setBold(true);
                 $row++;
-        
+
                 $headers1 = ['POL // ETD','POD // ETA','VESSEL NAME','VOYAGE NO.','STUFFING DATE'];
                 foreach($headers1 as $i => $h){
                     $sheet->setCellValue("{$cols[$i]}{$row}", $h);
@@ -2576,7 +2578,7 @@ class SeaExportController extends Controller
                     $sheet->getStyle("{$cols[$i]}{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
                 }
                 $row++;
-        
+
                 foreach($seaExport->container as $container){
                     $sheet->setCellValue("A{$row}", ($seaExport->loadingPortName->port_name ?? '') . ' // ' . ($seaExport->etd_date ?? ''));
                     $sheet->setCellValue("B{$row}", ($seaExport->dischargePortName->port_name ?? '') . ' // ' . ($seaExport->eta_date ?? ''));
@@ -2586,15 +2588,15 @@ class SeaExportController extends Controller
                     $sheet->getStyle("A{$row}:E{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
                     $row++;
                 }
-        
+
                 $row += 1;
-        
+
                 // Table 2: Gross WT, Volume, Package Count, Package Type, Shipping Bill
                 $sheet->mergeCells("A{$row}:F{$row}");
                 $sheet->setCellValue("A{$row}", "Package Details");
                 $sheet->getStyle("A{$row}")->getFont()->setBold(true);
                 $row++;
-        
+
                 $headers2 = ['GROSS WT.(IN KGS)','VOLUME','PACKAGE COUNT','PACKAGE TYPE','S/BILL NO // DATE','STUFFING POINT/DATE'];
                 foreach($headers2 as $i => $h){
                     $sheet->setCellValue("{$cols[$i]}{$row}", $h);
@@ -2602,7 +2604,7 @@ class SeaExportController extends Controller
                     $sheet->getStyle("{$cols[$i]}{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
                 }
                 $row++;
-        
+
                 foreach($seaExport->container as $container){
                     $sheet->setCellValue("A{$row}", $container->gross_weight ?? '');
                     $sheet->setCellValue("B{$row}", $seaExport->volume_unit ?? '');
@@ -2613,15 +2615,15 @@ class SeaExportController extends Controller
                     $sheet->getStyle("A{$row}:F{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
                     $row++;
                 }
-        
+
                 $row += 1;
-        
+
                 // Table 3: Container No, Custom Seal, Agent Seal, Size, Container Type
                 $sheet->mergeCells("A{$row}:F{$row}");
                 $sheet->setCellValue("A{$row}", "Container Details");
                 $sheet->getStyle("A{$row}")->getFont()->setBold(true);
                 $row++;
-        
+
                 $headers3 = ['Container No','Custom Seal No','Agent Seal No','Size','Container Type'];
                 foreach($headers3 as $i => $h){
                     $sheet->setCellValue("{$cols[$i]}{$row}", $h);
@@ -2629,7 +2631,7 @@ class SeaExportController extends Controller
                     $sheet->getStyle("{$cols[$i]}{$row}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
                 }
                 $row++;
-        
+
                 foreach($seaExport->container as $container){
                     $sheet->setCellValue("A{$row}", $container->container_no ?? '');
                     $sheet->setCellValue("B{$row}", $container->cust_seal_no ?? '');
@@ -2644,31 +2646,31 @@ class SeaExportController extends Controller
                 $sheet->setCellValue("A{$row}", "No container data available");
                 $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             }
-        
+
             // ------------------- Save & Download -------------------
             $file = "Loading-Confirmation-{$seaExport->id}.xlsx";
             $temp = tempnam(sys_get_temp_dir(), $file);
             (new Xlsx($spreadsheet))->save($temp);
-        
+
             return response()->download($temp, $file)->deleteFileAfterSend(true);
         }
 
-    
+
         // word
         if ($format === 'word') {
             $logoPath = $company->logo
                         ? public_path('uploads/company_logo/' . $company->logo)
                         : public_path('images/default-logo.png');
             $phpWord = new \PhpOffice\PhpWord\PhpWord();
-        
+
             $section = $phpWord->addSection([
                 'marginTop' => 200, 'marginBottom' => 200,
                 'marginLeft' => 400, 'marginRight' => 400
             ]);
-        
+
             $phpWord->setDefaultFontName('Arial');
             $phpWord->setDefaultFontSize(11);
-        
+
             // ------------------- Company Header -------------------
             $headerTable = $section->addTable([
                 'borderSize' => 0,        // No border
@@ -2684,7 +2686,7 @@ class SeaExportController extends Controller
                 'height' => 60,
                 'alignment' => 'left'
             ]);
-            
+
             $cell = $headerTable->addCell(7000, ['borderSize' => 0, 'borderColor' => 'FFFFFF']);
             $cell->addText($company->company_name, ['bold' => true, 'size' => 16, 'color' => '004080'], ['alignment' => 'right']);
             $cell->addText($company->address, [], ['alignment' => 'right']);
@@ -2700,13 +2702,13 @@ class SeaExportController extends Controller
             );
 
 
-        
+
             $section->addTextBreak(1);
-        
+
             // ------------------- Report Title -------------------
             $section->addText('LOADING CONFIRMATION REPORT', ['bold' => true, 'size' => 14], ['alignment' => 'center']);
             $section->addTextBreak(1);
-        
+
             // ------------------- Loading Confirmation Details Table -------------------
             $t1 = $section->addTable(['borderSize' => 6, 'borderColor' => '000000', 'cellMargin' => 50]);
             $details = [
@@ -2726,15 +2728,15 @@ class SeaExportController extends Controller
                 'ETD / SAIL ON Date' => $seaExport->etd_date ? Carbon::parse($seaExport->etd_date)->format('d/m/Y') : '',
                 // 'SOB' => $seaExport->sob_date ? Carbon::parse($seaExport->sob_date)->format('d/m/Y') : ''
             ];
-        
+
             foreach ($details as $key => $value) {
                 $t1->addRow();
                 $t1->addCell(4000)->addText($key, ['bold' => true]);
                 $t1->addCell(8000)->addText($value);
             }
-        
+
             $section->addTextBreak(1);
-        
+
             // ------------------- Container Details Tables -------------------
             // Table 1: POL // ETD, POD // ETA, Vessel Name, Voyage, Stuffing Date
             $tableStyle = [
@@ -2750,7 +2752,7 @@ class SeaExportController extends Controller
             $t2->addRow();
             $headers1 = ['POL // ETD', 'POD // ETA', 'VESSEL NAME', 'VOYAGE NO.'];
             foreach ($headers1 as $h) $t2->addCell()->addText($h, ['bold' => true]);
-            
+
             $t2->addRow();
             if ($seaExport->container) {
                 $t2->addCell()->addText(($seaExport->loadingPortName->port_name ?? '') . ' // ' . ($seaExport->etd_date ?? ''));
@@ -2762,16 +2764,16 @@ class SeaExportController extends Controller
                 $t2->addRow();
                 $t2->addCell(5)->addText('No container data available', ['italic' => true], ['alignment' => 'center']);
             }
-            
+
             $section->addTextBreak(1);
-            
+
             // Table 2
             // Table 2: Package Details per container
             $t3 = $section->addTable($tableStyle);
             $t3->addRow();
             $headers2 = ['GROSS WT.(IN KGS)', 'VOLUME', 'PACKAGE COUNT', 'PACKAGE TYPE', 'SHIPPING BILL NO // DATE','STUFFING POINT/ DATE'];
             foreach ($headers2 as $h) $t3->addCell()->addText($h, ['bold'=>true]);
-            
+
             if($seaExport->container && $seaExport->container->count()){
                 foreach($seaExport->container as $container){
                     $t3->addRow();
@@ -2783,13 +2785,13 @@ class SeaExportController extends Controller
                     $t3->addCell()->addText($seaExport->stuffing_point.'/'.$seaExport->stuffingDate ?? '');
                 }
             }
-            
+
             // Table 3: Container Details per container
             $t4 = $section->addTable($tableStyle);
             $t4->addRow();
             $headers3 = ['Container No','Custom Seal No','Agent Seal No','Size','Container Type'];
             foreach ($headers3 as $h) $t4->addCell()->addText($h, ['bold'=>true]);
-            
+
             if($seaExport->container && $seaExport->container->count()){
                 foreach($seaExport->container as $container){
                     $t4->addRow();
@@ -2802,19 +2804,19 @@ class SeaExportController extends Controller
             }
 
 
-        
+
             // ------------------- Save and Download -------------------
             $file = "Loading-Confirmation-{$seaExport->id}.docx";
             $filePath = storage_path("app/public/{$file}");
             \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007')->save($filePath);
-        
+
             return response()->download($filePath)->deleteFileAfterSend(true);
         }
 
-    
+
         abort(404);
     }
-    
+
     public function grossWeightTotal(Request $request)
     {
         $totalGrossWeight = OperationSeaExport::whereBetween(
@@ -2824,13 +2826,13 @@ class SeaExportController extends Controller
                 $request->end_date
             ]
         )->sum('gross_weight');
-    
+
         return response()->json([
             'status' => true,
             'total' => $totalGrossWeight
         ]);
     }
-    
+
     public function getShipmentDetail($id)
     {
         $shipmentDetail = OperationSeaExportShipmentLine::find($id);
@@ -2841,7 +2843,7 @@ class SeaExportController extends Controller
 
         return response()->json($shipmentDetail);
     }
-    
+
     public function addShipmentLine(Request $request)
     {
         if (!$request->filled('sea_export_id')) {
@@ -2947,7 +2949,7 @@ class SeaExportController extends Controller
         $shipmentLine->delete();
         return response()->json(['status'=>true,'message'=>'Shipment deleted successfully']);
     }
-    
+
     // export restrictions
     public function checkSeaExportDownloadPermission(Request $request)
     {
@@ -2955,21 +2957,21 @@ class SeaExportController extends Controller
             'job_no'    => 'required|integer',
             'copy_type' => 'required|string',
         ]);
-    
+
         $result = $this->downloadService->canDownload(
             $request->job_no,
             'sea_export',
             'mbl',
             $request->copy_type
         );
-    
+
         if (!$result['status']) {
             return response()->json([
                 'status' => false,
                 'message' => $result['message']
             ], 403);
         }
-    
+
         return response()->json([
             'status' => true,
             'remaining' => $this->downloadService->remainingDownloads(
@@ -2980,24 +2982,24 @@ class SeaExportController extends Controller
             )
         ]);
     }
-    
+
     public function confirmSeaExportDownload(Request $request)
     {
         $request->validate([
             'job_no'    => 'required|integer',
             'copy_type' => 'required|string',
         ]);
-    
+
         $this->downloadService->recordDownload(
             $request->job_no,
             'sea_export',
             'mbl',
             $request->copy_type
         );
-    
+
         return response()->json([
             'status' => true
         ]);
     }
-    
+
 }

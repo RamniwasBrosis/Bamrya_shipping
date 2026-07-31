@@ -436,8 +436,6 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['permission:accounts'])->group(function(){
         Route::prefix('admin')->group(function(){
             Route::resource('sales-invoices', SalesInvoiceController::class);
-
-
             Route::resource('tax-invoices', TaxInvoiceController::class);
 
             Route::resource('receipts', ReceiptController::class);

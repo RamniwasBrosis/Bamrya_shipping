@@ -14,7 +14,7 @@
                     {{-- <h4 class="card-title mb-2">Packages</h4> --}}
                 </div>
                 <div class="card-header d-block pb-2">
-                    <form class="row align-items-end" method="get" action="{{route('sales-invoices.index')}}">                   
+                    <form class="row align-items-end" method="get" action="{{route('sales-invoices.index')}}">
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Job No.</label>
                             <select id="statusFilter" class="form-control select2" name="job_no">
@@ -40,8 +40,8 @@
                                 @php
                                     $uniqueParties = $sales_invoices->unique('billing_party_id');
                                 @endphp
-        
-        
+
+
                                 @foreach ($uniqueParties as $sales_invoice)
                                     <option value="{{$sales_invoice->billing_party_id}}">{{$sales_invoice->partyName->party_name ?? ''}}</option>
                                 @endforeach
@@ -51,7 +51,7 @@
                         <!--    <label class="form-label">Start Date</label>-->
                         <!--    <input type="date" placeholder="dd/mm/yy" class="form-control" name="start_date" value="{{ request('start_date') }}">-->
                         <!--</div>-->
-                        
+
                         <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
                         <!--    <label class="form-label">End Date</label>-->
                         <!--    <input type="date" placeholder="dd/mm/yy" class="form-control" name="end_date" value="{{ request('end_date') }}">-->
@@ -111,7 +111,7 @@
                                                 break;
                                             case 'SE':
                                                 $Inv_cat = 'SEA EXPORT';
-                                                break;                                                                                      
+                                                break;
                                             default:
                                                 $Inv_cat = '--';
                                                 break;
@@ -121,7 +121,7 @@
                                         $latestCharge = $sales_invoice->chargesContainer
                                             ->sortByDesc('updated_at')
                                             ->first();
-                                    
+
                                         if (
                                             $latestCharge &&
                                             $latestCharge->updated_at > $sales_invoice->updated_at
@@ -135,9 +135,9 @@
                                     <tr>
                                         <td>{{$loop->iteration ?? '--'}}</td>
                                         <!--<td>{{$sales_invoice->inv_cat}}/{{$sales_invoice->job_no ?? '--'}}/{{$fy}}</td>                 gajendra  -->
-                                        
+
                                         <td>{{$sales_invoice->partyName->party_name ?? '--'}}</td>
-                                        <td>{{$sales_invoice->inv_cat}}/{{$sales_invoice->operationJob->job_no ?? '--'}}/{{$fy}}</td>  
+                                        <td>{{$sales_invoice->full_job_no??''}}</td>
                                         <td>{{$sales_invoice->invoice_no ?? '--'}}</td>
                                         <td>{{$sales_invoice->invoice_date ? \Carbon\Carbon::parse($sales_invoice->invoice_date)->format('d-m-Y') :'--'}}</td>
                                         <td>{{ $sales_invoice->invoice_type ?? '--'}}</td>
@@ -161,16 +161,16 @@
                                             <a href="{{ route('salesInvoice.import', $sales_invoice->id) }}" type="button" class="btn btn-success btn-sm">Print</a>
                                             <a class="badge badge-info light border-0" href="{{url('admin/sales-invoices/'.$sales_invoice->uuid.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-salesInvoice" href="javascript:void(0);" data-id="{{$sales_invoice->id}}">Delete</a>
-                                            
+
                                             <!--<form action="{{ route('sales-invoices.destroy', $sales_invoice->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this record?');">-->
                                             <!--    @csrf-->
                                             <!--    @method('DELETE')-->
                                             <!--    <button type="submit" class="badge badge-danger light border-0">Delete</button>-->
                                             <!--</form>-->
                                         </td>
-                                    </tr>                                    
+                                    </tr>
                                 @endforeach
-                                
+
                             </tbody>
                         </table>
                         <div class="d-flex justify-content-center mt-3">
@@ -178,7 +178,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div id="error-div"></div>
             </div>
         </div>
@@ -197,7 +197,7 @@
                 width: '100%'
             })
         })
-    
+
         $(document).on('click', '.delete-salesInvoice', function(e) {
             e.preventDefault();
             if (!confirm('Are you sure you want to delete this Sales Invoice record?')) return;
@@ -205,7 +205,7 @@
             const salesInvoiceId = $(this).data('id');
             let url = "{{ route('sales-invoices.destroy', ':id') }}";
             url = url.replace(':id', salesInvoiceId);
-            
+
             $.ajax({
                 url: url,
                 type: 'DELETE',
@@ -220,7 +220,7 @@
                     }else{
                         $('#error-div').text(response.message).css('color', 'red');
                     }
-                    
+
                     setTimeout(()=>{
                         $('#error-div').text('')
                     }, 3000)

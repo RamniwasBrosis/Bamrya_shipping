@@ -98,6 +98,7 @@ class JobMasterController extends Controller
                 ->where('company_id', $this->company_id)
                 ->first();
         $lastJob = OperationJobMaster::where('company_id', $this->company_id)
+            ->where('branch_id', Auth::user()->branch_id)
             ->latest('job_no')
             ->first();
 

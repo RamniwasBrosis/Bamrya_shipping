@@ -136,6 +136,7 @@
                                     <th>Cargo Dispatch Date</th>
                                     <th>Pickup Date</th>
                                     <th>Updated By</th>
+                                    <th>Branch</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -177,6 +178,7 @@
                                         <td>{!! $job_master->cargo_ready_date ? $job_master->cargo_ready_date : '<small class="text-danger">Pending</small>' !!}</td>
                                         <td>{{$job_master->pickup_date ?? ''}}</td>
                                         <td>{{$job_master->user->name ?? ''}}</td>
+                                        <td>{{$job_master->branch->branch_name ?? ''}}</td>
 
                                         <td>
                                             @if($job_master->job_status == 'O')

@@ -58,8 +58,8 @@
                                             class="text-danger">*</span></label>
                                     <div class="col-sm-9">
                                         <select class="select2 form-control wide" name="branch_id">
+                                            <option value="">Select Branch</option>
                                             @foreach ($branches as $branch)
-                                                <option value="">Select Branch</option>
                                                 <option value="{{$branch->id}}" {{$user->branch_id == $branch->id ? 'selected' : ''}}>{{$branch->branch_name}}</option>
                                             @endforeach
                                         </select>
@@ -89,7 +89,7 @@
                                     <label class="col-sm-3 col-form-label">Status:<span
                                             class="text-danger">*</span></label>
                                     <div class="col-sm-9">
-                                        <select class="default-select  form-control wide" placeholder="Select" name="status">
+                                        <select class="select2 form-control wide" placeholder="Select" name="status">
                                             <option value="1" {{$user->status == 1? 'selected' : ''}}>Active</option>
                                             <option value="0" {{$user->status == 0? 'selected' : ''}}>Deactive</option>
                                         </select>
