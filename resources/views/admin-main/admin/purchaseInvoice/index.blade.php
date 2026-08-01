@@ -14,7 +14,7 @@
                     {{-- <h4 class="card-title mb-2">Packages</h4> --}}
                 </div>
                 <div class="card-header d-block pb-2">
-                    <form class="row align-items-end" method="get" action="{{route('purchase-invoices.index')}}">                   
+                    <form class="row align-items-end" method="get" action="{{route('purchase-invoices.index')}}">
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Job No.</label>
                             <select id="statusFilter" class="form-control select2" name="job_no">
@@ -46,7 +46,7 @@
                         <!--    <label class="form-label">Start Date</label>-->
                         <!--    <input type="date" placeholder="dd/mm/yy" class="form-control" name="start_date" value="{{ request('start_date') }}">-->
                         <!--</div>-->
-                        
+
                         <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
                         <!--    <label class="form-label">End Date</label>-->
                         <!--    <input type="date" placeholder="dd/mm/yy" class="form-control" name="end_date" value="{{ request('end_date') }}">-->
@@ -72,6 +72,7 @@
                                     <th>FinYear</th>
                                     <th>Inv Amt</th>
                                     <th>Updated By</th>
+                                    <th>Branch</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -95,7 +96,7 @@
                                         switch ($purchase_invoice->party_type) {
                                             case 'customer':
                                                 $party_Type = 'Customer';
-                                                break;                                                                                                                           
+                                                break;
                                             default:
                                                 $party_Type = 'OtherBillingPARTY';
                                                 break;
@@ -113,7 +114,7 @@
                                                 break;
                                             case 'SE':
                                                 $Inv_cat = 'SEA EXPORT';
-                                                break;                                                                                      
+                                                break;
                                             default:
                                                 $Inv_cat = '--';
                                                 break;
@@ -123,7 +124,7 @@
                                         $latestCharge = $purchase_invoice->chargesContainer
                                             ->sortByDesc('updated_at')
                                             ->first();
-                                    
+
                                         if (
                                             $latestCharge &&
                                             $latestCharge->updated_at > $purchase_invoice->updated_at
@@ -137,7 +138,7 @@
                                     <tr>
                                         <td>{{$loop->iteration ?? '--'}}</td>
                                         <td>{{$purchase_invoice->partyName->party_name ?? '--'}}</td>
-                                        <td>{{$purchase_invoice->inv_cat}}/{{$purchase_invoice->operationJob->job_no ?? '--'}}/{{$fy}}</td>  
+                                        <td>{{$purchase_invoice->inv_cat}}/{{$purchase_invoice->operationJob->job_no ?? '--'}}/{{$fy}}</td>
                                         <td>{{$purchase_invoice->invoice_no ?? '--'}}</td>
                                             <td>{{$purchase_invoice->invoice_date ? \Carbon\Carbon::parse($purchase_invoice->invoice_date)->format('d-m-Y') :'--'}}</td>
                                         <td>{{ $purchase_invoice->invoice_type ?? '--'}}</td>
@@ -145,13 +146,14 @@
                                         <td>{{$fy ?? '--'}}</td>
                                         <td style="color: red;">{{round($purchase_invoice->chargesContainer->sum('total')) ?? '--'}}</td>
                                         <td>{{ $userName ?? '-' }}</td>
+                                        <td>{{ $purchase_invoice->branch->branch_name ?? '-'}}</td>
                                         <td>
                                             <a href="{{ route('ImportPurchaseInvoice.import', $purchase_invoice->id) }}" type="button" class="btn btn-success btn-sm">Print</a>
                                             <a class="badge badge-info light border-0" href="{{url('admin/purchase-invoices/'.$purchase_invoice->uuid.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-purchaseInvoice" href="javascript:void(0);" data-id="{{$purchase_invoice->id}}">Delete</a>
                                         </td>
-                                    </tr>  
-                                @endforeach                                
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

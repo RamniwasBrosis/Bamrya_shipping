@@ -64,6 +64,7 @@
                                     <th>Cust. Inv. No</th>
                                     <th>Shipping Bill No</th>
                                     <th>Updated By</th>
+                                    <th>Branch</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -77,6 +78,7 @@
                                     <td>{{$transportDetail->customer_inv_no}}</td>
                                     <td>{{$transportDetail->shipping_bill_no}}</td>
                                     <td>{{$transportDetail->user->name??''}}</td>
+                                    <td>{{$transportDetail->branch->branch_name??''}}</td>
                                     <td>
                                         <a class="badge badge-info light border-0" href="{{url('admin/transports/'.$transportDetail->uuid.'/edit')}}">Edit</a>
                                         <a class="badge badge-danger light border-0 delete-transport" href="javascript:void(0);" data-id="{{$transportDetail->id}}">Delete</a>

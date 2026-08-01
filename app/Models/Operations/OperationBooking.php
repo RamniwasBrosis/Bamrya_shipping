@@ -8,13 +8,14 @@ use App\Models\Operations\OperationBookingContainer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\CompanyBranch;
 
 class OperationBooking extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'company_id','uuid', 'booking_no', 'vessel_id', 'voy_no', 'eta_date', 'entry_date',
+        'company_id','uuid', 'booking_no', 'vessel_id', 'voy_no', 'eta_date', 'entry_date','branch_id',
         'validity_days', 'validity_date', 'cargo_type', 'shipment_terms',
         'gate_open', 'container_volume', 'plugging', 'do_cancel',
         'cargo_wt', 'cont_wt', 'ventilation', 'temperature', 'commodity',
@@ -32,11 +33,11 @@ class OperationBooking extends Model
     public function vessel(){
         return $this->belongsTo(MasterVessel::class, 'vessel_id');
     }
-    
+
     public function party(){
         return $this->belongsTo(MasterParty::class, 'sales_person_id ');
     }
-    
+
     public function containers()
     {
         return $this->hasMany(OperationBookingContainer::class, 'booking_id');
@@ -45,5 +46,9 @@ class OperationBooking extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+    public function branch()
+    {
+        return $this->belongsTo(CompanyBranch::class, 'branch_id', 'id');
     }
 }

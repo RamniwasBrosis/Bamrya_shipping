@@ -10,13 +10,14 @@ use App\Models\MasterPort;
 use App\Models\MasterShipping;
 use App\Models\MasterCharge;
 use App\Models\User;
+use App\Models\CompanyBranch;
 
 class OperationEnquiries extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
-    
+
     public function BuyChargeDetails()
     {
         return $this->belongsTo(MasterCharge::class, 'buy_charge_id');
@@ -26,12 +27,12 @@ class OperationEnquiries extends Model
     {
         return $this->belongsTo(MasterCharge::class, 'selling_charge_id');
     }
-    
+
     public function shippingLine()
     {
         return $this->belongsTo(MasterShipping::class, 'shipping_line_id');
     }
-    
+
     public function salesPerson()
     {
         return $this->belongsTo(OperationSalesPerson::class, 'sales_person_id');
@@ -51,9 +52,13 @@ class OperationEnquiries extends Model
     {
         return $this->belongsTo(MasterPort::class, 'discharge_port_id');
     }
-    
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+    public function branch()
+    {
+        return $this->belongsTo(CompanyBranch::class, 'branch_id', 'id');
     }
 }

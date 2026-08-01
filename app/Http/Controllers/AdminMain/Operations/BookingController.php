@@ -29,7 +29,7 @@ class BookingController extends Controller
             return $next($request);
         });
     }
-    
+
     /**
      * Display a listing of the resource.
      */
@@ -49,7 +49,7 @@ class BookingController extends Controller
 
         $bookingLists = $query->orderBy('created_at', 'desc')->paginate(10);
 
-        $filters = OperationBooking::where('company_id', $this->company_id)->get();     
+        $filters = OperationBooking::where('company_id', $this->company_id)->get();
 
         return view('admin-main.admin.booking.index', compact('bookingLists', 'filters'));
     }
@@ -70,10 +70,10 @@ class BookingController extends Controller
 
         $findFiles = $operationBookings->whereNotNull('file_name')->values();
         $booking_nums = $operationBookings->sortByDesc('created_at')->values();
-    
+
         $latestBooking = $operationBookings->sortByDesc('id')->first();
         // $nextBookingNo = $latestBooking ? $latestBooking->booking_no + 1 : 1;
-        
+
         $salePersons  = OperationSalesPerson::where('company_id', $this->company_id)->get();
         $shippingLines = MasterShipping::where('company_id', $this->company_id)->get();
         $exportParites = MasterExportParty::where('company_id', $this->company_id)->get();
@@ -125,13 +125,14 @@ class BookingController extends Controller
             'special_remark' => 'nullable|string',
             'full_do_no' => 'nullable|string',
         ]);
-    
+
         $validated['uuid'] = Str::uuid();
         $validated['company_id'] = $this->company_id;
+        $validated['branch_id'] = Auth::user()->branch_id;
         $validated['user_id'] = $this->user_id;
-    
+
         $booking = OperationBooking::create($validated);
-    
+
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -140,7 +141,7 @@ class BookingController extends Controller
                 'message' => 'Booking saved successfully!'
             ]);
         }
-    
+
         return redirect()->back()->with('success', 'Booking saved successfully.');
     }
 
@@ -161,7 +162,7 @@ class BookingController extends Controller
         $vessels  = MasterVessel::where('company_id', $this->company_id)->get();
         $parties  = MasterImportParty::where('company_id', $this->company_id)->get();
         $ports  = MasterPort::where('company_id', $this->company_id)->get();
-        
+
         $salePersons  = OperationSalesPerson::where('company_id', $this->company_id)->get();
         $bookingList = OperationBooking::with('containers')
                             ->where('uuid', $uuid)
@@ -172,7 +173,7 @@ class BookingController extends Controller
         $exportParites = MasterExportParty::where('company_id', $this->company_id)->get();
         $partyTypes = MasterParty::whereNotIn('party_type', [9, 6, 8])->get();
         $files = OperationBookingFileUploads::where('booking_no', $bookingList->id)->get();
-        
+
         return view('admin-main.admin.booking.edit', compact('partyTypes', 'exportParites', 'shippingLines', 'bookingList', 'vessels', 'parties', 'ports', 'salePersons', 'files', 'party_lists'));
     }
 
@@ -182,7 +183,7 @@ class BookingController extends Controller
     public function update(Request $request, string $id)
     {
         $booking = OperationBooking::findOrFail($id);
-             
+
         $validated = $request->validate([
             'booking_no' => 'required|string',
             'vessel_id' => 'nullable|exists:master_vessels,id',
@@ -230,11 +231,12 @@ class BookingController extends Controller
             // 'file_path' => 'nullable|string',
         ]);
         $validated['user_id'] = $this->user_id;
+        $validated['branch_id'] = Auth::user()->branch_id;
 
         $booking->update($validated);
 
         return redirect()->back()->with('success', 'Booking saved successfully.')->with('id', $booking->id);
-        
+
     }
 
     /**
@@ -257,10 +259,10 @@ class BookingController extends Controller
             'seal_no' => 'nullable|string|max:50',
             'do_no' => 'nullable|string|max:50',
         ]);
-    
+
         $validated['company_id'] = $this->company_id;
         $validated['uuid'] = Str::uuid();
-    
+
         $booking_record = OperationBookingContainer::create([
             'uuid' => $validated['uuid'],
             'company_id' => $validated['company_id'],
@@ -271,7 +273,7 @@ class BookingController extends Controller
             'seal_no' => $validated['seal_no'] ?? null,
             'do_no' => $validated['do_no'] ?? null,
         ]);
-    
+
         return response()->json([
             'status' => 'success',
             'message' => 'Container added successfully.',
@@ -301,15 +303,15 @@ class BookingController extends Controller
 
         return redirect()->back()->with('success', 'Container Updated successfully.');
     }
-    
+
     public function print($id)
     {
         $booking = OperationBooking::with(['vessel', 'party',]) // Add relationships as needed
                           ->findOrFail($id);
-    
+
         return view('admin-main.admin.booking.print', compact('booking'));
     }
-    
+
     public function updateFileUpload(Request $request)
     {
         //  Validate request
@@ -317,20 +319,20 @@ class BookingController extends Controller
             'booking_no' => 'required|string',
             'file.*' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx,xlsx,xls,txt,zip|max:10240', // up to 10MB
         ]);
-    
+
         //  Add uuid and company_id
         $validated['uuid'] = Str::uuid();
         $validated['company_id'] = $this->company_id;
-    
+
         //  Check if files exist
         if ($request->hasFile('file')) {
             foreach ($request->file('file') as $file) {
                 // Generate unique filename
                 $fileName = time() . '_' . $file->getClientOriginalName();
-    
+
                 // Store file in 'public/uploads/bookings'
                 $filePath = $file->storeAs('public/uploads/bookings', $fileName);
-    
+
                 // Save record in database
                 OperationBookingFileUploads::create([
                     'company_id' => $validated['company_id'],
@@ -340,13 +342,13 @@ class BookingController extends Controller
                     'file_path'  => $filePath,
                 ]);
             }
-    
+
             return back()->with('success', 'Files uploaded successfully!');
         }
-    
+
         return back()->with('error', 'No files selected!');
     }
-    
+
     public function saveContainer(Request $request)
     {
         $request->validate([
@@ -358,16 +360,16 @@ class BookingController extends Controller
             'booking_id'         => 'required|exists:operation_bookings,id',
             'container_id'       => 'nullable|exists:operation_booking_containers,id',
         ]);
-    
+
         if ($request->container_id) {
             // UPDATE
             $container = OperationBookingContainer::findOrFail($request->container_id);
             $container->update($request->only([
                 'container_category', 'size', 'container_no', 'seal_no', 'do_no'
             ]));
-    
+
             return response()->json(['success' => true, 'type' => 'update']);
-        } 
+        }
         else {
             // CREATE
             $container = OperationBookingContainer::create([
@@ -380,7 +382,7 @@ class BookingController extends Controller
                 'seal_no'            => $request->seal_no,
                 'do_no'              => $request->do_no,
             ]);
-    
+
             return response()->json(['success' => true, 'type' => 'create', 'data' => $container]);
         }
     }
@@ -390,11 +392,11 @@ class BookingController extends Controller
         $container = OperationBookingContainer::findOrFail($id);
         return response()->json($container);
     }
-    
+
     public function deleteContainer($id)
     {
         OperationBookingContainer::findOrFail($id)->delete();
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Container deleted successfully.'
@@ -404,10 +406,10 @@ class BookingController extends Controller
     public function listContainers($booking_id)
     {
         $containers = OperationBookingContainer::where('booking_id', $booking_id)->get();
-    
+
         // return only the table rows
         $html = '';
-    
+
         foreach ($containers as $c) {
             $html .= '
                 <tr id="row_'.$c->id.'">
@@ -423,7 +425,7 @@ class BookingController extends Controller
                 </tr>
             ';
         }
-    
+
         return $html;
     }
 

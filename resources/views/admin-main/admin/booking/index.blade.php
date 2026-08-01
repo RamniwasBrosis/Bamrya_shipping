@@ -35,10 +35,10 @@
                         </div>
                         <div class="col-xl-3 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Entry Date</label>
-                            <div class="d-flex">                            
+                            <div class="d-flex">
                                 <div>Form Date : <input type="date" name="from_date" class="form-control"></div>
                                 <div>To Date : <input type="date" name="to_date" class="form-control"></div>
-                            </div>                            
+                            </div>
                         </div>
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <button id="applyFilter" class="btn btn-primary" type="submit">Apply</button>
@@ -57,6 +57,7 @@
                                     <th>CargoType</th>
                                     <th>Entry Date</th>
                                     <th>Updated By</th>
+                                    <th>Branch</th>
                                     <th>Action</th>
                                     <th>Print</th>
                                 </tr>
@@ -75,9 +76,12 @@
                                             {{$bookingList->user->name??''}}
                                         </td>
                                         <td>
+                                            {{$bookingList->branch->branch_name??''}}
+                                        </td>
+                                        <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/bookings/'.$bookingList->uuid.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-booking" href="javascript:void(0);" data-id="{{$bookingList->id}}">Delete</a>
-                                            
+
                                         </td>
                                         <td>
                                             <a href="{{ route('booking.print', $bookingList->id) }}" class="btn btn-secondary btn-sm" target="_blank">
@@ -85,7 +89,7 @@
                                             </a>
                                         </td>
                                     </tr>
-                                @endforeach                                
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -128,7 +132,7 @@
                 }
             });
         });
-        
+
     </script>
     <!--<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
     <!--<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>-->
@@ -140,8 +144,8 @@
             });
         });
     </script>
-    
+
     <!--<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
-    
+
 
 @endpush

@@ -83,6 +83,7 @@
                                     <th>Gross weight</th>
                                     <th>Status</th>
                                     <th>Updated By</th>
+                                    <th>Branch</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -90,26 +91,27 @@
                                 @foreach($enquiries as $enquiry)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                
+
                                         <td>
                                             {{ optional($enquiry->consignee)->party_name ?? '-' }}
                                         </td>
-                                
+
                                         <td>{{ $enquiry->job_activity ?? '-' }}</td>
                                         <td>{{ $enquiry->lcl_fcl ?? '-' }}</td>
-                                
+
                                         <td>{{ $enquiry->buying_rate ?? '-' }}</td>
-                                
+
                                         <td>
                                             {{ $enquiry->selling_rate ?? '-' }}
                                         </td>
-                                
+
                                         <td>{{ $enquiry->salesPerson->name ?? '-' }}</td>
-                                
+
                                         <td>{{ $enquiry->gross_weight ?? '-' }}</td>
                                         <td>{{ $enquiry->enquiry_status ?? '-' }}</td>
                                         <td>{{ $enquiry->user->name ?? '-' }}</td>
-                                
+                                        <td>{{ $enquiry->branch->branch_name ?? '-' }}</td>
+
                                         <td>
                                             <a class="badge badge-info light border-0"
                                                href="{{ route('enquiry.edit', $enquiry->id) }}">
@@ -119,14 +121,14 @@
                                                 <form action="{{ route('enquiry.destroy', $enquiry->id) }}" method="POST" style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
-                                                
+
                                                     <button type="submit" class="badge badge-danger light border-0"
                                                             onclick="return confirm('Are you sure you want to delete this enquiry?')">
                                                         Delete
                                                     </button>
                                                 </form>
                                             @endif
-                                
+
                                         </td>
                                     </tr>
                                 @endforeach

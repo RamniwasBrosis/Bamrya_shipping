@@ -33,7 +33,7 @@ class PurchaseInvoiceController extends Controller
             return $next($request);
         });
     }
-    
+
     /**
      * Display a listing of the resource.
      */
@@ -52,7 +52,7 @@ class PurchaseInvoiceController extends Controller
         if($request->filled('billing_party_id')){
             $query->where('billing_party_id', 'LIKE', $request->billing_party_id);
         }
-        
+
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereBetween('created_at', [
                 $request->start_date . ' 00:00:00',
@@ -65,13 +65,13 @@ class PurchaseInvoiceController extends Controller
         }
 
         $purchase_invoices = $query->orderBy('created_at', 'desc')->paginate(10);
-        
+
         $all_invoices = AccountPurchaseInvoice::where('company_id', $this->company_id)->get();
         $job_nums = [];
         foreach ($all_invoices as $invoice) {
             $year = $invoice->created_at->format('Y');
             $month = $invoice->created_at->format('m');
-    
+
             if ((int)$month < 4) {
                 $fyStart = $year - 1;
                 $fyEnd = $year;
@@ -79,7 +79,7 @@ class PurchaseInvoiceController extends Controller
                 $fyStart = $year;
                 $fyEnd = $year + 1;
             }
-    
+
             $fy = $fyStart . '-' . substr($fyEnd, -2);
             // $job_nums[$invoice->job_no] = $invoice->inv_cat . '/' . $invoice->job_no . '/' . $fy;
             $job_nums[$invoice->job_no] = $invoice->full_job_no;
@@ -110,7 +110,7 @@ class PurchaseInvoiceController extends Controller
     {
         $ifAlreadyExit = AccountPurchaseInvoice::where('invoice_no', $request->invoice_no)->first();
         if($ifAlreadyExit){
-            return response()->json(['status' => false, 'message' => 'A record with this Invoice number already exists.']); 
+            return response()->json(['status' => false, 'message' => 'A record with this Invoice number already exists.']);
         }
         $validated = $request->validate([
             'job_no' => 'nullable|string',
@@ -128,20 +128,20 @@ class PurchaseInvoiceController extends Controller
             'overseas_exchange_rate' => 'nullable|numeric',
             'gst_type' => 'required|string',
             'invoice_date' => 'required|date',
-            
+
             'sale_purchase' => 'nullable|string',
             'awb_bl_no' => 'nullable|string',
             'vessel_name' => 'nullable|string',
             'bank_id' => 'nullable|integer',
             'full_invoice_no' => 'nullable|string',
-            
+
             'pol' => 'nullable|string',
             'pkgType' => 'nullable|string',
             'packages' => 'nullable|string',
             'shipping_no' => 'nullable|string',
             'shipping_bill_date' => 'nullable|date',
             'bl_no' => 'nullable|string',
-            
+
             'hawb_no' => 'nullable|string',
             'job_date' => 'nullable|string',
             'invoice_due_date' => 'nullable|date',
@@ -155,15 +155,16 @@ class PurchaseInvoiceController extends Controller
             'container_qty' => 'nullable|string',
             'remarks' => 'nullable|string',
         ]);
-    
+
         $validated['company_id'] = $this->company_id;
         $validated['uuid'] = Str::uuid();
         $validated['Inv_cat'] = $request->Inv_cat;
         $validated['full_job_no'] = $request->full_job_no;
         $validated['user_id'] = $this->user_id;
-        
+        $validated['branch_id'] = Auth::user()->branch_id;
+
         $purchaseInvoice = AccountPurchaseInvoice::create($validated);
-        
+
         return response()->json([
             'status' => true,
             'message' => 'Purchase Invoice saved successfully!',
@@ -173,7 +174,7 @@ class PurchaseInvoiceController extends Controller
 
 
         // return redirect()->back()->with('success', 'Purchase Invoice saved successfully.')->with('id', $purchaseInvoice->id);
-        
+
     }
 
     /**
@@ -194,11 +195,11 @@ class PurchaseInvoiceController extends Controller
         $parties = PurchaseParties::where('company_id', $this->company_id)->get();
         $charges = MasterCharge::where('company_id', $this->company_id)->get();
         $account_numbers = MasterBank::where('company_id', $this->company_id)->get();
-        
+
         $files = AccountFileUpload::where('file_related', 'purchase_invoice')
                                     ->where('purchase_invoice_id', $purchase_invoice->id)
                                     ->get();
-        
+
         $chargeDetails = AccountPurchaseInvoiceContainer::with(['chargeName', 'purchaseInvoice.operationJob'])
             ->where('purchase_invoice_id', $purchase_invoice->id)
             ->get();
@@ -229,20 +230,20 @@ class PurchaseInvoiceController extends Controller
             'overseas_exchange_rate' => 'nullable|numeric',
             'gst_type' => 'required|string',
             'invoice_date' => 'required|date',
-            
+
             'sale_purchase' => 'nullable|string',
             'awb_bl_no' => 'nullable|string',
             'vessel_name' => 'nullable|string',
             'bank_id' => 'nullable|integer',
             'full_invoice_no' => 'nullable|string',
-            
+
             'pol' => 'nullable|string',
             'pkgType' => 'nullable|string',
             'packages' => 'nullable|string',
             'shipping_no' => 'nullable|string',
             'shipping_bill_date' => 'nullable|date',
             'bl_no' => 'nullable|string',
-            
+
             'hawb_no' => 'nullable|string',
             'job_date' => 'nullable|string',
             'invoice_due_date' => 'nullable|date',
@@ -257,6 +258,7 @@ class PurchaseInvoiceController extends Controller
             'remarks' => 'nullable|string',
         ]);
         $validated['user_id'] = $this->user_id;
+        $validated['branch_id'] = Auth::user()->branch_id;
 
         $sales_invoice->update($validated);
         return redirect()->back()->with('success', 'Purchase Invoice updated successfully.');
@@ -284,9 +286,9 @@ class PurchaseInvoiceController extends Controller
                 'Inv_cat' => ''
             ]);
         }
-    
+
         switch ($request->search_by) {
-            case 'AI':  
+            case 'AI':
                 $job_numbers = OperationAirImport::select('id', 'job_no', 'created_at', 'sales_person_id', 'shipper_id')
                 ->where('company_id', $this->company_id)->get();
                 break;
@@ -310,30 +312,30 @@ class PurchaseInvoiceController extends Controller
                     'Inv_cat' => ''
                 ]);
         }
-    
+
         $FullJobNum = '<option value="">Select</option>';
         $jobData = []; // Add this line
-    
+
         foreach ($job_numbers as $job_number) {
             $activity = $request->search_by;
             $job_num = $job_number->jobMaster->full_job_no;
-            
+
             $job_date = $job_number->jobMaster->job_date ?? '';
             $shipper_name = $job_number->shipperName->party_name ?? '';
             $sales_person = optional($job_number->salesPerson)->name ?? '';
-            
+
             $original_job_no = $job_number->jobMaster->id;
-    
+
             // $FullJobNum .= '<option value="' . $job_number->id . '" data-type="' . $activity . '">' . $job_num . '</option>';
             // $FullJobNum .= '<option value="' . $job_number->id . '" data-type="' . $activity . '" data-fulljob="' . $job_num . '">' . $job_num . '</option>';
-            $FullJobNum .= '<option value="' . $job_number->id . '" 
-                data-type="' . $activity . '" 
-                data-fulljob="' . $job_num . '" 
+            $FullJobNum .= '<option value="' . $job_number->id . '"
+                data-type="' . $activity . '"
+                data-fulljob="' . $job_num . '"
                 data-originaljob="' . $job_number->jobMaster->id . '"
                 data-jobdate="' . $job_date . '"
                 data-shippername="' . $shipper_name . '"
-                data-salesperson="' . $sales_person . '">' 
-                . $job_num . 
+                data-salesperson="' . $sales_person . '">'
+                . $job_num .
             '</option>';
 
             // store for optional use if needed later
@@ -347,7 +349,7 @@ class PurchaseInvoiceController extends Controller
                 'sales_person' => $sales_person,
             ];
         }
-    
+
         return response()->json([
             'status' => 'success',
             'result' => $FullJobNum,
@@ -380,7 +382,7 @@ class PurchaseInvoiceController extends Controller
         }
         // Determine BL / AWB Number
         $blNo = '';
-        
+
         switch ($type) {
             case 'AE': // Air Export
                 $blNo = $invoice_records->hawb_no ?: $invoice_records->mawb_no ?: '';
@@ -403,21 +405,21 @@ class PurchaseInvoiceController extends Controller
         $loadingPort = $invoice_records->loadingPortName ? $invoice_records->loadingPortName->port_name : '';
         $packageName = $invoice_records->package ? $invoice_records->packageName->package_code : '';
         $consigneeName = $invoice_records->ConsigneeName ? $invoice_records->ConsigneeName->party_name : '';
-        
+
         // shipping bill no
         $sbill_no = '';
         if ($type == 'SE') {
             $sbill_no = optional($invoice_records->container->first())->sbill_no ?? '';
         }
-        
+
         if ($type == 'SI') {
             $sbill_no = optional($invoice_records->container->first())->customer_inv_no ?? '';
         }
-        
+
         if ($type == 'AE' || $type == 'AI') {
             $sbill_no = $invoice_records->sbill_no ?? '';
         }
-        
+
         // quantity
         if ($type == 'SI' || $type == 'SE') {
             $packageValue = $invoice_records->quantity ?? '';
@@ -426,13 +428,13 @@ class PurchaseInvoiceController extends Controller
         } else { // AI
             $packageValue = $invoice_records->package ?? '';
         }
-        
+
         if ($type == 'SI' || $type == 'SE') {
             $mbl_no = $invoice_records->mbl_no ?? '';
         }else { // AI / AE
             $mbl_no = $invoice_records->mawb_no ?? '';
         }
-        
+
         if ($type == 'AE') {
             $hbl_no = $invoice_records->hawb_no ?? '';
             $airLineAndVasselName = $invoice_records->flight_name_1 ?? ''.' '. $invoice_records->flight_name_2 ?? '';
@@ -446,11 +448,11 @@ class PurchaseInvoiceController extends Controller
             $hbl_no = $invoice_records->hbl_no ?? '';
             $airLineAndVasselName = $invoice_records->vessel_name ?? '';
         }
-        
+
         $totalCbm = collect($invoice_records->container)->sum(function ($container) {
             return (float) $container->cbm;
         });
-        
+
         return response()->json([
             'status' => 'success',
             'result' => $invoice_records,
@@ -477,7 +479,7 @@ class PurchaseInvoiceController extends Controller
                 'message' => 'Please create the purchase invoice first.'
             ]);
         }
-    
+
         //  Validate input
         $validated = $request->validate([
             'purchase_invoice_id' => 'required|numeric',
@@ -511,16 +513,16 @@ class PurchaseInvoiceController extends Controller
             'igst'                => 'nullable|numeric|min:0',
             'total'               => 'nullable|numeric|min:0',
         ]);
-    
+
         //  Add extra fields
         $validated['company_id'] = $this->company_id;
         $validated['user_id'] = $this->user_id;
         $validated['uuid'] = Str::uuid();
-    
+
         //  Insert into container table
         $purchaseInvoiceContainer = AccountPurchaseInvoiceContainer::create($validated);
         $purchaseInvoiceContainer->load('chargeName');
-        
+
         //  Return JSON with created record
         return response()->json([
             'status' => true,
@@ -548,14 +550,14 @@ class PurchaseInvoiceController extends Controller
             'tds'                 => 'nullable',
             'tds_amount'          => 'nullable',
             'remarks'             => 'nullable|string|max:255',
-            
+
             'caf_percent'         => 'nullable|numeric|min:0|max:100',
             'caf_amount'          => 'nullable|numeric|min:0',
             'baf_percent'         => 'nullable|numeric|min:0|max:100',
             'baf_amount'          => 'nullable|numeric|min:0',
             'cc_percent'          => 'nullable|numeric|min:0|max:100',
             'cc_amount'           => 'nullable|numeric|min:0',
-            
+
             'cc_apply'            => 'nullable|in:Y,N',
             'caf_apply'           => 'nullable|in:Y,N',
 
@@ -570,10 +572,10 @@ class PurchaseInvoiceController extends Controller
 
         $validated = $request->validate($rules);
         $con_id = $request->charge_edit_id;
-        
+
         // Find or create a record
         $add_charges = AccountPurchaseInvoiceContainer::find($con_id);
-    
+
         if ($add_charges) {
             $validated['user_id'] = $this->user_id;
             $add_charges->update($validated);
@@ -582,13 +584,13 @@ class PurchaseInvoiceController extends Controller
             $validated['user_id'] = $this->user_id;
             $validated['uuid'] = Str::uuid();
             $validated['purchase_invoice_id'] = $id;
-            
+
             AccountPurchaseInvoiceContainer::create($validated);
         }
 
         return redirect()->back()->with('success', 'Purchase Invoice Charges Updated successfully.');
     }
-    
+
     public function getChargeDetails($charge_id, $invoice_id)
     {
         // Find matching charge details in AccountSaleInvoiceContainer
@@ -596,10 +598,10 @@ class PurchaseInvoiceController extends Controller
             ->where('charge_id', $charge_id)
             ->with('chargeName') // Relation to MasterCharge
             ->first();
-    
+
         // Get master charge info (for default rate, description, etc.)
         $masterCharge = MasterCharge::find($charge_id);
-    
+
         // Merge both results
         if ($containerCharge) {
             $data = [
@@ -608,14 +610,14 @@ class PurchaseInvoiceController extends Controller
             ];
             return response()->json(['status' => true, 'data' => $data]);
         }
-    
+
         return response()->json([
             'status' => false,
             'message' => 'Charge details not found in this purchase invoice.'
         ]);
     }
-    
-    
+
+
     public function ImportPurchaseInvoice($id)
     {
         $purchaseInvoice = AccountPurchaseInvoice::with([
@@ -625,36 +627,36 @@ class PurchaseInvoiceController extends Controller
             'operationJob.airExport',
             'operationJob.airImport'
         ])->findOrFail($id);
-        
+
         $accountDetails = MasterBank::where('company_id', $this->company_id)->first();
-    
+
         $chargeDetails = AccountPurchaseInvoiceContainer::with('chargeName') // relation to MasterCharge
             ->where('purchase_invoice_id', $purchaseInvoice->id)
             ->get();
-            
+
         $company = Company::with(['companySetting', 'companyBranch'])
             ->where('id', $this->company_id)
             ->first();
-            
-        $logoUrl = $company->logo 
+
+        $logoUrl = $company->logo
             ? asset('public/uploads/company_logo/' . $company->logo)
             : asset('images/default-logo.png');
-        
+
         return view('admin-main.admin.purchaseInvoice.ImportPurchaseInvoice', compact('purchaseInvoice', 'chargeDetails', 'company', 'logoUrl', 'accountDetails'));
     }
-    
-    
+
+
     public function getChargeDetailForUpdate($id)
     {
         $chargeDetail = AccountPurchaseInvoiceContainer::with('chargeName', 'purchaseInvoice')->find($id);
-    
+
         if (!$chargeDetail) {
             return response()->json(['error' => 'Charge not found'], 404);
         }
-    
+
         return response()->json($chargeDetail);
     }
-    
+
     public function printPurchaseInvoice($id)
     {
         $purchaseInvoice = AccountPurchaseInvoice::with([
@@ -664,23 +666,23 @@ class PurchaseInvoiceController extends Controller
             'operationJob.airExport',
             'operationJob.airImport'
         ])->findOrFail($id);
-        
+
         $accountDetails = MasterBank::where('company_id', $this->company_id)->first();
-        
+
         $chargeDetails = AccountPurchaseInvoiceContainer::with('chargeName') // relation to MasterCharge
             ->where('purchase_invoice_id', $purchaseInvoice->id)
             ->get();
-        
+
         $company = Company::with(['companySetting', 'companyBranch'])
             ->where('id', $this->company_id)
             ->first();
-        
+
         $logoUrl = $company->logo
             ? public_path('uploads/company_logo/' . $company->logo)
             : public_path('images/default-logo.png');
-    
+
         $format = request('format', 'pdf');
-        
+
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
             'admin-main.admin.purchaseInvoice.print-purchase-invoice',
             compact('purchaseInvoice', 'chargeDetails', 'company', 'logoUrl', 'accountDetails')
@@ -688,17 +690,17 @@ class PurchaseInvoiceController extends Controller
 
         return $pdf->download("Purchase-Invoice-{$purchaseInvoice->id}.pdf");
     }
-    
+
     public function deleteChargeDetail($id)
     {
         $charge = AccountPurchaseInvoiceContainer::find($id);
-    
+
         if ($charge) {
             $charge->delete();
             return response()->json(['success' => true, 'message' => 'Charge deleted successfully']);
         }
-    
+
         return response()->json(['success' => false, 'message' => 'Charge not found'], 404);
     }
-    
+
 }

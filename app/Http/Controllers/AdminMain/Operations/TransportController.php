@@ -28,7 +28,7 @@ class TransportController extends Controller
             return $next($request);
         });
     }
-    
+
     /**
      * Display a listing of the resource.
      */
@@ -104,13 +104,14 @@ class TransportController extends Controller
             'job_no' => 'nullable|string',
             'full_job_no' => 'nullable|string',
         ]);
-    
+
         $transport = new OperationTransport($validated);
-        $transport->company_id = $this->company_id; 
-        $transport->user_id = $this->user_id; 
-        $transport->uuid = Str::uuid(); 
+        $transport->company_id = $this->company_id;
+        $transport->user_id = $this->user_id;
+        $transport->branch_id = Auth::user()->branch_id;
+        $transport->uuid = Str::uuid();
         $transport->save();
-    
+
         return response()->json([
             'success' => true,
             'transport_id' => $transport->id
@@ -139,11 +140,11 @@ class TransportController extends Controller
         $salePersons  = OperationSalesPerson::where('company_id', $this->company_id)->get();
         $files = OperationAllFileUpload::where('company_id', $this->company_id)->where('file_related', 'transport')->orderBy('created_at', 'desc')->get();
         $party_lists  = MasterParty::all();
-        
+
         $containerDetails = TransportContainer::where('company_id', $this->company_id)
                                             ->where('transport_id', $trasportDetail->id)
                                             ->get();
-    
+
         return view('admin-main.admin.transport.edit', compact('containerDetails', 'party_lists', 'files', 'salePersons', 'trasportDetail', 'parties', 'ports', 'con_sizes', 'packages'));
     }
 
@@ -177,6 +178,7 @@ class TransportController extends Controller
             'remarks' => 'nullable|string|max:500',
         ]);
         $validated['user_id'] = $this->user_id;
+        $transport->branch_id = Auth::user()->branch_id;
 
         $transport->update($validated);
 
@@ -200,7 +202,7 @@ class TransportController extends Controller
         if (!$request->filled('transport_id')) {
             return response()->json(['success' => false, 'message' => 'Transport ID missing']);
         }
-    
+
         $validated = $request->validate([
             'transport_id'         => 'required|exists:operation_transports,id',
             'transporter'         => 'nullable|exists:master_import_parties,id',
@@ -218,12 +220,12 @@ class TransportController extends Controller
             'cargo'                => 'nullable|string|max:50',
             'container_job_no'     => 'nullable|string|max:50',
         ]);
-    
+
         $container = new TransportContainer($validated);
-        $container->company_id = $this->company_id; 
-        $container->uuid = Str::uuid(); 
+        $container->company_id = $this->company_id;
+        $container->uuid = Str::uuid();
         $container->save();
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Container saved successfully',
@@ -252,25 +254,25 @@ class TransportController extends Controller
             'cargo'              => 'nullable|string',
             'container_job_no'   => 'nullable|string',
         ]);
-    
+
         $data = $validated;
         $data['company_id'] = $this->company_id;
-    
+
         // Prevent overwriting uuid on update
         if (!$request->container_id) {
             $data['uuid'] = Str::uuid();
         }
-    
+
         $container = TransportContainer::updateOrCreate(
             ['id' => $request->container_id],
             $data
         );
-    
+
         // Reload updated list
         $containerDetails = TransportContainer::where('transport_id', $request->transport_id)->get();
-    
+
         $html = view('admin-main.admin.transport.container_table', compact('containerDetails'))->render();
-    
+
         return response()->json([
             'success' => true,
             'message' => $request->container_id ? 'Container Updated' : 'Container Added',
@@ -281,16 +283,16 @@ class TransportController extends Controller
     public function deleteContainer($id)
     {
         $container = TransportContainer::find($id);
-    
+
         if (!$container) {
             return response()->json([
                 'success' => false,
                 'message' => 'Container not found'
             ]);
         }
-    
+
         $container->delete();
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Container deleted successfully'
@@ -298,11 +300,11 @@ class TransportController extends Controller
     }
 
 
-    // mourya    
+    // mourya
     public function getContainer($id)
     {
         $container = TransportContainer::findOrFail($id);
-    
+
         return response()->json([
             'success' => true,
             'container' => $container

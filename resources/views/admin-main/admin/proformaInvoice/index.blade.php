@@ -14,7 +14,7 @@
                     {{-- <h4 class="card-title mb-2">Packages</h4> --}}
                 </div>
                 <div class="card-header d-block pb-2">
-                    <form class="row align-items-end" method="get" action="{{route('proforma-invoices.index')}}">                   
+                    <form class="row align-items-end" method="get" action="{{route('proforma-invoices.index')}}">
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
                             <label class="form-label">Search By Job No.</label>
                             <select id="statusFilter" class="form-control select2" name="job_no">
@@ -41,12 +41,12 @@
                                     <option value="{{$proforma_invoice->billing_party_id}}">{{$proforma_invoice->partyName->party_name ?? ''}}</option>
                                 @endforeach
                             </select>
-                        </div>           
+                        </div>
                         <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
                         <!--    <label class="form-label">Start Date</label>-->
                         <!--    <input type="date" placeholder="dd/mm/yy" class="form-control" name="start_date" value="{{ request('start_date') }}">-->
                         <!--</div>-->
-                        
+
                         <!--<div class="col-xl-2 col-sm-6 col-lg-4 mb-3">-->
                         <!--    <label class="form-label">End Date</label>-->
                         <!--    <input type="date" placeholder="dd/mm/yy" class="form-control" name="end_date" value="{{ request('end_date') }}">-->
@@ -73,6 +73,7 @@
                                     <th>FinYear</th>
                                     <th>Inv Amt</th>
                                     <th>Updated By</th>
+                                    <th>Branch</th>
                                     <th>Action</th>
                                 </tr>
                                 </tr>
@@ -97,7 +98,7 @@
                                         switch ($proforma_invoice->party_type) {
                                             case 'customer':
                                                 $party_type = 'Customer';
-                                                break;                                                                                      
+                                                break;
                                             default:
                                                 $party_type = 'OtherBillingPARTY';
                                                 break;
@@ -115,7 +116,7 @@
                                                 break;
                                             case 'SE':
                                                 $Inv_cat = 'SEA EXPORT';
-                                                break;                                                                                      
+                                                break;
                                             default:
                                                 $Inv_cat = '--';
                                                 break;
@@ -125,7 +126,7 @@
                                         $latestCharge = $proforma_invoice->chargesContainer
                                             ->sortByDesc('updated_at')
                                             ->first();
-                                    
+
                                         if (
                                             $latestCharge &&
                                             $latestCharge->updated_at > $proforma_invoice->updated_at
@@ -135,11 +136,11 @@
                                             $userName = optional($proforma_invoice->user)->name;
                                         }
                                     @endphp
-                                    
+
                                     <tr>
                                         <td>{{$proforma_invoice->id ?? '--'}}</td>
                                         <td>{{$proforma_invoice->partyName->party_name ?? '--'}}</td>
-                                        <td>{{$proforma_invoice->inv_cat}}/{{$proforma_invoice->operationJob->job_no ?? '--'}}/{{$fy}}</td>  
+                                        <td>{{$proforma_invoice->inv_cat}}/{{$proforma_invoice->operationJob->job_no ?? '--'}}/{{$fy}}</td>
                                         <td>{{$proforma_invoice->invoice_no ?? '--'}}</td>
                                         <td>{{$proforma_invoice->invoice_date ? \Carbon\Carbon::parse($proforma_invoice->invoice_date)->format('d-m-Y') :'--'}}</td>
                                         <td>{{ $proforma_invoice->invoice_type ?? '--'}}</td>
@@ -147,12 +148,13 @@
                                         <td>{{$fy ?? '--'}}</td>
                                         <td style="color: red;">{{$proforma_invoice->chargesContainer->sum('total') ?? '--'}}</td>
                                         <td>{{ $userName ?? '-' }}</td>
+                                        <td>{{ $proforma_invoice->branch->branch_name ?? '-'}}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/proforma-invoices/'.$proforma_invoice->uuid.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-proformaInvoice" href="javascript:void(0);" data-id="{{$proforma_invoice->id}}">Delete</a>
                                         </td>
-                                    </tr>     
-                                @endforeach                                
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -172,7 +174,7 @@
                 width: '100%'
             })
         })
-    
+
         $(document).on('click', '.delete-proformaInvoice', function(e) {
             e.preventDefault();
             if (!confirm('Are you sure you want to delete this Proforma Invoice record?')) return;

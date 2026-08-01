@@ -10,13 +10,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Operations\OperationJobMaster;
 use App\Models\Operations\OperationSalesPerson;
+use App\Models\CompanyBranch;
+use PhpOffice\PhpSpreadsheet\Calculation\Engine\BranchPruner;
 
 class AccountProformaInvoice extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'company_id',
+        'company_id','branch_id',
         'uuid',
         'Inv_cat',
         'job_no',
@@ -36,7 +38,7 @@ class AccountProformaInvoice extends Model
         'invoice_date',
         'full_job_no',
         'doe_date',
-        
+
         'vessel_name',
         'awb_bl_no',
         'sale_purchase',
@@ -86,7 +88,7 @@ class AccountProformaInvoice extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
-    
+
     public function partyName(){
         return $this->belongsTo(MasterBillingParty::class, 'billing_party_id');
     }
@@ -94,19 +96,22 @@ class AccountProformaInvoice extends Model
     public function accountNumber(){
         return $this->belongsTo(MasterBank::class, 'bank_id');
     }
-    
+
     public function salesPerson(){
         return $this->belongsTo(OperationSalesPerson::class, 'sales_person_id');
     }
-    
+
     public function operationJob(){
         return $this->belongsTo(OperationJobMaster::class, 'job_no', 'id');
     }
-    
+
     public function chargeName(){
         return $this->belongsTo(MasterCharge::class, 'charge_name', 'id');
     }
-    
+    public function branch(){
+        return $this->belongsTo(CompanyBranch::class, 'branch_id', 'id');
+    }
+
     public function chargesContainer(){
         return $this->hasMany(AccountProformaInvoiceContainer::class, 'proforma_invoice_id');
     }

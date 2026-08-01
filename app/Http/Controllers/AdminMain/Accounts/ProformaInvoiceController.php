@@ -35,14 +35,15 @@ class ProformaInvoiceController extends Controller
             return $next($request);
         });
     }
-    
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
+        $page_title = "Proforma Invoice";
         $query = AccountProformaInvoice::with(['partyName', 'operationJob', 'chargeName', 'chargesContainer.user'])->where('company_id', $this->company_id);
-        
+
         if($request->filled('job_no')){
             $query->where('job_no', 'LIKE', $request->job_no);
         }
@@ -54,7 +55,7 @@ class ProformaInvoiceController extends Controller
         if($request->filled('billing_party_id')){
             $query->where('billing_party_id', 'LIKE', $request->billing_party_id);
         }
-        
+
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereBetween('created_at', [
                 $request->start_date . ' 00:00:00',
@@ -68,7 +69,7 @@ class ProformaInvoiceController extends Controller
 
         $proforma_invoices = $query->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('admin-main.admin.proformaInvoice.index', compact('proforma_invoices'));
+        return view('admin-main.admin.proformaInvoice.index', compact('proforma_invoices', 'page_title'));
     }
 
     /**
@@ -82,7 +83,7 @@ class ProformaInvoiceController extends Controller
         $account_numbers = MasterBank::where('company_id', $this->company_id)->get();
         $files = AccountFileUpload::where('company_id', $this->company_id)->where('file_related', 'proforma_invoice')->get();
         $party_lists  = MasterParty::whereIn('party_type', [1, 2])->get();
-        
+
         // echo "<pre>"; print_r($parties); exit();
 
         return view('admin-main.admin.proformaInvoice.create', compact('party_lists', 'parties', 'charges', 'account_numbers', 'files', 'salesPerson'));
@@ -95,51 +96,52 @@ class ProformaInvoiceController extends Controller
     {
         $ifAlreadyExit = AccountProformaInvoice::where('invoice_no', $request->invoice_no)->first();
         if($ifAlreadyExit){
-            return response()->json(['status' => false, 'message' => 'A record with this Invoice number already exists.']); 
+            return response()->json(['status' => false, 'message' => 'A record with this Invoice number already exists.']);
         }
-        
+
         $validated = $request->validate([
             'job_no' => 'required|string',
             'full_job_no' => 'required|string',
             'invoice_no' => 'nullable|string',
             'invoice_date' => 'required|date',
             'gst_type' => 'required|string',
-            
+
             'voyage_code' => 'nullable|string',
             'pod' => 'required|string',
             'pol' => 'required|string',
-            
+
             'container' => 'nullable|string',
             'consignee' => 'nullable|string',
-            
+
             'cbm' => 'nullable|string',
             'pkgType' => 'nullable|string',
             'packages' => 'nullable|string',
-            
+
             'gross_weight' => 'nullable|string',
             'chargeable_weight' => 'nullable|string',
             'vessel_name' => 'nullable|string',
             'shipping_no' => 'nullable|string',
             'boe_date' => 'nullable|string',
             'awb_bl_no' => 'nullable|string',
-            
+
             'party_type' => 'nullable|string',
             'billing_party_id' => 'required',
-            
+
             'invoice_type' => 'required|string',
             'bank_id' => 'nullable',
             'sale_purchase' => 'nullable|string',
             'sales_person_id' => 'required|exists:operation_sales_people,id',
         ]);
-    
+
         $validated['company_id'] = $this->company_id;
         $validated['uuid'] = \Str::uuid();
         $validated['Inv_cat'] = $request->Inv_cat;
         $validated['job_no'] = $request->job_id;
         $validated['user_id'] = $this->user_id;
-    
+        $validated['branch_id'] = Auth::user()->branch_id;
+
         $invoice = AccountProformaInvoice::create($validated);
-    
+
         // return JSON response for AJAX
         return response()->json([
             'success' => true,
@@ -155,7 +157,7 @@ class ProformaInvoiceController extends Controller
      */
     public function show(string $id)
     {
-        // 
+        //
     }
 
     /**
@@ -169,11 +171,11 @@ class ProformaInvoiceController extends Controller
         $salesPerson = OperationSalesPerson::where('company_id', $this->company_id)->get();
 
         $proforma_invoice = AccountProformaInvoice::where('company_id', $this->company_id)->where('uuid', $uuid)->firstOrFail();
-        
+
         $files = AccountFileUpload::where('file_related', 'proforma_invoice')
                                     ->where('proforma_invoice_id', $proforma_invoice->id)
                                     ->get();
-        
+
         $chargeDetails = AccountProformaInvoiceContainer::with(['charge', 'purchaseInvoice'])
             ->where('company_id', $this->company_id)
             ->where('proforma_invoice_id', $proforma_invoice->id)
@@ -181,7 +183,7 @@ class ProformaInvoiceController extends Controller
 
         return view('admin-main.admin.proformaInvoice.edit', compact('files', 'parties', 'charges', 'proforma_invoice', 'account_numbers', 'chargeDetails', 'salesPerson'));
     }
-    
+
     /**
      * Update the specified resource in storage.
      */
@@ -195,11 +197,11 @@ class ProformaInvoiceController extends Controller
             'invoice_no' => 'nullable|string',
             'invoice_date' => 'required|date',
             'gst_type' => 'required|string',
-            
+
             'voyage_code' => 'nullable|string',
             'pod' => 'required|string',
             'pol' => 'required|string',
-            
+
             'container' => 'nullable|string',
             'consignee' => 'nullable|string',
             'cbm' => 'nullable|string',
@@ -219,6 +221,7 @@ class ProformaInvoiceController extends Controller
             'sales_person_id' => 'required|exists:operation_sales_people,id',
         ]);
         $validated['user_id'] = $this->user_id;
+        $validated['branch_id'] = Auth::user()->branch_id;
 
         $proforma_invoice->update($validated);
         return redirect()->back()->with('success', 'Proforma Invoice updated successfully.');
@@ -246,7 +249,7 @@ class ProformaInvoiceController extends Controller
         }
 
         switch ($request->search_by) {
-            case 'AI':  
+            case 'AI':
                 $job_numbers = OperationAirImport::select('id', 'job_no', 'created_at')
                                 ->where('company_id', $this->company_id)->get();
                 break;
@@ -308,33 +311,33 @@ class ProformaInvoiceController extends Controller
                 $invoice_records = OperationAirImport::with(['ConsigneeName', 'dischargePortName', 'loadingPortName'])->find($recorde_id);
                 break;
         }
-        
+
         // Determine BL / AWB Number
         $blNo = '';
-        
+
         switch ($type) {
-            case 'AE': 
+            case 'AE':
                 $blNo = $invoice_records->hawb_no ?: $invoice_records->mawb_no ?: '';
                 break;
-            case 'SI': 
+            case 'SI':
                 $blNo = $invoice_records->hbl_no ?: $invoice_records->mbl_no ?: '';
                 break;
-            case 'SE': 
+            case 'SE':
                 $blNo = $invoice_records->hbl_no ?: $invoice_records->mbl_no ?: '';
                 break;
-            case 'TR': 
-                $blNo = ''; 
+            case 'TR':
+                $blNo = '';
                 break;
-            default: 
+            default:
                 $blNo = $invoice_records->mawb_no ?: $invoice_records->mawb_no ?: '';
                 break;
         }
-        
+
         $deliveryPort = $invoice_records->dischargePortName ? $invoice_records->dischargePortName->port_name : '';
         $consigneeName = $invoice_records->ConsigneeName ? $invoice_records->ConsigneeName->party_name : '';
         $loadingPort = $invoice_records->loadingPortName ? $invoice_records->loadingPortName->port_name : '';
         $packageName = $invoice_records->package ? $invoice_records->packageName->package_code : '';
-        
+
         $containers = '';
         $boe = '';
         $shippingBillNoDt = '';
@@ -345,7 +348,7 @@ class ProformaInvoiceController extends Controller
             $boe .=  $con->bill_of_entry_date ? $con->bill_of_entry_date . ", " : '';
             $customer_inv_no .= $con->customer_inv_no ? $con->customer_inv_no . ", " : '';
         }
-        
+
         $grossWeight = '';
         $chargeNetWeight = '';
         $vessel_airLine = '';
@@ -356,7 +359,7 @@ class ProformaInvoiceController extends Controller
             $chargeNetWeight = $invoice_records->net_weight ?? '';
             $vessel_airLine = $invoice_records->vessel_name ?? '';
             $Awb_BlNo = $invoice_records->mbl_no ?? '';
-            
+
         } else if ($type == 'AE' || $type == 'AI') {
             $packageValue = $invoice_records->package ?? '';
             $grossWeight = $invoice_records->gross_weight ?? '';
@@ -366,31 +369,31 @@ class ProformaInvoiceController extends Controller
             $shippingBillNoDt = $invoice_records->sbill_no;
             $boe = $invoice_records->bill_of_entry_date;
         }
-    
+
 
         return response()->json([
             'status' => 'success',
             // 'result' => $invoice_records,
-            
+
             'deliveryPort' => $deliveryPort,
             'loadingPort' => $loadingPort,
             'consigneeName' => $consigneeName,
             'packageType' => $packageName,
             'packages' => $packageValue,
-            
+
             'grossWeight' => $grossWeight,
             'chargeWeight' => $chargeNetWeight,
             'vessel_airLine' => $vessel_airLine,
-            
+
             'containerNo' => $containers,
             'voyageNo' => $invoice_records->voyage_no ?? '',
             'cbm' => $invoice_records->cbm,
             'Awb_BlNo' =>   $Awb_BlNo,
-            
+
             'shippingBillNoDt' => $shippingBillNoDt,
             'boe' => $boe,
             'customer_inv_no' => $customer_inv_no
-            
+
         ]);
 
     }
@@ -428,19 +431,19 @@ class ProformaInvoiceController extends Controller
             'igst'                  => 'nullable|numeric|min:0',
             'total'                 => 'nullable|numeric|min:0',
             'remarks'                 => 'nullable|string',
-            
+
             'tds' => 'nullable|numeric',
             'tds_amount' => 'nullable|numeric',
         ]);
-    
+
         $data = $request->all();
         $data['company_id'] = $this->company_id;
         $data['user_id'] = $this->user_id;
         $data['uuid'] = \Str::uuid();
-    
+
         $proformaCharges = AccountProformaInvoiceContainer::create($data);
         $proformaCharges->load('charge');
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Proforma Invoice Charge saved successfully.',
@@ -482,14 +485,14 @@ class ProformaInvoiceController extends Controller
             'tds'                 => 'nullable|numeric',
             'tds_amount'          => 'nullable|numeric',
         ];
-    
+
         $validated = $request->validate($rules);
-    
+
         // 🔹 Try to find existing charge for this invoice
         $existingCharge = AccountProformaInvoiceContainer::where('proforma_invoice_id', $id)
             ->where('charge_id', $request->charge_id)
             ->first();
-    
+
         if ($existingCharge) {
             // 🔄 Update existing charge
             $validated['user_id'] = $this->user_id;
@@ -500,25 +503,25 @@ class ProformaInvoiceController extends Controller
             $validated['user_id'] = $this->user_id;
             $validated['uuid'] = Str::uuid();
             $validated['proforma_invoice_id'] = $id;
-    
+
             AccountProformaInvoiceContainer::create($validated);
         }
-    
+
         return redirect()->back()->with('success', 'Proforma Invoice Charges saved successfully.');
     }
 
-    
+
     function getCharge(Request $request){
        $recorde_id = $request->id;
        $charges = MasterCharge::find($recorde_id);
-       
+
        if($charges){
            return response()->json(['status' => true, 'data' => $charges]);
        }else{
            return response()->json(['status' => false, 'data' => "Data not found related to this charges."]);
        }
     }
-    
+
     public function getChargeDetails($charge_id, $invoice_id)
     {
         // Find matching charge details in AccountSaleInvoiceContainer
@@ -526,7 +529,7 @@ class ProformaInvoiceController extends Controller
             ->where('charge_id', $charge_id)
             ->with(['charge', 'salesInvoice.operationJob']) // Relation to MasterCharge
             ->first();
-    
+
         // Get master charge info (for default rate, description, etc.)
         $masterCharge = MasterCharge::find($charge_id);
         // Merge both results
@@ -537,17 +540,17 @@ class ProformaInvoiceController extends Controller
             ];
             return response()->json(['status' => true, 'data' => $data]);
         }
-    
+
         return response()->json([
             'status' => false,
             'message' => 'Charge details not found in this sales invoice.'
         ]);
     }
-    
+
     public function importProformaInvoice($id)
     {
         $currentDate = Carbon::now()->format('d-m-Y');
-        
+
         $porformaInvoice = AccountProformaInvoice::with([
             'partyName',
             'operationJob.seaExport',
@@ -555,48 +558,48 @@ class ProformaInvoiceController extends Controller
             'operationJob.airExport',
             'operationJob.airImport'
         ])->findOrFail($id);
-        
+
         $accountDetails = MasterBank::where('company_id', $this->company_id)->first();
-    
+
         $chargeDetails = AccountProformaInvoiceContainer::with(['charge', 'purchaseInvoice']) // relation to MasterCharge
             ->where('proforma_invoice_id', $porformaInvoice->id)
             ->get();
-        
+
         $company = Company::with(['companySetting', 'companyBranch'])
             ->where('id', $this->company_id)
             ->first();
-            
-        $logoUrl = $company->logo 
+
+        $logoUrl = $company->logo
             ? asset('public/uploads/company_logo/' . $company->logo)
             : asset('images/default-logo.png');
-    
+
         // pass both invoice + its related charges to the view
         return view('admin-main.admin.proformaInvoice.ImportPorformaInvoice', compact('porformaInvoice', 'chargeDetails', 'company', 'logoUrl', 'accountDetails', 'currentDate'));
     }
-    
+
     public function getChargeDetailForUpdate($id)
     {
         $chargeDetail = AccountProformaInvoiceContainer::with('charge', 'purchaseInvoice')->find($id);
-    
+
         if (!$chargeDetail) {
             return response()->json(['error' => 'Charge not found'], 404);
         }
-    
+
         return response()->json($chargeDetail);
     }
-    
+
     public function deleteChargeDetail($id)
     {
         $charge = AccountProformaInvoiceContainer::find($id);
-    
+
         if ($charge) {
             $charge->delete();
             return response()->json(['success' => true, 'message' => 'Charge deleted successfully']);
         }
-    
+
         return response()->json(['success' => false, 'message' => 'Charge not found'], 404);
     }
-    
+
     public function printProformaInvoice($id)
     {
         $currentDate = Carbon::now()->format('d-m-Y');
@@ -609,23 +612,23 @@ class ProformaInvoiceController extends Controller
             'operationJob.airImport',
             'salesPerson'
         ])->findOrFail($id);
-        
+
         $accountDetails = MasterBank::where('company_id', $this->company_id)->first();
-        
+
         $chargeDetails = AccountProformaInvoiceContainer::with('charge') // relation to MasterCharge
             ->where('proforma_invoice_id', $porformaInvoice->id)
             ->get();
-            
+
         $company = Company::with(['companySetting', 'companyBranch'])
             ->where('id', $this->company_id)
             ->first();
-            
+
         $logoUrl = $company->logo
             ? public_path('uploads/company_logo/' . $company->logo)
             : public_path('images/default-logo.png');
-    
+
         $format = request('format', 'pdf');
-        
+
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
             'admin-main.admin.proformaInvoice.print-proforma-invoice',
             compact('porformaInvoice', 'chargeDetails', 'company', 'logoUrl', 'accountDetails', 'currentDate')
