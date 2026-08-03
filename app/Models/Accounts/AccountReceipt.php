@@ -6,13 +6,14 @@ use App\Models\MasterImportParty;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\CompanyBranch;
 
 class AccountReceipt extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'company_id','user_id',
+        'company_id','user_id','branch_id',
         'uuid',
         'billing_party_id',
         'receipt_date',
@@ -20,7 +21,7 @@ class AccountReceipt extends Model
         'invoice_type',
         'invoice_no'
     ];
-    
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
@@ -28,5 +29,9 @@ class AccountReceipt extends Model
 
     public function billingParty(){
         return $this->belongsTo(MasterImportParty::class, 'billing_party_id');
+    }
+
+    public function branch(){
+        return $this->belongsTo(CompanyBranch::class, 'branch_id');
     }
 }

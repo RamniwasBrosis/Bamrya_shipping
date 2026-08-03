@@ -22,7 +22,7 @@ class ReceiptController extends Controller
             return $next($request);
         });
     }
-    
+
     /**
      * Display a listing of the resource.
      */
@@ -72,21 +72,22 @@ class ReceiptController extends Controller
             'invoice_no'            => 'required|string|max:255',
             'amount'                => 'required|numeric|min:0',
         ]);
-    
+
         $receipt = new AccountReceipt();
-    
+
         $receipt->company_id = $this->company_id;
         $receipt->user_id = $this->user_id;
+        $receipt->branch_id = Auth::user()->branch_id;
         $receipt->uuid = Str::uuid();
-    
+
         $receipt->billing_party_id = $validated['billing_party_id'];
         $receipt->receipt_date = $validated['receipt_date'];
         $receipt->invoice_type = $validated['invoice_type'];
         $receipt->invoice_no = $request->invoice_no;
         $receipt->amount = $validated['amount']; // matching DB column
-    
+
         $receipt->save();
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Receipt entry stored successfully!',
@@ -127,9 +128,10 @@ class ReceiptController extends Controller
             'amount'                => 'required|numeric|min:0',
         ]);
         $validated['user_id'] = $this->user_id;
+        $validated['branch_id'] = Auth::user()->branch_id;
         $receipt = AccountReceipt::findOrFail($id);
         $receipt->update($validated);
-    
+
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -146,23 +148,23 @@ class ReceiptController extends Controller
     // public function destroy(string $id)
     // {
     //     $receipt = AccountReceipt::findOrFail($id);
-    
+
     //     // Delete related payment details if exist
     //     $paymentDetail = AccountReceiptPaymentDetail::where('receipt_id', $id)->first();
     //     if ($paymentDetail) {
     //         $paymentDetail->delete();
     //     }
-    
+
     //     $receipt->delete();
-    
+
     //     return response()->json(['success' => 'Receipt deleted successfully!']);
     // }
-    
+
     public function destroy($id)
     {
         $receipt = AccountReceipt::findOrFail($id);
         $receipt->delete();
-    
+
         return redirect()->route('receipts.index')->with('success', 'Receipt deleted successfully.');
     }
 
@@ -192,6 +194,6 @@ class ReceiptController extends Controller
         }else{
             AccountReceiptPaymentDetail::create($validated);
             return back()->with('success', 'Payment details saved successfully.');
-        }     
+        }
     }
 }

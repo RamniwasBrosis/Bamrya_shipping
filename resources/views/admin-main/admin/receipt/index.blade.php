@@ -53,7 +53,7 @@
                                     <label for="">To Date:</label>
                                     <input type="date" name="to_date" class="form-control">
                                 </div>
-                                
+
                             </div>
                         </div>
                         <div class="col-xl-2 col-sm-6 col-lg-4 mb-3">
@@ -75,6 +75,7 @@
                                     <th>Debit</th>
                                     <th>Credit</th>
                                     <th>Updated By</th>
+                                    <th>Branch</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -86,7 +87,7 @@
                                         <td>{{ $receipt_list->invoice_type ?? '' }}</td>
                                         <td>{{ $receipt_list->invoice_no ?? '' }}</td>
                                         <td>{{ $receipt_list->receipt_date ? \Carbon\Carbon::parse($receipt_list->receipt_date)->format('d-F-Y') : '' }}</td>
-                        
+
                                         {{-- Conditional Debit / Credit --}}
                                         <td>
                                             @if ($receipt_list->invoice_type === 'Sales')
@@ -105,9 +106,10 @@
                                             @endif
                                         </td>
                                         <td>{{ $receipt_list->user->name ?? '' }}</td>
+                                        <td>{{ $receipt_list->branch->branch_name ?? '' }}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{ url('admin/receipts/'.$receipt_list->uuid.'/edit') }}">Edit</a>
-                        
+
                                             <form action="{{ route('receipts.destroy', $receipt_list->id) }}" method="POST" style="display:inline-block;">
                                                 @csrf
                                                 @method('DELETE')
@@ -137,12 +139,12 @@
     $(document).on('click', '.delete-receipt', function(e) {
         e.preventDefault();
         let id = $(this).data('id');
-    
+
         if (!id) return console.log("⚠️ No ID found!");
-    
+
         let url = "{{ route('receipts.destroy', ':id') }}";
         url = url.replace(':id', id);
-    
+
         Swal.fire({
             title: 'Delete Receipt?',
             text: "Are you sure you want to delete this receipt permanently?",
@@ -170,7 +172,7 @@
                             timer: 1500,
                             showConfirmButton: false
                         });
-    
+
                         $(`.delete-receipt[data-id='${id}']`).closest('tr').fadeOut(500, function() {
                             $(this).remove();
                         });

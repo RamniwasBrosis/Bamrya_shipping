@@ -22,7 +22,7 @@ class PurchasePaymentController extends Controller
             return $next($request);
         });
     }
-    
+
     /**
      * Display a listing of the resource.
      */
@@ -72,18 +72,20 @@ class PurchasePaymentController extends Controller
             'invoice_no'       => 'required|string|max:255',
             'amount'           => 'required|numeric|min:0',
         ]);
-    
-        $receipt = new AccountPurchasePayment();
-        $receipt->company_id = $this->company_id;
-        $receipt->user_id = $this->user_id;
-        $receipt->uuid = Str::uuid();
-        $receipt->billing_party_id = $request->billing_party_id;
-        $receipt->purchase_date = $request->purchase_date; // fixed: matches form name
-        $receipt->invoice_type = $request->invoice_type;
-        $receipt->invoice_no = $request->invoice_no;
-        $receipt->amount = $request->amount;
-        $receipt->save();
-    
+
+        $purchase = new AccountPurchasePayment();
+        $purchase->company_id = $this->company_id;
+        $purchase->user_id = $this->user_id;
+        $purchase->branch_id = Auth::user()->branch_id;
+        $purchase->uuid = Str::uuid();
+
+        $purchase->billing_party_id = $request->billing_party_id;
+        $purchase->purchase_date = $request->purchase_date; // fixed: matches form name
+        $purchase->invoice_type = $request->invoice_type;
+        $purchase->invoice_no = $request->invoice_no;
+        $purchase->amount = $request->amount;
+        $purchase->save();
+
         return response()->json([
             'success' => true,
             'message' => 'Purchase payment added successfully!'
@@ -112,7 +114,7 @@ class PurchasePaymentController extends Controller
 
         return view('admin-main.admin.purchasePayment.edit', compact('purchase_payment', 'parties', 'purchase_payment_detail', 'party_lists'));
     }
-    
+
     /**
      * Update the specified resource in storage.
      */
@@ -126,10 +128,11 @@ class PurchasePaymentController extends Controller
             'amount'           => 'required|numeric|min:0',
         ]);
         $validated['user_id'] = $this->user_id;
-    
+        $validated['branch_id'] = Auth::user()->branch_id;
+
         $purchasePayment = AccountPurchasePayment::findOrFail($id);
         $purchasePayment->update($validated);
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Purchase details updated successfully!',
@@ -175,6 +178,6 @@ class PurchasePaymentController extends Controller
         }else{
             AccountPurchasePaymentDetail::create($validated);
             return back()->with('success', 'Payment details saved successfully.');
-        }     
+        }
     }
 }

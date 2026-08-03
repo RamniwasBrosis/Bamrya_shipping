@@ -35,7 +35,7 @@
 
                     <li><a href="{{route('seaJobCard')}}">Sea</a></li>
                 </ul>
-            </li>   
+            </li>
             @endcan
             @can('masters')
             <li><a class="has-arrow " href="javascript:void(0);" aria-expanded="false">
@@ -124,9 +124,9 @@
             <li><a class="has-arrow " href="javascript:void(0);" aria-expanded="false">
                 <div class="menu-icon">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" 
+                    <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z"
                             stroke="#888888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M4 20C4 16.6863 7.58172 14 12 14C16.4183 14 20 16.6863 20 20" 
+                    <path d="M4 20C4 16.6863 7.58172 14 12 14C16.4183 14 20 16.6863 20 20"
                             stroke="#888888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 </div>
@@ -137,8 +137,8 @@
                     <li><a href="{{ url('admin/tax-invoices') }}">Tax-Invoice</a></li>
                     <li><a href="{{ url('admin/receipts') }}">Receipt</a></li>
                     <li><a href="{{ url('admin/purchase-payment') }}">Purchase Payment</a></li>
-                    <li><a href="{{ url('admin/on-accounts') }}">Receive Amount (Sale)</a></li>
-                    <li><a href="{{ url('admin/payment-amount') }}">Payment Amount (purchase)</a></li>
+                    {{-- <li><a href="{{ url('admin/on-accounts') }}">Receive Amount (Sale)</a></li>
+                    <li><a href="{{ url('admin/payment-amount') }}">Payment Amount (purchase)</a></li> --}}
                 </ul>
             </li>
             @endcan
@@ -164,17 +164,17 @@
                     <li><a href="{{ url('admin/sales-report') }}">Sales Report</a></li>
                     <li><a href="{{ url('admin/purchase-report') }}">Purchase Report</a></li>
                     <li><a href="{{ url('admin/sale-purchase-report') }}">Sale/Purchase Report</a></li>
-                
+
                     <li><a href="{{ url('admin/sales-outstanding') }}">Sales Outstanding</a></li>
                     <li><a href="{{ url('admin/purchase-outstanding') }}">Purchase Outstanding</a></li>
-                    
+
                     <li><a href="{{ url('admin/receipts-list') }}">Reciept</a></li>
                     <li><a href="{{ url('admin/purchase-payment-list') }}">Purchase</a></li>
-                    
+
                     <!--<li><a href="{{ url('admin/loading-list') }}">Loading List</a></li>-->
                     <!--<li><a href="{{ url('admin/cost-sheet-report') }}">CostSheet Report</a></li>-->
                     <!--<li><a href="{{ url('admin/SacSummaryReport') }}">Sac Summary Report</a></li>-->
-                    
+
                     <!--<li><a href="{{ url('admin/SallesRegister') }}">Salles Register</a></li>-->
                     <!--<li><a href="{{ url('admin/GstPayableReport') }}">Gst Payable Report</a></li>-->
                     <!--<li><a href="{{ url('admin/PurchaseRegister') }}">Purchase Register</a></li>-->
@@ -200,7 +200,7 @@
 
             @can('members')
             <li><a class="has-arrow " href="javascript:void(0);" aria-expanded="false">
-                    
+
                     <div class="menu-icon">
                         <svg width="22" height="22" viewBox="0 0 22 22" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
@@ -255,8 +255,8 @@
 
                     <li><a href="{{ url('admin/branches') }}">Branch</a></li>
                 </ul>
-            </li>   
-            @endcan       
+            </li>
+            @endcan
         </ul>
     </div>
 </div>

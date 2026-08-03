@@ -84,6 +84,7 @@
                                     <th>Debit</th>
                                     <th>Credit</th>
                                     <th>Updated By</th>
+                                    <th>Branch</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -95,7 +96,7 @@
                                         <td>{{ $purchase_payment->invoice_type ?? '' }}</td>
                                         <td>{{ $purchase_payment->invoice_no ?? '' }}</td>
                                         <td>{{ $purchase_payment->purchase_date ? \Carbon\Carbon::parse($purchase_payment->purchase_date)->format('d-F-Y') : '' }}</td>
-                        
+
                                         {{-- Conditional Debit / Credit --}}
                                         <td>
                                             @if ($purchase_payment->invoice_type === 'Journal')
@@ -112,9 +113,10 @@
                                             @endif
                                         </td>
                                         <td>{{ $purchase_payment->user->name ?? '' }}</td>
+                                        <td>{{ $purchase_payment->branch->branch_name ?? '' }}</td>
                                         <td>
                                             <a class="badge badge-info light border-0" href="{{url('admin/purchase-payment/'.$purchase_payment->uuid.'/edit')}}">Edit</a>
-                        
+
                                             <form action="{{ route('purchase-payment.destroy', $purchase_payment->id) }}" method="POST" style="display:inline-block;">
                                                 @csrf
                                                 @method('DELETE')

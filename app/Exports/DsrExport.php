@@ -23,7 +23,7 @@ class DsrExport implements FromArray, WithStyles, ShouldAutoSize
 
         // Header
         $output[] = [
-            'Sr No', 'Job No', 'Shipper', 'Consignee',
+            'Sr No', 'Job No','Branch', 'Shipper', 'Consignee',
             'Inv No/Inv Dt','PKGS','LCL/FCL/AIR',
             'Load Port','Discharge Port',
             'Cargo Dispatch',
@@ -41,13 +41,13 @@ class DsrExport implements FromArray, WithStyles, ShouldAutoSize
 
             // ------ AIR (AI / AE) ------
             if ($item->prefix == 'AI' || $item->prefix == 'AE') {
-                
+
                 if($item->prefix == 'AI'){
                     $charge_able_weight = $item->chg_weight;
                 }elseif($item->prefix == 'AE'){
                     $charge_able_weight = $item->chargable_weight;
                 }
-                
+
                 $firstFlightNumber = $item->flight_number_1 ?? $item->flight_no ?? '--';
                 $secondFlightNumber = $item->flight_number_2 ?? '';
                 $firstFlightDate = $item->flight_date_1 ?? $item->flight_date ?? '--';
@@ -58,16 +58,17 @@ class DsrExport implements FromArray, WithStyles, ShouldAutoSize
                 $output[] = [
                     $sr++,
                     $item->jobMaster->full_job_no ?? '',
+                    $item->jobMaster->branch->branch_name ?? '',
                     $item->shipperName->party_name ?? '',
                     $item->ConsigneeName->party_name ?? '',
-                    
+
                     $item->customer_inv_no ?? '',
                     $item->package ?? 0,
                     'Air',
-                    
+
                     $item->loadingPortName->port_name ?? '--',
                     $item->dischargePortName->port_name ?? '',
-                    
+
                     $item->jobMaster->cargo_ready_date ?? 'Pending',
                     $item->check_list_date ?? 'Pending',
                     $item->sbill_no ?? $item->bill_of_entry_date ?? '',
@@ -76,25 +77,25 @@ class DsrExport implements FromArray, WithStyles, ShouldAutoSize
                     '--',
                     $item->flight_name_1 ?? $item->flight_name_2 ?? '--',
                     $item->mawb_no ?? '--'.'/'.$item->hbl_no ?? '--',
-                    
+
                     '--',
                     $FlightNumbers.' / '.$FlightDate,
                     $item->sobDate ?? '--',
                     '--',
-                    
+
                     !empty($item->etd_date) ? \Carbon\Carbon::parse($item->etd_date)->format('Y-m-d') : 'Pending',
                     !empty($item->eta_date) ? \Carbon\Carbon::parse($item->eta_date)->format('Y-m-d') : 'Pending',
                     $item->Forwarder->party_name ?? '--',
                     $charge_able_weight,
                     $item->iataAgent->party_name ?? $item->LataAgentName->party_name ?? '--',
-                    
+
                     ($item->booking_no ?? '--') .'/'. (!empty($item->booking_date) ? \Carbon\Carbon::parse($item->booking_date)->format('Y-m-d') : 'Pending'),
                     $item->ChaName->party_name ?? '',
                     $item->transportation_details ?? '--',
                     $item->destinationPortName->port_name ?? '--',
                     $item->deliveryPortName->port_name ?? '--',
                     $item->flight_status,
-                    
+
                 ];
 
             }else {
@@ -151,7 +152,7 @@ class DsrExport implements FromArray, WithStyles, ShouldAutoSize
                             $billDate = !empty($line->shipping_bill_date)
                                 ? Carbon::parse($line->shipping_bill_date)->format('Y-m-d')
                                 : '--';
-                    
+
                             return $billNo . ' / ' . $billDate;
                         })->toArray();
                     }
@@ -193,6 +194,7 @@ class DsrExport implements FromArray, WithStyles, ShouldAutoSize
                 $output[] = [
                     $sr++,
                     $item->jobMaster->full_job_no ?? '',
+                    $item->jobMaster->branch->branch_name ?? '',
                     $item->shipperName->party_name ?? '',
                     implode($hr, $containerBlocks['consignee']),
                     implode($hr, $containerBlocks['invoice']),
@@ -226,7 +228,7 @@ class DsrExport implements FromArray, WithStyles, ShouldAutoSize
                 ];
             }
         }
-    
+
         return $output;
     }
 

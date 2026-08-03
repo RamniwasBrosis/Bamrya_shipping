@@ -79,6 +79,7 @@
                                     <th>FinYear</th>
                                     <th>Inv Amt</th>
                                     <th>Updated By</th>
+                                    <th>Branch</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -157,6 +158,7 @@
                                             }}
                                         </td>
                                         <td>{{ $userName ?? '-' }}</td>
+                                        <td>{{ $sales_invoice->branch->branch_name ?? '-'}}</td>
                                         <td>
                                             <a href="{{ route('salesInvoice.import', $sales_invoice->id) }}" type="button" class="btn btn-success btn-sm">Print</a>
                                             <a class="badge badge-info light border-0" href="{{url('admin/sales-invoices/'.$sales_invoice->uuid.'/edit')}}">Edit</a>
