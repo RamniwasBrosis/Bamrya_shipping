@@ -29,7 +29,7 @@ class SalesOutstandingExport implements FromCollection, WithHeadings, WithStyles
         foreach ($this->data as $item) {
             $charges = $item['chargesContainer'] ?? collect();
             if ($charges->isEmpty()) continue;
-            
+
             $cgstAmount  = $charges->sum('cgst');
             $sgstAmount  = $charges->sum('sgst');
             $igstAmount  = $charges->sum('igst');
@@ -51,7 +51,8 @@ class SalesOutstandingExport implements FromCollection, WithHeadings, WithStyles
 
             $rows->push([
                 'Party Name'   => optional($item->partyName)->party_name ?? '--',
-                'Job No'       => optional($item->operationJob)->job_no ?? '--',
+                'Job No'       => optional($item->operationJob)->full_job_no ?? '--',
+                'Branch'       => $item->branch->branch_name ?? '--',
                 'Invoice No'   => $item->invoice_no ?? '--',
                 'INV DT'       => $item->invoice_date ? \Carbon\Carbon::parse($item->invoice_date)->format('d-m-Y') : '' ,
                 'GSTIN No'       => optional($item->partyName)->pan_no ?? '--',
@@ -65,6 +66,7 @@ class SalesOutstandingExport implements FromCollection, WithHeadings, WithStyles
         $rows->push([
             'Party Name'   => '',
             'Job No'       => '',
+            'Branch'       => '',
             'Invoice No'   => '',
             'INV DT'       => '',
             'GSTIN No'       => 'GRAND TOTAL:',
@@ -81,6 +83,7 @@ class SalesOutstandingExport implements FromCollection, WithHeadings, WithStyles
         return [
             'Party Name',
             'Job No',
+            'Branch',
             'Invoice No',
             'INV DT',
             'GSTIN No',

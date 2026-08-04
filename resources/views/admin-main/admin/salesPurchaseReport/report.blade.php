@@ -23,6 +23,7 @@
         <thead>
             <tr>
                 <th>Job No</th>
+                <th>Branch</th>
                 <th>Type</th>
                 <th>Party Name</th>
                 <th>Invoice No(s)</th>
@@ -51,6 +52,7 @@
                 <tr class="{{ $row->type == 'Sale' ? 'sale-row' : 'purchase-row' }}">
                     @if($row->is_first)
                         <td rowspan="{{ $row->rowspan }}">{{ $row->job_no }}</td>
+                        <td rowspan="{{ $row->rowspan }}">{{ $row->branch_name }}</td>
                     @endif
                     <td>{{ $row->type }}</td>
                     <td>{{ $row->party_name }}</td>
@@ -72,12 +74,12 @@
                     @endif
                 </tr>
             @empty
-                <tr><td colspan="8" class="text-center">No records found.</td></tr>
+                <tr><td colspan="9" class="text-center">No records found.</td></tr>
             @endforelse
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="4" class="text-right">GRAND TOTAL</td>
+                <td colspan="5" class="text-right">GRAND TOTAL</td>
                 <td class="text-right">{{ number_format($grandTaxable, 2) }}</td>
                 <td class="text-right">{{ number_format($grandGst, 2) }}</td>
                 <td class="text-right">{{ number_format($grandTotal, 2) }}</td>

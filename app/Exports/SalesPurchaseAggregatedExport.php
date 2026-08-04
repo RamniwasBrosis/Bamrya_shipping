@@ -21,6 +21,7 @@ class SalesPurchaseAggregatedExport implements FromCollection, WithHeadings
             $profit = ($row->is_first && $row->profit !== null) ? number_format($row->profit, 2) : '';
             return [
                 $row->job_no,
+                $row->branch_name,
                 $row->type,
                 $row->party_name,
                 $row->invoices,
@@ -34,6 +35,6 @@ class SalesPurchaseAggregatedExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ['Job No', 'Type', 'Party Name', 'Invoice No(s)', 'Taxable Amount', 'GST Amount', 'Total Amount', 'Profit'];
+        return ['Job No', 'Branch', 'Type', 'Party Name', 'Invoice No(s)', 'Taxable Amount', 'GST Amount', 'Total Amount', 'Profit'];
     }
 }

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\View;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PurchaseTDSReportExport;
 use App\Models\Accounts\AccountSaleInvoice;
+use App\Models\CompanyBranch;
 
 class SalesTDSReportController extends Controller
 {
@@ -29,7 +30,7 @@ class SalesTDSReportController extends Controller
         });
     }
 
-    
+
     public function index(){
 
         $parties = MasterImportParty::where('company_id', $this->company_id)->where('party_type', 10)->get();
@@ -39,13 +40,22 @@ class SalesTDSReportController extends Controller
                             ->distinct()
                             ->orderBy('full_job_no')
                             ->get();
-        return view('admin-main.admin.salesTDSReport.first', compact(['parties','sales_invoices']));
+        $branches = CompanyBranch::where('company_id', $this->company_id)
+            ->where('status',1)
+            ->orderBy('branch_name')
+            ->get();
+
+        return view('admin-main.admin.salesTDSReport.first', compact(['parties','sales_invoices', 'branches']));
     }
 
     public function preview(Request $request)
     {
+        $branch_id = $request->branch_id;
         $sales_invoices = AccountSaleInvoice::with(['partyName', 'chargesContainer']) // important
         ->where('company_id', $this->company_id)
+        ->when($branch_id != 'all', function ($q) use ($branch_id) {
+            $q->where('branch_id', $branch_id);
+        })
         ->when($request->filled('from_date') && $request->filled('to_date'), function ($q) use ($request) {
             $from = Carbon::parse($request->from_date)->startOfDay();   // 00:00:00
             $to   = Carbon::parse($request->to_date)->endOfDay();
@@ -59,7 +69,7 @@ class SalesTDSReportController extends Controller
         })
         ->orderBy('created_at', 'desc')
         ->paginate(25);
-        
+
         $html = '
             <h4 style="text-align:center;">Sales Invoice</h4>
            <div>
@@ -74,22 +84,25 @@ class SalesTDSReportController extends Controller
                             'full_job_no' => $request->full_job_no,
                             'from_date'   => $request->from_date,
                             'to_date'     => $request->to_date,
+                            'branch_id' => $request->branch_id,
                         ]).'" target="_blank">Download PDF</a></li>
-                        
+
                         <li><a class="dropdown-item" href="'.route('sales-tds-report.download', [
                             'format'      => 'excel',
                             'party_id'    => $request->party_id,
                             'full_job_no' => $request->full_job_no,
                             'from_date'   => $request->from_date,
                             'to_date'     => $request->to_date,
+                            'branch_id' => $request->branch_id,
                         ]).'" target="_blank">Download Excel</a></li>
-                        
+
                         <li><a class="dropdown-item" href="'.route('sales-tds-report.download', [
                             'format'      => 'word',
                             'party_id'    => $request->party_id,
                             'full_job_no' => $request->full_job_no,
                             'from_date'   => $request->from_date,
                             'to_date'     => $request->to_date,
+                            'branch_id' => $request->branch_id,
                         ]).'" target="_blank">Download Word</a></li>
                     </ul>
                 </div>
@@ -100,18 +113,19 @@ class SalesTDSReportController extends Controller
                     <tr style="background-color: #f4e9d8; text-align: center; font-weight: bold;">
                         <th>Party Name</th>
                         <th>Job No</th>
+                        <th>Branch</th>
                         <th>Invoice No</th>
                         <th>Inv DT</th>
                         <th>GSTIN No</th>
                         <th>Taxable Amount</th>
                         <th>GST Amount</th>
                         <th>Total Amount</th>
-                        
+
                     </tr>
                 </thead>
-                <tbody>'              
+                <tbody>'
             ;
-                
+
             // Totals
             $totalBill = 0;
             $totalBasic = 0;
@@ -123,30 +137,31 @@ class SalesTDSReportController extends Controller
             foreach ($sales_invoices as $item) {
                 $charges = $item['chargesContainer'];
                 if ($charges->isEmpty()) continue;
-            
+
                 $cgstAmount  = $charges->sum('cgst');
                 $sgstAmount  = $charges->sum('sgst');
                 $igstAmount  = $charges->sum('igst');
                 $gstAmount = $igstAmount + $sgstAmount + $cgstAmount;
                 $billAmount  = $charges->sum('amount');
                 $taxableAmount  = $charges->sum('freight');
-                $basicAmount = $charges->sum('basic_amount'); 
+                $basicAmount = $charges->sum('basic_amount');
                 $tdsAmt      = $charges->sum('tds_amount');
                 $tdsPercent  = $charges->avg('tds'); // Average TDS %
                 $payableAmt  = $billAmount - $tdsAmt;
                 // $payableAmt  = $charges->sum('total');
                 $panNo       = $item->partyName->gstin ?? '--';
-       
+
                 $totalBill     += $billAmount;
                 // $totalBasic    += $basicAmount;
                 $totalTds      += $tdsAmt;
                 $totalPayable  += $payableAmt;
                 $totalTaxableAmount  += $taxableAmount;
                 $totalGstAmount += $gstAmount;
-            
+
                 $html .= '<tr style="text-align: center;">
                     <td>' . ($item->partyName->party_name ?? '--') . '</td>
-                    <td>' . ($item->operationJob->job_no ?? '--') . '</td>
+                    <td>' . ($item->operationJob->full_job_no ?? '--') . '</td>
+                    <td>'.($item->branch->branch_name ?? '--').'</td>
                     <td>' . ($item->invoice_no ?? '--') . '</td>
                     <td>'. ($item->invoice_date ? \Carbon\Carbon::parse($item->invoice_date)->format('d-m-Y') : '' ).'</td>
                     <td>' . $panNo . '</td>
@@ -176,22 +191,22 @@ class SalesTDSReportController extends Controller
     {
         $query = AccountSaleInvoice::with(['partyName', 'chargesContainer'])
             ->where('company_id', $this->company_id)
-    
+            ->when($request->branch_id != 'all', function ($q) use ($request) {
+                $q->where('branch_id', $request->branch_id);
+            })
             ->when($request->filled('party_id'), function ($q) use ($request) {
                 $q->where('billing_party_id', $request->party_id);
             })
-    
             ->when($request->filled('full_job_no'), function ($q) use ($request) {
                 $q->where('full_job_no', $request->full_job_no);
             })
-    
             ->when($request->filled('from_date') && $request->filled('to_date'), function ($q) use ($request) {
                 $q->whereBetween('created_at', [
                     Carbon::parse($request->from_date)->startOfDay(),
                     Carbon::parse($request->to_date)->endOfDay(),
                 ]);
             })
-    
+
             ->get();
 
         if ($format == 'pdf') {
@@ -203,7 +218,7 @@ class SalesTDSReportController extends Controller
             $dompdf->render();
             return response($dompdf->output(), 200)
                     ->header('Content-Type', 'application/pdf')
-                    ->header('Content-Disposition', 'attachment; filename="repost.pdf"');
+                    ->header('Content-Disposition', 'attachment; filename="sales-report.pdf"');
         }
 
         if ($format == 'excel') {
@@ -211,11 +226,11 @@ class SalesTDSReportController extends Controller
         }
 
         if ($format == 'word') {
-            
+
             $html = View::make('admin-main.admin.salesTDSReport.report', compact('query'))->render();
             return response($html)
                 ->header('Content-Type', 'application/msword')
-                ->header('Content-Disposition', 'attachment; filename="loading-list.doc"');
+                ->header('Content-Disposition', 'attachment; filename="sales-report.doc"');
         }
 
         return redirect()->back()->with('error', 'Invalid format selected');

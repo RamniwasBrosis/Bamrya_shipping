@@ -14,6 +14,7 @@ use App\Exports\SalesPurchaseAggregatedExport;
 use App\Models\Accounts\AccountPurchaseInvoice;
 use App\Models\Accounts\AccountSaleInvoice;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\CompanyBranch;
 
 class SalesPurchaseReportController extends Controller
 {
@@ -32,18 +33,26 @@ class SalesPurchaseReportController extends Controller
             ->select('id', 'full_job_no')
             ->orderBy('full_job_no')
             ->get();
-    
-        return view('admin-main.admin.salesPurchaseReport.first', compact('jobs'));
+        $branches = CompanyBranch::where('company_id', $this->company_id)
+            ->where('status',1)
+            ->orderBy('branch_name')
+            ->get();
+
+        return view('admin-main.admin.salesPurchaseReport.first', compact('jobs', 'branches'));
     }
 
     public function preview(Request $request)
     {
+        $branch_id = $request->branch_id;
         $from = Carbon::parse($request->from_date)->startOfDay();
         $to   = Carbon::parse($request->to_date)->endOfDay();
 
         // Fetch sales invoices
-        $sales = AccountSaleInvoice::with(['partyName', 'chargesContainer'])
+        $sales = AccountSaleInvoice::with(['partyName', 'chargesContainer', 'branch'])
             ->where('company_id', $this->company_id)
+            ->when($branch_id != 'all', function($q) use ($branch_id){
+                $q->where('branch_id',$branch_id);
+            })
             ->whereBetween('created_at', [$from, $to])
             ->when($request->filled('full_job_no'), function ($q) use ($request) {
                 return $q->where('full_job_no', $request->full_job_no);
@@ -51,8 +60,11 @@ class SalesPurchaseReportController extends Controller
             ->get();
 
         // Fetch purchase invoices
-        $purchase = AccountPurchaseInvoice::with(['partyName', 'chargesContainer'])
+        $purchase = AccountPurchaseInvoice::with(['partyName', 'chargesContainer', 'branch'])
             ->where('company_id', $this->company_id)
+            ->when($branch_id != 'all', function($q) use ($branch_id){
+                $q->where('branch_id',$branch_id);
+            })
             ->whereBetween('created_at', [$from, $to])
             ->when($request->filled('full_job_no'), function ($q) use ($request) {
                 return $q->where('full_job_no', $request->full_job_no);
@@ -71,6 +83,7 @@ class SalesPurchaseReportController extends Controller
             if (!isset($grouped[$job]['sales'])) {
                 $grouped[$job]['sales'] = [
                     'party_name' => optional($inv->partyName)->party_name ?? '--',
+                    'branch_name'=>optional($inv->branch)->branch_name ?? '--',
                     'invoices' => [],
                     'taxable' => 0,
                     'gst' => 0,
@@ -100,6 +113,7 @@ class SalesPurchaseReportController extends Controller
             if (!isset($grouped[$job]['purchase'])) {
                 $grouped[$job]['purchase'] = [
                     'party_name' => optional($inv->partyName)->party_name ?? '--',
+                    'branch_name'=>optional($inv->branch)->branch_name ?? '--',
                     'invoices' => [],
                     'taxable' => 0,
                     'gst' => 0,
@@ -126,7 +140,7 @@ class SalesPurchaseReportController extends Controller
             $hasSale = !is_null($types['sales']);
             $hasPurchase = !is_null($types['purchase']);
             $rowspan = ($hasSale && $hasPurchase) ? 2 : 1;
-            
+
             // Calculate profit: taxable sale - taxable purchase (if both exist)
             $profit = null;
             if ($hasSale && $hasPurchase) {
@@ -145,6 +159,7 @@ class SalesPurchaseReportController extends Controller
                     'total' => $types['sales']['total'],
                     'is_first' => true,
                     'profit' => $profit,
+                    'branch_name'=>$types['sales']['branch_name'],
                 ];
             }
             if ($hasPurchase) {
@@ -159,6 +174,7 @@ class SalesPurchaseReportController extends Controller
                     'total' => $types['purchase']['total'],
                     'is_first' => false,
                     'profit' => null, // profit only shown in first row
+                    'branch_name'=>$types['purchase']['branch_name'],
                 ];
             }
         }
@@ -217,18 +233,21 @@ class SalesPurchaseReportController extends Controller
                         'full_job_no' => $request->full_job_no,
                         'from_date' => $request->from_date,
                         'to_date' => $request->to_date,
+                        'branch_id'=>$request->branch_id,
                     ]).'" target="_blank">PDF</a></li>
                     <li><a class="dropdown-item" href="'.route('sale-purchase-report.download', [
                         'format' => 'excel',
                         'full_job_no' => $request->full_job_no,
                         'from_date' => $request->from_date,
                         'to_date' => $request->to_date,
+                        'branch_id'=>$request->branch_id,
                     ]).'" target="_blank">Excel</a></li>
                     <li><a class="dropdown-item" href="'.route('sale-purchase-report.download', [
                         'format' => 'word',
                         'full_job_no' => $request->full_job_no,
                         'from_date' => $request->from_date,
                         'to_date' => $request->to_date,
+                        'branch_id'=>$request->branch_id,
                     ]).'" target="_blank">Word</a></li>
                 </ul>
             </div>
@@ -237,6 +256,7 @@ class SalesPurchaseReportController extends Controller
                 <thead>
                     <tr>
                         <th>Job No</th>
+                        <th>Branch</th>
                         <th>Type</th>
                         <th>Party Name</th>
                         <th>Invoice No(s)</th>
@@ -254,6 +274,7 @@ class SalesPurchaseReportController extends Controller
                 // Job No cell with rowspan if it's the first row for this job
                 if ($row->is_first) {
                     $html .= '<td rowspan="'.$row->rowspan.'">'.e($row->job_no).'</td>';
+                    $html.='<td rowspan="'.$row->rowspan.'">'.$row->branch_name.'</td>';
                 }
                 $html .= '
                     <td>'.e($row->type).'</td>
@@ -289,7 +310,7 @@ class SalesPurchaseReportController extends Controller
                 </tbody>
                 <tfoot>
                     <tr style="font-weight: bold; background-color: #e9ecef;">
-                        <td colspan="4" class="text-right">GRAND TOTAL</td>
+                        <td colspan="5" class="text-right">GRAND TOTAL</td>
                         <td class="text-right">'.number_format($grandTaxable, 2).'</td>
                         <td class="text-right">'.number_format($grandGst, 2).'</td>
                         <td class="text-right">'.number_format($grandTotal, 2).'</td>
@@ -310,6 +331,9 @@ class SalesPurchaseReportController extends Controller
 
         $sales = AccountSaleInvoice::with(['partyName', 'chargesContainer'])
             ->where('company_id', $this->company_id)
+            ->when($request->branch_id != 'all', function($q) use ($request){
+                $q->where('branch_id',$request->branch_id);
+            })
             ->whereBetween('created_at', [$from, $to])
             ->when($request->filled('full_job_no'), function ($q) use ($request) {
                 return $q->where('full_job_no', $request->full_job_no);
@@ -318,6 +342,9 @@ class SalesPurchaseReportController extends Controller
 
         $purchase = AccountPurchaseInvoice::with(['partyName', 'chargesContainer'])
             ->where('company_id', $this->company_id)
+            ->when($request->branch_id != 'all', function($q) use ($request){
+                $q->where('branch_id',$request->branch_id);
+            })
             ->whereBetween('created_at', [$from, $to])
             ->when($request->filled('full_job_no'), function ($q) use ($request) {
                 return $q->where('full_job_no', $request->full_job_no);
@@ -329,7 +356,7 @@ class SalesPurchaseReportController extends Controller
             $job = $inv->full_job_no;
             if (!isset($grouped[$job])) $grouped[$job] = ['sales' => null, 'purchase' => null];
             if (!isset($grouped[$job]['sales'])) {
-                $grouped[$job]['sales'] = ['party_name' => optional($inv->partyName)->party_name ?? '--', 'invoices' => [], 'taxable' => 0, 'gst' => 0, 'total' => 0];
+                $grouped[$job]['sales'] = ['party_name' => optional($inv->partyName)->party_name ?? '--','branch_name'=>optional($inv->branch)->branch_name ?? '--', 'invoices' => [], 'taxable' => 0, 'gst' => 0, 'total' => 0];
             }
             $charges = $inv->chargesContainer;
             $cgst = $charges->sum('cgst');
@@ -348,7 +375,7 @@ class SalesPurchaseReportController extends Controller
             $job = $inv->full_job_no;
             if (!isset($grouped[$job])) $grouped[$job] = ['sales' => null, 'purchase' => null];
             if (!isset($grouped[$job]['purchase'])) {
-                $grouped[$job]['purchase'] = ['party_name' => optional($inv->partyName)->party_name ?? '--', 'invoices' => [], 'taxable' => 0, 'gst' => 0, 'total' => 0];
+                $grouped[$job]['purchase'] = ['party_name' => optional($inv->partyName)->party_name ?? '--', 'branch_name'=>optional($inv->branch)->branch_name ?? '--', 'invoices' => [], 'taxable' => 0, 'gst' => 0, 'total' => 0];
             }
             $charges = $inv->chargesContainer;
             $cgst = $charges->sum('cgst');
@@ -385,6 +412,7 @@ class SalesPurchaseReportController extends Controller
                     'total' => $types['sales']['total'],
                     'is_first' => true,
                     'profit' => $profit,
+                    'branch_name'=>$types['sales']['branch_name'],
                 ];
             }
             if ($hasPurchase) {
@@ -399,6 +427,7 @@ class SalesPurchaseReportController extends Controller
                     'total' => $types['purchase']['total'],
                     'is_first' => false,
                     'profit' => null,
+                    'branch_name'=>$types['purchase']['branch_name'],
                 ];
             }
         }

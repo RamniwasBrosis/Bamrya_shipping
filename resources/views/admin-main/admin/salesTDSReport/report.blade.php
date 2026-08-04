@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Sales Outstandig Report</title>
-    
+
      <style>
         body {
             font-family: 'DejaVu Sans', sans-serif;
@@ -65,8 +65,8 @@
             border: none !important;
         }
     </style>
-    
-    
+
+
 </head>
 <body>
     <h4 class="text-center">
@@ -79,6 +79,7 @@
             <tr>
                 <th>Party Name</th>
                 <th>Job No</th>
+                <th>Branch</th>
                 <th>Invoice No</th>
                 <th>INV DT</th>
                 <!--<th>Basic Amount</th>-->
@@ -86,7 +87,7 @@
                 <th>Taxable Amount</th>
                 <th>GST Amount</th>
                 <th>Total Amount</th>
-                
+
             </tr>
         </thead>
         <tbody>
@@ -102,7 +103,7 @@
                 @php
                     $charges = $item['chargesContainer'];
                     if ($charges->isEmpty()) continue;
-                    
+
                     $cgstAmount  = $charges->sum('cgst');
                     $sgstAmount  = $charges->sum('sgst');
                     $igstAmount  = $charges->sum('igst');
@@ -123,21 +124,22 @@
                 @endphp
                 <tr>
                     <td class="left">{{ optional($item->partyName)->party_name ?? '--' }}</td>
-                    <td>{{ optional($item->operationJob)->job_no ?? '--' }}</td>
+                    <td>{{ optional($item->operationJob)->full_job_no ?? '--' }}</td>
+                    <td>{{ $item->branch->branch_name ?? '--' }}</td>
                     <td>{{ $item->invoice_no ?? '--' }}</td>
                     <td>{{ $item->invoice_date ? \Carbon\Carbon::parse($item->invoice_date)->format('d-m-Y') : ''  }}</td>
                     <td>{{ $panNo }}</td>
                     <td class="right">{{ number_format($taxableAmount, 2) }}</td>
                     <td class="right">{{ number_format($gstAmount, 2) }}</td>
                     <td class="right">{{ number_format($billAmount, 2) }}</td>
-                
+
                 </tr>
             @endforeach
         </tbody>
 
         <tfoot>
             <tr>
-                <td colspan="5" class="right">GRAND TOTAL :</td>
+                <td colspan="6" class="right">GRAND TOTAL :</td>
                 <td class="right">{{ number_format($totalTaxableAmount, 2) }}</td>
                 <td class="right">{{ number_format($totalGstAmount, 2) }}</td>
                 <td class="right">{{ number_format(round($totalBill), 2) }}</td>

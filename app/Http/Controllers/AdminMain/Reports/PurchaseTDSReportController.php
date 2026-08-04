@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\View;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PurchaseTDSReportExport;
 use App\Models\Accounts\AccountPurchaseInvoice;
+use App\Models\CompanyBranch;
 
 class PurchaseTDSReportController extends Controller
 {
@@ -37,17 +38,25 @@ class PurchaseTDSReportController extends Controller
                             ->distinct()
                             ->orderBy('full_job_no')
                             ->get();
-        
-        return view('admin-main.admin.purchaseTDSReport.first', compact(['parties', 'party_lists','invoices']));
+        $branches = CompanyBranch::where('company_id', $this->company_id)
+            ->where('status',1)
+            ->orderBy('branch_name')
+            ->get();
+
+        return view('admin-main.admin.purchaseTDSReport.first', compact(['parties', 'party_lists','invoices','branches']));
     }
 
     public function preview(Request $request)
     {
+        $branch_id = $request->branch_id;
         $invoices = AccountPurchaseInvoice::with(['partyName', 'chargesContainer']) // important
         ->where('company_id', $this->company_id)
+        ->when($branch_id != 'all', function ($q) use ($branch_id) {
+            $q->where('branch_id', $branch_id);
+        })
         ->when($request->filled('from_date') && $request->filled('to_date'), function ($q) use ($request) {
-            $from = Carbon::parse($request->from_date)->startOfDay();  
-            $to   = Carbon::parse($request->to_date)->endOfDay();     
+            $from = Carbon::parse($request->from_date)->startOfDay();
+            $to   = Carbon::parse($request->to_date)->endOfDay();
             $q->whereBetween('created_at', [$from, $to]);
         })
         ->when($request->filled('party_id'), function ($q) use ($request) {
@@ -58,10 +67,10 @@ class PurchaseTDSReportController extends Controller
         })
         ->orderBy('created_at', 'desc')
         ->paginate(25);
-        
+
         $html = '
             <h4 style="text-align:center; font-weight:bold;">PURCHASE REPORT <span style="font-size:14px;"></span></h4>
-            
+
             <div>
                 <div class="dropdown mb-3">
                     <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -74,22 +83,25 @@ class PurchaseTDSReportController extends Controller
                             'full_job_no' => $request->full_job_no,
                             'from_date'   => $request->from_date,
                             'to_date'     => $request->to_date,
+                            'branch_id' => $request->branch_id,
                         ]).'" target="_blank">Download PDF</a></li>
-                        
+
                         <li><a class="dropdown-item" href="'.route('purchase-tds-report.download', [
                             'format'      => 'excel',
                             'party_id'    => $request->party_id,
                             'full_job_no' => $request->full_job_no,
                             'from_date'   => $request->from_date,
                             'to_date'     => $request->to_date,
+                            'branch_id' => $request->branch_id,
                         ]).'" target="_blank">Download Excel</a></li>
-                        
+
                         <li><a class="dropdown-item" href="'.route('purchase-tds-report.download', [
                             'format'      => 'word',
                             'party_id'    => $request->party_id,
                             'full_job_no' => $request->full_job_no,
                             'from_date'   => $request->from_date,
                             'to_date'     => $request->to_date,
+                            'branch_id' => $request->branch_id,
                         ]).'" target="_blank">Download Word</a></li>
                     </ul>
                 </div>
@@ -100,6 +112,7 @@ class PurchaseTDSReportController extends Controller
                     <tr style="background-color: #f4e9d8; text-align: center; font-weight: bold;">
                         <th>Party Name</th>
                         <th>Job No</th>
+                        <th>Branch</th>
                         <th>Invoice No</th>
                         <th>INV DT</th>
                         <th>GSTIN No</th>
@@ -121,37 +134,38 @@ class PurchaseTDSReportController extends Controller
             foreach ($invoices as $item) {
                 $charges = $item['chargesContainer'];
                 if ($charges->isEmpty()) continue;
-                
+
                 $cgstAmount  = $charges->sum('cgst');
                 $sgstAmount  = $charges->sum('sgst');
                 $igstAmount  = $charges->sum('igst');
                 $gstAmount = $igstAmount + $sgstAmount + $cgstAmount;
-            
+
                 $taxableAmount  = $charges->sum('freight');
                 $payableAmt  = $taxableAmount + $gstAmount;
-                
+
                 $panNo       = $item->partyName->gstin ?? '--';
 
                 $totalPayable  += $payableAmt;
                 $totalTaxableAmount += $taxableAmount;
                 $totalGstAmount += $gstAmount;
-            
+
                 $html .= '<tr style="text-align: center;">
                     <td>' . ($item->partyName->party_name ?? '--') . '</td>
-                    <td>' . ($item->operationJob->job_no ?? '--') . '</td>
+                    <td>' . ($item->operationJob->full_job_no ?? '--') . '</td>
+                    <td>'.($item->branch->branch_name ?? '--').'</td>
                     <td>' . ($item->invoice_no ?? '--') . '</td>
                     <td>'. ($item->invoice_date ? \Carbon\Carbon::parse($item->invoice_date)->format('d-m-Y') : '' ).'</td>
                     <td>' . $panNo . '</td>
                     <td>' . number_format($taxableAmount, 2) . '</td>
                     <td>' . number_format($gstAmount, 2) . '</td>
                     <td>' . number_format($payableAmt, 2) . '</td>
-                    
+
                 </tr>';
             }
 
         $html .= '
             <tr style="font-weight: bold; background-color: #f9f9f9; text-align: center;">
-                <td align="right" colspan="5">GRAND TOTAL :</td>
+                <td align="right" colspan="6">GRAND TOTAL :</td>
                 <td>' . number_format($totalTaxableAmount, 2) . '</td>
                 <td>' . number_format($totalGstAmount, 2) . '</td>
                 <td>' . number_format(round($totalPayable), 2) . '</td>
@@ -169,22 +183,20 @@ class PurchaseTDSReportController extends Controller
     {
         $query = AccountPurchaseInvoice::with(['partyName', 'chargesContainer'])
             ->where('company_id', $this->company_id)
-    
+            ->when($request->branch_id != 'all', function ($q) use ($request) {
+                $q->where('branch_id', $request->branch_id);
+            })
             ->when($request->filled('from_date') && $request->filled('to_date'), function ($q) use ($request) {
                 $from = Carbon::parse($request->from_date)->startOfDay();
                 $to   = Carbon::parse($request->to_date)->endOfDay();
-    
                 $q->whereBetween('created_at', [$from, $to]);
             })
-    
             ->when($request->filled('party_id'), function ($q) use ($request) {
                 $q->where('billing_party_id', $request->party_id);
             })
-    
             ->when($request->filled('full_job_no'), function ($q) use ($request) {
                 $q->where('full_job_no', $request->full_job_no);
             })
-    
             ->get();
 
         if ($format == 'pdf') {
@@ -213,5 +225,5 @@ class PurchaseTDSReportController extends Controller
         return redirect()->back()->with('error', 'Invalid format selected');
     }
 
-    
+
 }

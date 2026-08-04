@@ -69,7 +69,7 @@ class DsrRepostController extends Controller
         $data = collect(); // unified collection
 
         // Helper date filter
-        $dateFilter = fn($q) => $q->whereBetween('booking_date', [
+        $dateFilter = fn($q) => $q->whereBetween('created_at', [
             Carbon::parse($from_date)->startOfDay(),
             Carbon::parse($to_date)->endOfDay()
         ]);
@@ -105,7 +105,7 @@ class DsrRepostController extends Controller
                     break;
             }
 
-            $query->whereBetween('booking_date', [
+            $query->whereBetween('created_at', [
                 Carbon::parse($from_date)->startOfDay(),
                 Carbon::parse($to_date)->endOfDay()
             ]);
@@ -133,7 +133,7 @@ class DsrRepostController extends Controller
                     $q->where('branch_id',$branch_id);
                 })
                 ->when($from_date && $to_date, function ($q) use ($from_date, $to_date) {
-                    $q->whereBetween('booking_date', [
+                    $q->whereBetween('created_at', [
                         Carbon::parse($from_date)->startOfDay(),
                         Carbon::parse($to_date)->endOfDay()
                     ]);
@@ -146,7 +146,7 @@ class DsrRepostController extends Controller
                     $q->where('branch_id',$branch_id);
                 })
                 ->when($from_date && $to_date, function ($q) use ($from_date, $to_date) {
-                    $q->whereBetween('booking_date', [
+                    $q->whereBetween('created_at', [
                         Carbon::parse($from_date)->startOfDay(),
                         Carbon::parse($to_date)->endOfDay()
                     ]);
@@ -159,7 +159,7 @@ class DsrRepostController extends Controller
                     $q->where('branch_id',$branch_id);
                 })
                 ->when($from_date && $to_date, function ($q) use ($from_date, $to_date) {
-                    $q->whereBetween('booking_date', [
+                    $q->whereBetween('created_at', [
                         Carbon::parse($from_date)->startOfDay(),
                         Carbon::parse($to_date)->endOfDay()
                     ]);
@@ -172,7 +172,7 @@ class DsrRepostController extends Controller
                     $q->where('branch_id',$branch_id);
                 })
                 ->when($from_date && $to_date, function ($q) use ($from_date, $to_date) {
-                    $q->whereBetween('booking_date', [
+                    $q->whereBetween('created_at', [
                         Carbon::parse($from_date)->startOfDay(),
                         Carbon::parse($to_date)->endOfDay()
                     ]);
@@ -559,7 +559,7 @@ class DsrRepostController extends Controller
                 $party_type = 'consignee';
             }
 
-            $query->whereBetween('booking_date', [
+            $query->whereBetween('created_at', [
                 Carbon::parse($from_date)->startOfDay(),
                 Carbon::parse($to_date)->endOfDay()
             ]);
@@ -574,28 +574,28 @@ class DsrRepostController extends Controller
             ->when($branch_id != 'all', function ($q) use ($branch_id) {
                 $q->where('branch_id', $branch_id);
             })
-            ->whereBetween('booking_date', [Carbon::parse($from_date)->startOfDay(), Carbon::parse($to_date)->endOfDay()])
+            ->whereBetween('created_at', [Carbon::parse($from_date)->startOfDay(), Carbon::parse($to_date)->endOfDay()])
             ->get();
 
         $airExport = OperationAirExport::where('company_id', $company_id)
             ->when($branch_id != 'all', function ($q) use ($branch_id) {
                 $q->where('branch_id', $branch_id);
             })
-            ->whereBetween('booking_date', [Carbon::parse($from_date)->startOfDay(), Carbon::parse($to_date)->endOfDay()])
+            ->whereBetween('created_at', [Carbon::parse($from_date)->startOfDay(), Carbon::parse($to_date)->endOfDay()])
             ->get();
 
         $seaImport = OperationSeaImport::with('container')->where('company_id', $company_id)
             ->when($branch_id != 'all', function ($q) use ($branch_id) {
                 $q->where('branch_id', $branch_id);
             })
-            ->whereBetween('booking_date', [Carbon::parse($from_date)->startOfDay(), Carbon::parse($to_date)->endOfDay()])
+            ->whereBetween('created_at', [Carbon::parse($from_date)->startOfDay(), Carbon::parse($to_date)->endOfDay()])
             ->get();
 
         $seaExport = OperationSeaExport::with(['container.shipmentLines.consignee', 'jobMaster'])->where('company_id', $company_id)
             ->when($branch_id != 'all', function ($q) use ($branch_id) {
                 $q->where('branch_id', $branch_id);
             })
-            ->whereBetween('booking_date', [Carbon::parse($from_date)->startOfDay(), Carbon::parse($to_date)->endOfDay()])
+            ->whereBetween('created_at', [Carbon::parse($from_date)->startOfDay(), Carbon::parse($to_date)->endOfDay()])
             ->get();
 
         return $airImport->concat($airExport)->concat($seaImport)->concat($seaExport)->sortByDesc('created_at')->values();
