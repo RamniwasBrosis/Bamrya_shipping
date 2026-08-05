@@ -18,7 +18,7 @@ class MembersUserRoleController extends Controller
        ->where('company_id', Auth::user()->company_id)
         ->whereNotIn('name', ['super-admin'])
         ->paginate(10);
-        
+
         return view('admin-main.admin.userrole.index', compact('roles'));
     }
 
@@ -37,7 +37,7 @@ class MembersUserRoleController extends Controller
             'name' => 'required|unique:roles,name',
             'permissions' => 'nullable|array',
         ]);
-        
+
         $company_id = Auth::user()->company_id;
 
         $role = Role::create(['name' => $request->name, 'company_id' => $company_id]);
@@ -48,7 +48,7 @@ class MembersUserRoleController extends Controller
 
         return redirect()->back()->with('success', 'Role created successfully!');
     }
-    
+
 
     public function edit($id)
     {
@@ -76,7 +76,7 @@ class MembersUserRoleController extends Controller
         $role->save();
 
         return response()->json(['success' => true, 'message' => 'Role updated successfully.']);
-         
+
     }
 
     public function destroy($id){

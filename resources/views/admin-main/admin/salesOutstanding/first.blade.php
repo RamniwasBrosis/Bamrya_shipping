@@ -60,6 +60,23 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col-xl-6">
+                                        <div class="mb-3 row">
+                                            <label class="col-sm-3 col-form-label">Branch:</label>
+
+                                            <div class="col-sm-9">
+                                                <select name="branch_id" class="form-control select2">
+                                                    <option value="all">All Branches</option>
+
+                                                    @foreach($branches as $branch)
+                                                        <option value="{{ $branch->id }}">
+                                                            {{ $branch->branch_name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     {{-- Submit Button --}}
                                     <div class="">
@@ -68,10 +85,10 @@
                                 </div>
                             </form>
                         </div>
-                        
+
                         <div id="reportPreview" class="mt-5 border border-dark p-4" style="display: none;">
-                      
-                        </div>                        
+
+                        </div>
                     </div>
                 </div>
             </div>

@@ -470,11 +470,11 @@ Route::middleware('auth')->group(function () {
 
             Route::get('/sales-outstanding', [SalesOutstandingController::class, 'index']);
             Route::match(['get', 'post'], '/sales-outstanding/preview', [SalesOutstandingController::class, 'preview'])->name('sales-outstanding.preview');
-            Route::get('/sales-outstanding/download/{format}/{id}', [SalesOutstandingController::class, 'download'])->name('sales-outstanding.download');
+            Route::get('/sales-outstanding/download/{format}', [SalesOutstandingController::class, 'download'])->name('sales-outstanding.download');
 
             Route::get('/purchase-outstanding', [PurchaseOutstandingController::class, 'index']);
             Route::match(['get', 'post'], '/purchase-outstanding/preview', [PurchaseOutstandingController::class, 'preview'])->name('purchase-outstanding.preview');
-            Route::get('/purchase-outstanding/download/{format}/{id}', [PurchaseOutstandingController::class, 'download'])->name('purchase-outstanding.download');
+            Route::get('/purchase-outstanding/download/{format}', [PurchaseOutstandingController::class, 'download'])->name('purchase-outstanding.download');
 
             Route::get('/loading-list', [LoadingListController::class, 'index']);
             Route::post('/loading-list/preview', [LoadingListController::class, 'preview'])->name('loading-list.preview');

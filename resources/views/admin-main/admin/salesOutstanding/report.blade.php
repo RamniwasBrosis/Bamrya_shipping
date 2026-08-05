@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Sales Outstandig Report</title>
-    
+
      <style>
         @page {
             size: A4 landscape;
@@ -70,14 +70,14 @@
         .no-border {
             border: none !important;
         }
-        
+
         .scale {
             transform: scale(0.93);
             transform-origin: top left;
         }
     </style>
-    
-    
+
+
 </head>
 <body>
     <h4 class="text-center">
@@ -86,13 +86,14 @@
 
 
     <div style="overflow-x: auto; width: 100%;" class="scale">
-        <table border="1" cellspacing="0" cellpadding="5" 
-               style="border-collapse: collapse; width:100%;" 
+        <table border="1" cellspacing="0" cellpadding="5"
+               style="border-collapse: collapse; width:100%;"
                class="table table-bordered table-striped">
-    
+
             <thead style="background-color: #d2ebf9;">
                 <tr>
                     <th>Job No</th>
+                    <th>Branch</th>
                     <th>Inv No</th>
                     <th>Party Name</th>
                     <th>Inv Date</th>
@@ -102,7 +103,7 @@
                     <th>Credit Amount</th>
                 </tr>
             </thead>
-    
+
             <tbody>
                 @php
                     $totalInvoiceAmt = 0;
@@ -110,23 +111,24 @@
                     $totalOutstandingAmt = 0;
                     $credit_amount = 0;
                 @endphp
-    
+
                 @foreach ($sales_invoices as $item)
                     @php
                         // Calculate invoice amount from charge container
                         $invoice_amount = $item->chargesContainer->sum('total');
-    
+
                         $totalInvoiceAmt += $invoice_amount;
                         $totalRecievedAmt += $item->recieved_amount ?? 0;
                         $totalOutstandingAmt += $item->outstanding_amount ?? 0;
-    
+
                         if ($total_get_amount_by_party > $totalInvoiceAmt) {
                             $credit_amount = $total_get_amount_by_party - $totalInvoiceAmt;
                         }
                     @endphp
-    
+
                     <tr>
-                        <td>{{ optional($item->operationJob)->job_no ?? '--' }}</td>
+                        <td>{{ optional($item->operationJob)->full_job_no ?? '--' }}</td>
+                        <td>{{ $item->branch->branch_name ?? '--' }}</td>
                         <td>{{ $item->invoice_no ?? '--' }}</td>
                         <td>{{ optional($item->partyName)->party_name ?? '--' }}</td>
                         <td>{{ $item->invoice_date ? \Carbon\Carbon::parse($item->invoice_date)->format('d-m-Y') : '--' }}</td>
@@ -139,16 +141,16 @@
                     </tr>
                 @endforeach
             </tbody>
-    
+
             <tfoot>
                 <tr style="font-weight: bold; background-color: #f9f9f9; text-align: center;">
-                    <td colspan="4">GRAND TOTAL :</td>
+                    <td colspan="5">GRAND TOTAL :</td>
                     <td align="right">{{ number_format($totalInvoiceAmt, 2) }}</td>
                     <td align="right">{{ number_format($totalRecievedAmt, 2) }}</td>
                     <td align="right">{{ $round_of_amount ? '00' : number_format($totalOutstandingAmt, 2) }}</td>
                     <td align="right">{{ number_format($credit_amount ?? 0, 2) }}</td>
                 </tr>
-    
+
                 @if(!empty($round_of_amount) && $round_of_amount > 0)
                     @php
                         $closingAmt = $totalInvoiceAmt - ($round_of_amount + $total_get_amount_by_party);
@@ -157,7 +159,7 @@
                         <td colspan="2">Round of amount in this bill :</td>
                         <td colspan="1">INV AMT <br>{{ number_format($totalInvoiceAmt, 2) }}</td>
                         <td colspan="1"> - </td>
-                        <td colspan="2"> 
+                        <td colspan="2">
                             ROUND OF AMT <br> {{ number_format($round_of_amount, 2) }} + RECEIVED AMT <br>{{ number_format($total_get_amount_by_party, 2) }}
                         </td>
                         <td colspan="1"> = </td>
@@ -165,7 +167,7 @@
                     </tr>
                 @endif
             </tfoot>
-    
+
         </table>
     </div>
 

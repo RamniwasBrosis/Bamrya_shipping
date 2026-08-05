@@ -3,7 +3,7 @@
     <div class="page-titles">
         <ol class="breadcrumb">
             <li>
-                <h5 class="bc-title">Loading List</h5>
+                <h5 class="bc-title">Purchase</h5>
             </li>
         </ol>
         <a class="text-primary fs-13" href="#">Go -></a>
@@ -37,7 +37,7 @@
                         </div>
                     </div>
                    <div id="reportPreview" class="mt-4 bg-slate-400 p-3 border border-dark" style="display: none;" ></div>
-                </div>                
+                </div>
             </div>
         </div>
     </div>
@@ -67,7 +67,7 @@
                             event.preventDefault()
                             event.stopPropagation()
                         }
- 
+
                         form.classList.add('was-validated')
                     }, false)
                 })
@@ -79,9 +79,9 @@
 
             $('#purchaseList').on('submit', function(e){
                 e.preventDefault();
-            
+
                 let party = $('select[name="billing_party_id"]').val();
-            
+
                 if (!party) {
                     Swal.fire({
                         icon: 'warning',
@@ -90,9 +90,9 @@
                     });
                     return; // STOP submitting
                 }
-            
+
                 var data = $(this).serialize();
-            
+
                 $.ajax({
                     url: '{{ route("purhcasePayment-list.preview") }}',
                     type: 'post',
@@ -105,10 +105,10 @@
                         console.log(xhr.responseText);
                     }
                 });
-            
+
             });
 
-            
+
         });
     </script>
 @endpush
