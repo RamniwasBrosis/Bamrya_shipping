@@ -68,7 +68,7 @@
             margin-top: 20px;
             border: 1px solid #000;
         }
-        
+
         .charges-table th,
         .charges-table td{
             border: 1px solid #000;
@@ -76,12 +76,12 @@
             font-size: 13px;
             text-align: center;
         }
-        
+
         .charges-table thead{
             background: #f2f2f2;
             font-weight: bold;
         }
-        
+
         .charges-table tbody tr{
             height: 35px;
         }
@@ -96,10 +96,10 @@
                 <td class="logo">{{ $company->company_name }}</td>
                 <td class="company-details">
                     <strong>{{ $company->company_name }}</strong><br>
-                    {{ $company->address }}<br>
-                    <b>PAN NO:</b> {{ $company->companySetting->pan_no ?? '' }} &nbsp; <b>GSTIN:</b> {{ $company->companySetting->gstin_no ?? '' }}<br>
-                    <b>CIN:</b> {{ $company->companySetting->cin_no ?? '' }} <br>
-                    <b>Phone:</b> {{ $company->companySetting->phone ?? '' }} &nbsp; <b>Email:</b> {{ $company->companySetting->email ?? '' }}
+                    {{ $seaImport->branch->address ?? $company->address }}<br>
+                    <b>PAN NO:</b> {{ $seaImport->branch->pan_no ?? $company->companySetting->pan_no }} &nbsp; <b>GSTIN:</b> {{ $seaImport->branch->gstin_no ?? $company->companySetting->gstin_no }}<br>
+                    <b>CIN:</b> {{ $seaImport->branch->cin_no ?? $company->companySetting->cin_no }} <br>
+                    <b>Phone:</b> {{ $seaImport->branch->phone ?? $company->companySetting->phone }} &nbsp; <b>Email:</b> {{ $company->companySetting->email ?? '' }}
                 </td>
             </tr>
         </table>
@@ -111,7 +111,7 @@
         $countRate = 0;
         $countContainer = count($seaImport->container);
         $totalCbm = 0;
-        
+
         foreach($seaImport->container as $container){
             $countExRate = $container->ex_rate;
             $countRate = $container->rate;
@@ -129,7 +129,7 @@
             <li><strong>PACKAGES:</strong> {{ $seaImport->quantity }}</li>
             <li><strong>WEIGHT / VOLUME</strong>: {{ $seaImport->gross_weight }} KGS / {{ $totalCbm }} CBM</li>
             <li><strong>TYPE OF CARGO:</strong> {{ $seaImport->cargo_type }}</li>
-            <li><strong>FREIGHT</strong>: 
+            <li><strong>FREIGHT</strong>:
                 @if($seaImport->freight == 'C')
                     Collect
                 @else
@@ -146,7 +146,7 @@
             @endif
         </ul>
     </div>
-    
+
     @if(!empty($seaImport->container))
     <table class="charges-table">
         <thead>

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Company;
+use App\Models\CompanyBranch;
 
 class JobCardController extends Controller
 {
@@ -18,52 +19,52 @@ class JobCardController extends Controller
             return $next($request);
         });
     }
-    
+
     public function airJobCard()
     {
         return view('admin-main.admin.JobCard.air-job-card');
     }
-    
+
     public function printAirJobCard(Request $request)
     {
         $data = $request->all();
-        
+        $branch = CompanyBranch::findOrFail(Auth::user()->branch_id);
         $company = Company::with(['companySetting', 'companyBranch'])
             ->where('id', $this->company_id)
             ->first();
-            
+
         $logoUrl = $company->logo
             ? public_path('uploads/company_logo/' . $company->logo)
             : public_path('images/default-logo.png');
-        
-        return view('admin-main.admin.JobCard.print-air-way-job-card', compact('data', 'logoUrl', 'company'));
-    
+
+        return view('admin-main.admin.JobCard.print-air-way-job-card', compact('data', 'logoUrl', 'company', 'branch'));
+
         // $pdf = Pdf::loadView(
         //     'admin-main.admin.JobCard.print-air-way-job-card',
         //     compact('data')
         // )->setPaper('a4', 'portrait');
-    
+
         // // Open + Print
         // return $pdf->stream('air-job-card.pdf');
     }
-    
+
     public function seaJobCard()
     {
         return view('admin-main.admin.JobCard.sea-job-card');
     }
-    
+
     public function printSeaJobCard(Request $request)
     {
         $data = $request->all();
-        
+        $branch = CompanyBranch::findOrFail(Auth::user()->branch_id);
         $company = Company::with(['companySetting', 'companyBranch'])
             ->where('id', $this->company_id)
             ->first();
-            
+
         $logoUrl = $company->logo
             ? public_path('uploads/company_logo/' . $company->logo)
             : public_path('images/default-logo.png');
-        
-        return view('admin-main.admin.JobCard.print-sea-job-card', compact('data', 'logoUrl', 'company'));
+
+        return view('admin-main.admin.JobCard.print-sea-job-card', compact('data', 'logoUrl', 'company', 'branch'));
     }
 }

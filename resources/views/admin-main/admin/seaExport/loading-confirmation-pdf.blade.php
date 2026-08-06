@@ -89,17 +89,17 @@ use Carbon\Carbon;
             <td style="width: 25%; vertical-align: top; border: 0px;">
                 <img src="{{ $logoPath }}" style="width:120px; height:auto;" alt="Company logo">
             </td>
-    
+
             <!-- Right: Company Details -->
             <td style="text-align: right; width: 75%; vertical-align: top;border: 0px;">
                 <div style="font-size:16px; font-weight:bold; color:#004080;">
                     {{ $company->company_name }}
                 </div>
-                <div>{{$company->address}}</div>
-                <div><strong>PAN NO.:</strong> {{$company->companySetting->pan_no}} &nbsp;&nbsp; 
-                     <strong>GSTIN:</strong> {{$company->companySetting->gstin_no}}
+                <div>{{ $seaExport->branch->address ?? $company->address}}</div>
+                <div><strong>PAN NO.:</strong> {{ $seaExport->branch->pan_no ?? $company->companySetting->pan_no}} &nbsp;&nbsp;
+                     <strong>GSTIN:</strong> {{ $seaExport->branch->gstin_no ?? $company->companySetting->gstin_no}}
                 </div>
-                <div><strong>CIN:</strong> {{$company->companySetting->cin_no}}</div>
+                <div><strong>CIN:</strong> {{ $seaExport->branch->cin_no ?? $company->companySetting->cin_no}}</div>
             </td>
         </tr>
     </table>
@@ -150,7 +150,7 @@ use Carbon\Carbon;
                 </tr>
             </tbody>
         </table>
-        
+
         <!--2-->
         <table>
             <thead>
@@ -182,7 +182,7 @@ use Carbon\Carbon;
                 @endif
             </tbody>
         </table>
-        
+
         <!--3-->
         <table>
             <thead>

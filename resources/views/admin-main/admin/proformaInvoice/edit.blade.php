@@ -9,13 +9,13 @@
 
     @if (session('success'))
         <div class="alert alert-success">
-            {{session('success')}}    
+            {{session('success')}}
         </div>
     @endif
 
     @if (session('error'))
         <div class="alert alert-danger">
-            {{session('error')}}    
+            {{session('error')}}
         </div>
     @endif
 
@@ -25,7 +25,7 @@
                 @foreach ($errors->all() as $error)
                     <li class="mb-2">{{$error}}</li>
                 @endforeach
-            </ul> 
+            </ul>
         </div>
     @endif
 
@@ -95,7 +95,7 @@
                                                 <input type="text" value="{{$proforma_invoice->full_job_no}}" readonly class="form-control" name="full_job_no" style="background: #eee; cursor: not-allowed;">
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label class="form-label">Invoice No:</label>
+                                                <label class="form-label">Proforma Invoice No:</label>
                                                 <input type="text" name="invoice_no" class="form-control" value="{{$proforma_invoice->invoice_no}}">
                                             </div>
                                             <div class="col-md-4 mb-3">
@@ -110,7 +110,7 @@
                                                     <option value="outstation" {{$proforma_invoice->gst_type == 'outstation'? 'selected' : ''}}>OUTSTATION</option>
                                                 </select>
                                             </div>
-                                            
+
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Voyage Code:</label>
                                                 <input type="text" name="voyage_date" class="form-control" value="{{$proforma_invoice->voyage_date}}" style="background: #eee; cursor: not-allowed;">
@@ -123,7 +123,7 @@
                                                 <label class="form-label">POL:</label>
                                                 <input type="text" name="pol" class="form-control" value="{{$proforma_invoice->pol}}" style="background: #eee; cursor: not-allowed;">
                                             </div>
-                                          
+
                                             <!-- Row 2 -->
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Container:</label>
@@ -141,7 +141,7 @@
                                                 <label class="form-label">Package Type:</label>
                                                 <input type="text" name="pkgType" value="{{$proforma_invoice->pkgType}}" class="form-control" style="background: #eee; cursor: not-allowed;">
                                             </div>
-                                            
+
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Packages:</label>
                                                 <input type="text" name="packages" value="{{$proforma_invoice->packages}}" class="form-control" style="background: #eee; cursor: not-allowed;">
@@ -172,9 +172,9 @@
                                                 <label class="form-label">AWB / BL NO:</label>
                                                 <input type="text" name="awb_bl_no" class="form-control" value="{{ $proforma_invoice->awb_bl_no }}" style="background: #eee; cursor: not-allowed;">
                                             </div>
-                                            
-                                            
-                                            
+
+
+
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Party Type:</label>
                                                 <select name="party_type" class="form-control select2">
@@ -192,7 +192,7 @@
                                                     <!--<option value="CREDITNOTE(Rs)" {{$proforma_invoice->invoice_type == 'CREDITNOTE(Rs)'? 'selected' : ''}}>CREDITNOTE(Rs)</option>-->
                                                     <!--<option value="DEBITNOTE(Ovr.)" {{$proforma_invoice->invoice_type == 'DEBITNOTE(Ovr.)'? 'selected' : ''}}>DEBITNOTE(Ovr.)</option>-->
                                                     <!--<option value="CREDITNOTE(Ovr.)" {{$proforma_invoice->invoice_type == 'CREDITNOTE(Ovr.)'? 'selected' : ''}}>CREDITNOTE(Ovr.)</option>-->
-                                                   
+
                                                 </select>
                                             </div>
                                             <div class="col-md-4 mb-3">
@@ -203,8 +203,8 @@
                                                         <option value="{{$account_number->id}}" {{$proforma_invoice->bank_id == $account_number->id? 'selected' :''}}>{{$account_number->account_no}}</option>
                                                     @endforeach
                                                 </select>
-                                            </div> 
-                                            
+                                            </div>
+
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Billing Party:</label>
                                                 <select name="billing_party_id" class="form-control select2">
@@ -214,12 +214,12 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                           
+
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Sale / Purchase:</label>
                                                 <input type="text" name="sale_purchase" class="form-control" value="{{ $proforma_invoice->sale_purchase }}">
                                             </div>
-                                        
+
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Sales Person:<span class="text-danger">*</span></label>
                                                 <select name="sales_person_id" class="form-control select2" required>
@@ -239,10 +239,10 @@
                                         </div>
                                     </form>
                                 </div>
-                            </div>                            
+                            </div>
                         </div>
 
-                        
+
                         <h4>Charges</h4>
                         <hr>
                         <div class="form-validation">
@@ -269,7 +269,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- Currency -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -296,7 +296,7 @@
                                                 <option value="HUF">HUF</option>
                                                 <option value="IDR">IDR</option>
                                                 <option value="ILS">ILS</option>
-                        
+
                                                 <option value="INR" selected>INR</option>
                                                 <option value="ISK">ISK</option>
                                                 <option value="JPY">JPY</option>
@@ -312,7 +312,7 @@
                                                 <option value="SEK">SEK</option>
                                                 <option value="SGD">SGD</option>
                                                 <option value="SIT">SIT</option>
-                        
+
                                                 <option value="SKK">SKK</option>
                                                 <option value="THB">THB</option>
                                                 <option value="TRL">TRL</option>
@@ -324,7 +324,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- Rate Basis -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -357,7 +357,7 @@
                                 <!-- Per Unit -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
-                                        <!--Per Unit changed to total unit--> 
+                                        <!--Per Unit changed to total unit-->
                                         <label class="col-sm-3 col-form-label">Per Unit:</label>
                                         <div class="col-sm-9">
                                             <input type="text" name="per_unit" class="form-control">
@@ -366,14 +366,14 @@
                                 </div>
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
-                                        <!--Per Unit changed to total unit--> 
+                                        <!--Per Unit changed to total unit-->
                                         <label class="col-sm-3 col-form-label">Total Unit:</label>
                                         <div class="col-sm-9">
                                             <input type="text" name="total_unit" class="form-control" value="">
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- Freight -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -383,7 +383,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- GST -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -443,7 +443,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- TDS -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -453,7 +453,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- TDS Amt. -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -472,7 +472,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- Prepaid/Collect -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -486,9 +486,9 @@
                                         </div>
                                     </div>
                                 </div>
-                        
-                                
-                        
+
+
+
                                 <!-- Rate -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -498,8 +498,8 @@
                                         </div>
                                     </div>
                                 </div>
-                        
-                                
+
+
                                 <!-- Remarks -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -509,7 +509,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- CAF % -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -519,7 +519,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- BAF % -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -529,7 +529,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- CC % -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -539,7 +539,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- CC Apply -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -553,7 +553,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- CAF Amount -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -563,7 +563,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- BAF Amount -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -573,7 +573,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- CC Amount -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -583,7 +583,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- CAF Apply -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -597,7 +597,7 @@
                                         </div>
                                     </div>
                                 </div>
-                        
+
                                 <!-- Total -->
                                 <div class="col-xl-6">
                                     <div class="mb-3 row">
@@ -608,7 +608,7 @@
                                     </div>
                                 </div>
                             </div>
-                        
+
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                 <button type="submit" class="btn btn-primary btn-sm">ADD/UPDATE CHARGES</button>
                             </div>
@@ -621,7 +621,7 @@
                         <div class="form-validation">
                             <form class="ajaxFileUpload" action="{{route('file-upload.updateFileUpload')}}" method="post" enctype="multipart/form-data">
                                 @csrf
-                                
+
                                 <input type="hidden" name="file_related" value="proforma_invoice">
                                 <input type="hidden" name="proforma_invoice_id" class="" value="{{ $proforma_invoice->id }}">
                                 <div class="row">
@@ -636,7 +636,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>                                
+                                    </div>
                                 </div>
                             </form>
                             <form id="searchProformaInvoiceFile" method="post">
@@ -658,11 +658,11 @@
                                     </div>
                                 </div>
                             </form>
-                            
+
                             <div id="searchFile"></div>
 
                         </div>
-                        
+
                         <div>
                             <table class="table">
                                 <thead>
@@ -697,7 +697,7 @@
                                           <td>{{ $chargeDetail?->cgst }}</td>
                                           <td>{{ $chargeDetail?->igst }}</td>
                                           <td>{{ $chargeDetail?->total }}</td>
-                                          
+
                                           <td><a class="btn btn-sm btn-primary editChargeBtn" data-id="{{ $chargeDetail->id }}">Edit</a></td>
                                           <td><a class="btn btn-sm btn-danger deleteChargeBtn" data-id="{{ $chargeDetail->id }}">DELETE</a></td>
                                         </tr>
@@ -723,30 +723,30 @@
 
             $('.ajaxFileUpload').on('submit', function(e) {
                 e.preventDefault();
-        
+
                 let form = $(this);
                 let formData = new FormData();
-        
+
                 // Append file_related
                 let fileRelated = form.find('input[name="file_related"]').val();
                 formData.append('file_related', fileRelated);
-        
+
                 // Append correct invoice ID automatically
                 form.find('input[type="hidden"]').each(function() {
                     formData.append($(this).attr('name'), $(this).val());
                 });
-        
+
                 // Append multiple files
                 let files = form.find('input[type="file"]')[0].files;
                 if (files.length === 0) {
                     alert("Please select at least one file.");
                     return;
                 }
-        
+
                 $.each(files, function(i, file) {
                     formData.append('file[]', file);
                 });
-        
+
                 $.ajax({
                     url: "{{ route('account.file-upload.uploadFileUpload') }}",
                     type: 'POST',
@@ -772,18 +772,18 @@
                         }
                     }
                 });
-        
+
             });
-        
+
         });
     </script>
     <script>
         document.getElementById('searchProformaInvoiceFile').addEventListener('submit', function(e) {
             e.preventDefault();
-    
+
             const formData = new FormData(this);
             const id = formData.get('search_query');
-    
+
             fetch("{{ route('file-upload.searchFile') }}", {
                     method: "POST",
                     headers: {
@@ -796,7 +796,7 @@
                     // const deleteUrl = `/multi-file-upload/${id}`;
                     document.getElementById('searchFile').innerHTML = data;
                     document.getElementById('delete_td').innerHTML = `
-                        <button class="btn btn-sm btn-danger" onclick="clearSearchFile()">×</button> 
+                        <button class="btn btn-sm btn-danger" onclick="clearSearchFile()">×</button>
                         <button class="btn btn-sm btn-danger" onclick="deleteSearchFile(${id})">Delete</button>
                     `;
                 })
@@ -808,19 +808,19 @@
         function clearSearchFile() {
             document.getElementById("searchFile").innerHTML = "";
         }
-        
+
         function clearSearchFile() {
             document.getElementById("searchFile").innerHTML = "";
         }
-        
+
         const deleteFileUrl = "{{ route('file-upload.destroy', ['id' => ':id']) }}"; // placeholder :id
         // Placeholder for delete function
         function deleteSearchFile(id) {
             if (!confirm("Are you sure you want to delete this file?")) return;
-    
+
             // Replace :id with actual file id
             const url = deleteFileUrl.replace(':id', id);
-    
+
             fetch(url, {
                 method: 'DELETE',
                 headers: {
@@ -839,17 +839,17 @@
 
     </script>
 
-    
+
     <script>
             $(document).on('click', '.editChargeBtn', function() {
                 const chargeId = $(this).data('id');
-            
+
                 // Fetch charge detail using AJAX
                 $.ajax({
                     url: "{{ route('proforma-invoices.getChargeDetail', '') }}/" + chargeId,
                     method: "GET",
                     success: function(response) {
-                        
+
                         // Fill form fields
                         $('#charge_edit_id').val(response.id);
                         $('#charge_name').val(response.charge_id).trigger('change');
@@ -881,7 +881,7 @@
                         $('input[name="sac_code"]').val(response.sac_code);
                         $('input[name="sgst"]').val(response.sgst);
                         $('input[name="total"]').val(response.total);
-            
+
                         // Scroll smoothly to the form
                         $('html, body').animate({
                             scrollTop: $(".form-validation").offset().top - 100
@@ -892,18 +892,18 @@
                     }
                 });
             });
-            
+
             $(document).on('click', '.deleteChargeBtn', function(e){
                 e.preventDefault();
-               
+
                 let chargeId = $(this).data('id'); // get the id from button
                 if (!confirm('Are you sure you want to delete this charge?')) return;
-        
+
                 $.ajax({
                     url: "{{ route('proforma-invoices.deleteChargeDetail', '') }}/" + chargeId,
                     type: "DELETE",
                     data: {
-                        _token: "{{ csrf_token() }}" 
+                        _token: "{{ csrf_token() }}"
                     },
                     success: function(response) {
                         setTimeout(() => location.reload(), 500);
@@ -929,26 +929,26 @@
             // Submit charge form via AJAX
             $('#chargeForm').on('submit', function (e) {
                 e.preventDefault();
-        
+
                 $.ajax({
                     url: $(this).attr('action'),
                     type: 'POST',
                     data: $(this).serialize(),
                     success: function (res) {
                         if (res.status) {
-        
+
                             // Close modal
                             $('#chargesNames').modal('hide');
-        
+
                             // Reset the form fields
                             $('#chargeForm')[0].reset();
-        
+
                             // Create a new option in the select box
                             const newOption = new Option(res.data.charge_name, res.data.id, true, true);
-        
+
                             // Add to select2 and trigger change
                             $('#charge_name').append(newOption).trigger('change');
-        
+
                             // Optional: show a small alert
                             alert('Charge added successfully!');
                         } else {
@@ -961,31 +961,31 @@
                     }
                 });
             });
-        
+
         });
-        
-        
+
+
         //mourya
         $(document).ready(function(){
-    
+
             // --- Calculate TDS amount separately (optional trigger) ---
             function calculateTds() {
                 let tdsPercent = parseFloat($('#tds').val()) || 0;
                 let freight = parseFloat($('input[name="freight"]').val()) || 0;
-            
+
                 let tdsAmount = (freight * tdsPercent) / 100;
                 $('#tds_amount').val(tdsAmount.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
-            
+
                 // Freight after TDS
                 let freightAfterTds = freight - tdsAmount;
-            
+
                 // Recalculate GST
                 let gstType = $('select[name="gst_type"]').val();
                 let gstPercent = parseFloat($('input[name="gst"]').val()) || 0;
                 let cgst = 0, sgst = 0, igst = 0;
-            
+
                 if (gstPercent > 0) {
                     if (gstType === 'local') {
                         cgst = (gstPercent / 2) * freightAfterTds / 100;
@@ -994,7 +994,7 @@
                         igst = (gstPercent * freightAfterTds) / 100;
                     }
                 }
-            
+
                 $('input[name="cgst"]').val(cgst.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
@@ -1004,30 +1004,30 @@
                 $('input[name="igst"]').val(igst.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
-            
+
                 let finalTotal = freightAfterTds + cgst + sgst + igst;
                 let roundedTotal = Math.round(finalTotal);
                 $('input[name="total"]').val(roundedTotal.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
-            
+
                 $('input[name="amount"]').val(finalTotal.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
             }
-            
+
             // Trigger TDS recalculation on blur
             $('#tds').on('blur', function () {
                 calculateTotals();
             });
-            
-            
+
+
             // --- When charge_name changes ---
             $('#charge_name').on('change', function (e) {
                 e.preventDefault();
-        
+
                 let selectedValue = $(this).val();
-        
+
                 $.ajax({
                     url: '{{ route("sales-invoices.getCharge") }}',
                     type: 'post',
@@ -1042,12 +1042,12 @@
                                     .css('background', '#ded9d9')
                                     .prop('readonly', true);
                             }
-        
+
                             $('input[name="sac_code"]').val(res.data.sac_code)
                                 .css('background', '#ded9d9')
                                 .prop('readonly', true);
                         }
-        
+
                         calculateTotals();
                     },
                     error: function(xhr){
@@ -1055,14 +1055,14 @@
                     }
                 });
             });
-            
-            
+
+
             // --- Recalculate whenever relevant fields change ---
             $('select[name="gst_type"], input[name="per_unit"], input[name="total_unit"], input[name="exchange_rate"], select[name="gst_applicable"], input[name="tds"], input[name="gst"]').on('change keyup', function () {
                 calculateTotals();
             });
-            
-            
+
+
             // === MAIN CALCULATION FUNCTION ===
             function calculateTotals() {
                 let gstType = $('select[name="gst_type"]').val(); // local / otherState
@@ -1072,13 +1072,13 @@
                 let gstPercent = parseFloat($('input[name="gst"]').val()) || 0;
                 let gstApplicable = $('select[name="gst_applicable"]').val(); // Y or N
                 let tdsPercent = parseFloat($('#tds').val()) || 0;
-        
+
                 // --- Step 1: Base Amount ---
                 let baseAmount = perUnit * totalUnit * exchRate;
                 $('input[name="freight"]').val(baseAmount.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
-        
+
                 // --- Step 2: GST Calculation (on base) ---
                 let cgst = 0, sgst = 0, igst = 0;
                 if (gstApplicable === 'Y') {
@@ -1089,7 +1089,7 @@
                         igst = (gstPercent * baseAmount) / 100;
                     }
                 }
-        
+
                 $('input[name="cgst"]').val(cgst.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
@@ -1099,7 +1099,7 @@
                 $('input[name="igst"]').val(igst.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
-        
+
                 // --- Step 3: TDS Calculation (on base only) ---
                 let tdsAmount = 0;
                 if (tdsPercent > 0) {
@@ -1108,17 +1108,17 @@
                 $('#tds_amount').val(tdsAmount.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
-        
+
                 // --- Step 4: Final Total = (Base + GST) - TDS ---
                 let finalTotal = baseAmount + cgst + sgst + igst - tdsAmount;
                 let amountWithGst = baseAmount + cgst + sgst + igst ;
-                
+
                 $('input[name="amount"]').val(amountWithGst.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
-                    
-                let roundedTotal = Math.round(finalTotal);    
-        
+
+                let roundedTotal = Math.round(finalTotal);
+
                 $('input[name="total"]').val(roundedTotal.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
@@ -1130,12 +1130,12 @@
         // $('#charge_name').on('change', function () {
         //     const chargeId = $(this).val();
         //     const invoiceId = "{{ $proforma_invoice->id }}"; // current invoice id
-        
+
         //     if (!chargeId) {
         //         $('form input, form select').not('#charge_name').val('');
         //         return;
         //     }
-        
+
         //     $.ajax({
         //         url: `/proforma-invoices/get-charge-details/${chargeId}/${invoiceId}`,
         //         type: 'GET',
@@ -1143,7 +1143,7 @@
         //             if (res.status) {
         //                 const container = res.data.container || {};
         //                 const master = res.data.master || {};
-        
+
         //                 //  Fill form fields
         //                 $('[name="currency"]').val(container.currency || master.currency || '');
         //                 $('[name="rate_basis"]').val(container.rate_basis || master.rate_basis || '');
@@ -1170,7 +1170,7 @@
         //                 $('[name="sac_code"]').val(container.sac_code || '');
         //                 $('[name="sgst"]').val(container.sgst || '');
         //                 $('[name="total"]').val(container.total || '');
-        
+
         //                 // ✅ Auto-select currency if exists
         //                 const currency = container.currency || master.currency;
         //                 if (currency) {

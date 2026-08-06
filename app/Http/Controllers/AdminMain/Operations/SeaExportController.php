@@ -2444,7 +2444,7 @@ class SeaExportController extends Controller
         $page_title = 'Sea Export Loading Confirmation';
         $seaExport = OperationSeaExport::with([
             'shipperName', 'jobMaster', 'container', 'packageName',
-            'ConsigneeName', 'deliveryPortName', 'dischargePortName', 'loadingPortName'
+            'ConsigneeName', 'deliveryPortName', 'dischargePortName', 'loadingPortName', 'branch'
         ])
             ->where('company_id', $this->company_id)
             ->where('id', $id)
@@ -2471,7 +2471,7 @@ class SeaExportController extends Controller
     {
         $seaExport = OperationSeaExport::with([
             'shipperName', 'jobMaster', 'container', 'packageName',
-            'ConsigneeName', 'deliveryPortName', 'dischargePortName', 'loadingPortName'
+            'ConsigneeName', 'deliveryPortName', 'dischargePortName', 'loadingPortName', 'branch'
         ])
         ->where('company_id', $this->company_id)
         ->where('id', $id)
@@ -2506,19 +2506,19 @@ class SeaExportController extends Controller
 
             // ------------------- Company Header -------------------
             $sheet->mergeCells("A{$row}:F{$row}");
-            $sheet->setCellValue("A{$row}", $company->address);
+            $sheet->setCellValue("A{$row}", $company->company_name);
             $sheet->getStyle("A{$row}")->getFont()->setBold(true)->setSize(16);
             $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
             $row++;
             $sheet->mergeCells("A{$row}:F{$row}");
-            $sheet->setCellValue("A{$row}", $company->company_name);
+            $sheet->setCellValue("A{$row}", $seaExport->branch->address ?? $company->address);
             $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
             $row++;
             $sheet->mergeCells("A{$row}:F{$row}");
             $sheet->setCellValue("A{$row}",
-                "PAN: {$company->companySetting->pan_no}   GSTIN: {$company->companySetting->gstin_no}   CIN: {$company->companySetting->cin_no}"
+                "PAN: {$seaExport->branch->pan_no}   GSTIN: {$seaExport->branch->gstin_no}   CIN: {$seaExport->branch->cin_no}"
             );
 
             $sheet->getStyle("A{$row}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
@@ -2689,7 +2689,7 @@ class SeaExportController extends Controller
 
             $cell = $headerTable->addCell(7000, ['borderSize' => 0, 'borderColor' => 'FFFFFF']);
             $cell->addText($company->company_name, ['bold' => true, 'size' => 16, 'color' => '004080'], ['alignment' => 'right']);
-            $cell->addText($company->address, [], ['alignment' => 'right']);
+            $cell->addText($seaExport->branch->address ?? $company->address, [], ['alignment' => 'right']);
             $cell->addText(
                 "PAN: {$company->companySetting->pan_no}   GSTIN: {$company->companySetting->gstin_no}",
                 [],

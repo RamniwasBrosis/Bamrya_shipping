@@ -9,13 +9,13 @@
 
     @if (session('success'))
         <div class="alert alert-success">
-            {{session('success')}}    
+            {{session('success')}}
         </div>
     @endif
 
     @if (session('error'))
         <div class="alert alert-danger">
-            {{session('error')}}    
+            {{session('error')}}
         </div>
     @endif
 
@@ -97,7 +97,7 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label class="form-label">Invoice No:</label>
+                                                <label class="form-label">Proforma Invoice No:</label>
                                                 <input type="text" name="invoice_no" class="form-control">
                                             </div>
                                             <div class="col-md-4 mb-3">
@@ -138,12 +138,12 @@
                                                 <label class="form-label">CBM:</label>
                                                 <input type="text" name="cbm" class="form-control" style="background: #eee; cursor: not-allowed;">
                                             </div>
-                                            
+
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Package Type:</label>
                                                 <input type="text" name="pkgType" class="form-control" style="background: #eee; cursor: not-allowed;">
                                             </div>
-                                            
+
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Packages:</label>
                                                 <input type="text" name="packages" class="form-control" style="background: #eee; cursor: not-allowed;">
@@ -158,7 +158,7 @@
                                                 <label class="form-label">Chg WT:</label>
                                                 <input type="text" name="chargeable_weight" class="form-control" style="background: #eee; cursor: not-allowed;">
                                             </div>
-                                            
+
                                            <div class="col-md-4 mb-3">
                                                 <label class="form-label">Vessel / Air Line:</label>
                                                 <input type="text" name="vessel_name" class="form-control" style="background: #eee; cursor: not-allowed;">
@@ -175,7 +175,7 @@
                                                 <label class="form-label">AWB / BL NO: <span class="text-danger">*</span></label>
                                                 <input type="text" name="awb_bl_no" required class="form-control" style="background: #eee; cursor: not-allowed;">
                                             </div>
-                                            
+
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Party Type:</label>
                                                 <select name="party_type" class="form-control">
@@ -196,7 +196,7 @@
                                                     <option value="DEBITNOTE(Ovr.)">DEBITNOTE(Ovr.)</option>
                                                     <option value="CREDITNOTE(Ovr.)">CREDITNOTE(Ovr.)</option>
                                                 </select>
-                                            </div>                                  
+                                            </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Account No:</label>
                                                 <select name="bank_id" class="form-control select2">
@@ -205,8 +205,8 @@
                                                         <option value="{{$account_number->id}}" >{{$account_number->account_no}}</option>
                                                     @endforeach
                                                 </select>
-                                                
-                                            </div>  
+
+                                            </div>
                                             <!-- Row 5 -->
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Billing Party: <span class="text-danger">*</span></label>
@@ -231,7 +231,7 @@
                                                 <label class="form-label">Shipper Invoice No:</label>
                                                 <input type="text" name="shipper_invoice_no" class="form-control" value="{{ old('shipper_invoice_no', $salesInvoice->shipper_invoice_no ?? '') }}">
                                             </div>
-                                            
+
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Sales Person:<span class="text-danger">*</span></label>
                                                 <div class="col-sm-12 d-flex align-items-center">
@@ -257,10 +257,10 @@
                                     </form>
                                     <div id="msg"></div>
                                 </div>
-                            </div>                           
+                            </div>
                         </div>
 
-                        
+
                         <h4>Charges</h4>
                         <hr>
                         <div class="form-validation">
@@ -339,7 +339,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Rate Basis -->
                                     <div class="col-xl-6">
                                         <div class="mb-3 row">
@@ -378,7 +378,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <!--Total Unit-->
                                     <div class="col-xl-6">
                                         <div class="mb-3 row">
@@ -397,7 +397,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- GST -->
                                     <div class="col-xl-6">
                                         <div class="mb-3 row">
@@ -447,7 +447,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Amount -->
                                     <div class="col-xl-6">
                                         <div class="mb-3 row">
@@ -467,7 +467,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- TDS Amt. -->
                                     <div class="col-xl-6">
                                         <div class="mb-3 row">
@@ -477,7 +477,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- SAC Code -->
                                     <div class="col-xl-6">
                                         <div class="mb-3 row">
@@ -521,7 +521,7 @@
                                         </div>
                                     </div>
 
-                                    
+
 
                                     <!-- Rate -->
                                     <!--<div class="col-xl-6">-->
@@ -586,10 +586,10 @@
                                     <!--        </div>-->
                                     <!--    </div>-->
                                     <!--</div>-->
-                                    
-                                    
 
-                                    
+
+
+
 
                                     <!-- CAF Amount -->
                                     <div class="col-xl-6">
@@ -635,7 +635,7 @@
                                         </div>
                                     </div>
 
-                                    
+
 
                                     <!-- Total -->
                                     <div class="col-xl-6">
@@ -652,7 +652,7 @@
                                     <button type="submit" id="saveBtn" class="btn btn-primary btn-sm">ADD/UPDATE CHARGES</button>
                                 </div>
                             </form>
-                            
+
                             <div id="purchaseInvoiceChargesList"></div>
                         </div>
 
@@ -662,7 +662,7 @@
                         <div class="form-validation">
                             <form class="ajaxFileUpload" action="{{route('file-upload.updateFileUpload')}}" method="post" enctype="multipart/form-data">
                                 @csrf
-                                
+
                                 <input type="hidden" name="file_related" value="proforma_invoice">
                                 <input type="hidden" name="proforma_invoice_id" class="proforma_invoice_id">
                                 <div class="row">
@@ -677,7 +677,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>                                
+                                    </div>
                                 </div>
                             </form>
 
@@ -713,7 +713,7 @@
     </div>
 
     <!-- Charge Name Details -->
-@include('admin-main.admin.commonModelForms.charge_name_model') 
+@include('admin-main.admin.commonModelForms.charge_name_model')
 @include('admin-main.admin.commonModelForms.addNewBillingParty')
 @include('admin-main.admin.commonModelForms.salesperson_modal')
 @endsection
@@ -726,30 +726,30 @@
 
             $('.ajaxFileUpload').on('submit', function(e) {
                 e.preventDefault();
-        
+
                 let form = $(this);
                 let formData = new FormData();
-        
+
                 // Append file_related
                 let fileRelated = form.find('input[name="file_related"]').val();
                 formData.append('file_related', fileRelated);
-        
+
                 // Append correct invoice ID automatically
                 form.find('input[type="hidden"]').each(function() {
                     formData.append($(this).attr('name'), $(this).val());
                 });
-        
+
                 // Append multiple files
                 let files = form.find('input[type="file"]')[0].files;
                 if (files.length === 0) {
                     alert("Please select at least one file.");
                     return;
                 }
-        
+
                 $.each(files, function(i, file) {
                     formData.append('file[]', file);
                 });
-        
+
                 $.ajax({
                     url: "{{ route('account.file-upload.uploadFileUpload') }}",
                     type: 'POST',
@@ -775,44 +775,44 @@
                         }
                     }
                 });
-        
+
             });
-        
+
         });
     </script>
     <script>
         $(document).ready(function () {
-            
+
             $('.select2').select2({
                 width: '100%'
             })
-            
+
             //first form
             // Handle first form (Proforma Invoice)
             $('#proformaForm').on('submit', function (e) {
                 e.preventDefault();
-                
+
                 var job_id = $("select[name='job_no'] option:selected").attr('job_id');
-   
+
                 let form = $(this);
                 let formData = form.serialize() + '&job_id=' + encodeURIComponent(job_id);
-                
+
 
                 $.ajax({
                     url: form.attr('action'),
                     method: 'POST',
                     data: formData,
                     success: function (res) {
-                        
+
                         if (res.status === false) {
                             $('#msg').text(res.message).css('color', 'red');
-                            
+
                             setTimeout(()=>{
                                $('#msg').text('').css({color:'',background:'',padding:''});
                             }, 3000)
                             return;
                         }
-                        
+
                         if (res.success) {
                             $('#msg').text(res.message).css({'color': 'green', 'background' : '#90ee90','padding' : '10px',});
                             // Store the invoice ID into the second form hidden field
@@ -834,7 +834,7 @@
             $('#proformaChargeForm').on('submit', function (e) {
                 e.preventDefault();
                 $('#saveBtn').prop('disabled', true).text('Saving...');
-        
+
                 let form = $(this);
                 $.ajax({
                     url: form.attr('action'),
@@ -843,7 +843,7 @@
                     success: function (res) {
                         console.log(res);
                         if (res.success) {
-                            
+
                             $('#saveBtn').prop('disabled', false).text('ADD/UPDATE CHARGES');
                             let charge = res.proformaInvoiceCharges;
                             let html = `
@@ -854,7 +854,7 @@
                                 </div>
                             `;
                             $('#purchaseInvoiceChargesList').prepend(html);
-                            
+
                             form.trigger('reset'); // optional
                         }
                     },
@@ -870,26 +870,26 @@
 
     <script>
         $(document).ready(function(){
-            
+
             $(document).on('submit', '#billingPartyAdd', function (e) {
                 e.preventDefault(); // stop reload
-        
+
                 const form = $(this);
                 const btn = form.find('button[type="submit"]');
                 btn.prop('readonly', true).text('Saving...');
-        
+
                 $.ajax({
                     url: "{{ route('new-billing-party.store') }}",
                     type: "POST",
                     data: form.serialize(),
                     success: function (res) {
                         btn.prop('readonly', false).text('Save');
-        
+
                         if (res.success) {
                             const shipperSelect = $('#shipper_id');
                             const newOption = new Option(res.party.name, res.party.id, true, true);
                             shipperSelect.append(newOption).trigger('change');
-        
+
                             form[0].reset();
                             $('#exportPartyDetails').modal('hide');
                         } else {
@@ -906,10 +906,10 @@
                     }
                 });
             });
-            
+
 
             $('input[name="search_by"]').on('change', function() {
-                
+
                 let selected = $('input[name="search_by"]:checked').val();
                 if (!selected) {
                     // Clear dropdown and hidden input
@@ -919,11 +919,11 @@
                 }
                 $('#searchForm').submit();
             });
-        
+
             $('#searchForm').on('submit', function(e){
                 e.preventDefault();
                 var data = $(this).serialize();
-        
+
                 $.ajax({
                     url : '{{ route('proforma-invoices.getJobNo') }}',
                     type : 'POST',
@@ -932,7 +932,7 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     success : function(res){
-                        if(res.status === 'success'){                         
+                        if(res.status === 'success'){
                             $('#option').html(res.result);
                             $('input[name="Inv_cat"]').val(res.Inv_cat);
                         }
@@ -942,21 +942,21 @@
                     }
                 });
             });
-        
+
             $('#option').on('change', function (e) {
                 e.preventDefault();
-        
-                let selectedOption = $(this).find('option:selected'); 
+
+                let selectedOption = $(this).find('option:selected');
                 let selectedValue = selectedOption.val();
                 let type = selectedOption.data('type');
                 let fullJobNo = selectedOption.data('fulljob');
                 let originalJob = selectedOption.data('job_id');
-                
+
                 $('input[name="full_job_no"]').val(fullJobNo);
                 $('input[name="Inv_cat"]').val(type);
                 $('input[name="job_no"]').val(originalJob); // hidden input
                 $('#hidden_job_no').val(originalJob);
-        
+
                 $.ajax({
                     url: '{{route("proforma-invoices.getInvoiceRecord")}}',
                     type: 'post',
@@ -965,30 +965,30 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     success: function(res){
-                        
+
                         console.log('res,res', res);
-                   
+
                         if(res.status == 'success'){
-                           
+
                             $('input[name="pod"]').val(res.deliveryPort);
                             $('input[name="pol"]').val(res.loadingPort);
                             $('input[name="pkgType"]').val(res.packageType);
                             $('input[name="packages"]').val(res.packages);
-                            
+
                             $('input[name="container"]').val(res.containerNo);
                             $('input[name="consignee"]').val(res.consigneeName);
                             $('input[name="cbm"]').val(res.cbm);
                             $('input[name="gross_weight"]').val(res.grossWeight);
                             $('input[name="voyage_code"]').val(res.voyageNo);
-                            
+
                             $('input[name="awb_bl_no"]').val(res.Awb_BlNo);
                             $('input[name="shipping_no"]').val(res.shippingBillNoDt);
                             $('input[name="vessel_name"]').val(res.vessel_airLine);
                             $('input[name="boe_date"]').val(res.boe);
-            
+
                             $('input[name="chargeable_weight"]').val(res.chargeWeight);
                             $('input[name="shipper_invoice_no"]').val(res.customer_inv_no || '');
-                            
+
                             // if(res.result.full_job_no){
                             //     $('#full_job_no').val(res.result.full_job_no);
                             // }
@@ -999,7 +999,7 @@
                     }
                 });
             });
-        
+
         });
 
     </script>
@@ -1007,7 +1007,7 @@
     <script>
         document.getElementById('searchProformaInvoiceFile').addEventListener('submit', function(e) {
             e.preventDefault();
-          
+
             const formData = new FormData(this);
 
             fetch("{{ route('file-upload.searchFile') }}", {
@@ -1020,7 +1020,7 @@
             .then(response => response.text())
             .then(data => {
                 console.log(data);
-                
+
                 document.getElementById('searchFile').innerHTML = data;
             })
             .catch(error => {
@@ -1039,7 +1039,7 @@
         // Submit charge form via AJAX
             $('#chargeForm').on('submit', function (e) {
                 e.preventDefault();
-        
+
                 $.ajax({
                     url: $(this).attr('action'),
                     type: 'POST',
@@ -1048,10 +1048,10 @@
                         if (res.status) {
                             $('#chargesNames').modal('hide');
                             $('#chargeForm')[0].reset();
-                            
+
                             const newOption = new Option(res.data.charge_name, res.data.id, true, true);
                             $('select[name="charge_id"]').append(newOption).trigger('change');
-                            
+
                         } else {
                             alert(res.message || 'Failed to add charge.');
                         }
@@ -1062,10 +1062,10 @@
                     }
                 });
             });
-        
+
         });
-        
-        
+
+
         //mourya
         $(document).ready(function() {
 
@@ -1078,13 +1078,13 @@
                 let gstPercent = parseFloat($('input[name="gst"]').val()) || 0;
                 let gstApplicable = $('select[name="gst_applicable"]').val(); // Y or N
                 let tdsPercent = parseFloat($('#tds').val()) || 0;
-        
+
                 // --- Step 1: Base Amount ---
                 let baseAmount = perUnit * totalUnit * exchRate;
                 $('input[name="freight"]').val(baseAmount.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
-        
+
                 // --- Step 2: GST Calculation (on base) ---
                 let cgst = 0, sgst = 0, igst = 0;
                 if (gstApplicable === 'Y') {
@@ -1095,7 +1095,7 @@
                         igst = (gstPercent * baseAmount) / 100;
                     }
                 }
-        
+
                 $('input[name="cgst"]').val(cgst.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
@@ -1105,13 +1105,13 @@
                 $('input[name="igst"]').val(igst.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
-                    
-                
+
+
                 let amountWithTax = baseAmount + cgst + sgst + igst;
                 $('input[name="amount"]').val(amountWithTax.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
-        
+
                 // --- Step 3: TDS Calculation (on base only) ---
                 let tdsAmount = 0;
                 if (tdsPercent > 0) {
@@ -1120,25 +1120,25 @@
                 $('#tds_amount').val(tdsAmount.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
-        
+
                 // --- Step 4: Final Total = (Base + GST) - TDS ---
                 let finalTotal = baseAmount + cgst + sgst + igst - tdsAmount;
-                let roundedTotal = Math.round(finalTotal);
+                let roundedTotal = finalTotal;
                 $('input[name="total"]').val(roundedTotal.toFixed(2))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
             }
-        
+
             // --- Trigger recalculation whenever relevant fields change ---
             $('select[name="gst_type"], input[name="per_unit"], input[name="total_unit"], input[name="exchange_rate"], select[name="gst_applicable"], input[name="tds"], input[name="gst"]').on('change keyup', function () {
                 calculateTotals();
             });
-        
+
             // --- When charge_name changes (fetch GST & SAC code) ---
             $('#charge_name').on('change', function (e) {
                 e.preventDefault();
                 let selectedValue = $(this).val();
-        
+
                 $.ajax({
                     url: '{{ route("sales-invoices.getCharge") }}',
                     type: 'post',
@@ -1151,7 +1151,7 @@
                                     .css('background', '#ded9d9')
                                     .prop('readonly', true);
                             }
-        
+
                             $('input[name="sac_code"]').val(res.data.sac_code)
                                 .css('background', '#ded9d9')
                                 .prop('readonly', true);
@@ -1163,19 +1163,19 @@
                     }
                 });
             });
-        
+
             // --- Trigger calculation when TDS input loses focus ---
             $('#tds').on('blur', function () {
                 calculateTotals();
             });
-        
+
         });
-        
+
         // sales person submit using ajax
         $(document).ready(function() {
             $('#salespersonForm').on('submit', function(e) {
                 e.preventDefault();
-        
+
                 $.ajax({
                     url: "{{ route('salesperson.store') }}", // route name
                     method: 'POST',
@@ -1185,17 +1185,17 @@
                         $('select[name="sales_person_id"]').each(function() {
                             $(this).append(`<option value="${response.id}" selected>${response.name}</option>`);
                         });
-        
+
                         // Close modal and reset form
                         $('#salespersonForm')[0].reset();
                         $('#salespersonModal').modal('hide');
                     },
                     error: function(xhr) {
                         alert("You can't enter duplicate sales person name.");
-        
+
                         // Properly log the full error
                         console.error('Error:', xhr.responseText);
-        
+
                         // Optional: Show the Laravel validation errors if exist
                         if (xhr.responseJSON && xhr.responseJSON.errors) {
                             let messages = '';
@@ -1207,7 +1207,7 @@
                     }
                 });
             });
-        
+
         });
 
     </script>

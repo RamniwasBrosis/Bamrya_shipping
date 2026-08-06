@@ -137,10 +137,10 @@
             {{-- BUTTONS --}}
             <div class="row mt-3">
                 <div class="col-md-12 text-start">
-                    <button class="btn btn-primary" id="previewBtn">PREVIEW</button> 
+                    <button class="btn btn-primary" id="previewBtn">PREVIEW</button>
                     <!--<button class="btn btn-warning text-white">GENERATE E-INVOICE</button>-->
-                    <a href="{{ route('proformaInvoice.printProformaInvoice', $porformaInvoice->id) }}" 
-                       class="btn btn-warning text-white" 
+                    <a href="{{ route('proformaInvoice.printProformaInvoice', $porformaInvoice->id) }}"
+                       class="btn btn-warning text-white"
                        target="_blank">
                        PRINT PROFORMA
                     </a>
@@ -155,7 +155,7 @@
                     {{ $porformaInvoice->invoice_type }}
                 </h3>
                 <hr>
-            
+
                 <!-- HEADER: Logo + Company Info -->
                 <table class="header-table">
                     <tr>
@@ -171,7 +171,7 @@
                         </td>
                     </tr>
                 </table>
-            
+
                 <!-- SHIPPER & INVOICE INFO -->
                 <table>
                     <!--<tr>-->
@@ -185,31 +185,31 @@
                             ?? $purchaseInvoice->operationJob->seaExport->full_job_no
                             ?? $purchaseInvoice->operationJob->seaImport->full_job_no
                             ?? '';
-                            
+
                         $shippingBill = $purchaseInvoice->operationJob->airExport->shipping_bill
                             ?? $purchaseInvoice->operationJob->airImport->shipping_bill
                             ?? $purchaseInvoice->operationJob->seaExport->shipping_bill
                             ?? $purchaseInvoice->operationJob->seaImport->shipping_bill
                             ?? '';
-                            
+
                         $grossWeight = $purchaseInvoice->operationJob->airExport->gross_weight
                             ?? $purchaseInvoice->operationJob->airImport->gross_weight
                             ?? $purchaseInvoice->operationJob->seaExport->gross_weight
                             ?? $purchaseInvoice->operationJob->seaImport->gross_weight
                             ?? '';
-                            
+
                         $cbm = $purchaseInvoice->operationJob->airExport->cbm
                             ?? $purchaseInvoice->operationJob->airImport->cbm
                             ?? $purchaseInvoice->operationJob->seaExport->cbm
                             ?? $purchaseInvoice->operationJob->seaImport->cbm
                             ?? '';
-                            
+
                         $package = $purchaseInvoice->operationJob->airExport->package
                             ?? $purchaseInvoice->operationJob->airImport->package
                             ?? $purchaseInvoice->operationJob->seaExport->package
                             ?? $purchaseInvoice->operationJob->seaImport->package
                             ?? '';
-                            
+
                         $mawb_no = $purchaseInvoice->operationJob->airExport->mawb_no
                             ?? $purchaseInvoice->operationJob->airImport->mawb_no
                             ?? $purchaseInvoice->operationJob->seaExport->mawb_no
@@ -242,12 +242,12 @@
                         <th>PORT OF DISHARGE</th>
                         <td>{{ $porformaInvoice->pod ?? '' }}</td>
                     </tr>
-            
+
                     <tr>
                         <td><strong>SB/BOE BILL NO :</strong> {{ $porformaInvoice->shipping_no ?? '' }}</td>
                         <td><strong>GROSS WEIGHT : </strong>{{ $porformaInvoice->gross_weight ?? '' }}</td>
                     </tr>
-            
+
                     <tr>
                         <th>CBM</th>
                         <th>NO OF PKGS</th>
@@ -258,7 +258,7 @@
                         <td>{{ $porformaInvoice->packages ?? 0 }}</td>
                         <td>{{ $porformaInvoice->equipment_size ?? 0 }}</td>
                     </tr>
-                
+
                     <tr>
                         <td><strong>VESSEL & VOY / AIRLINE :</strong> {{ $porformaInvoice->vessel_name ?? '' }}</td>
                         <td><strong>CONTAINER NO. :</strong> {{ $porformaInvoice->container ?? '' }}</td>
@@ -272,7 +272,7 @@
                         <td colspan="3"><strong>CONSIGNEE / Consigner:</strong>{{ $porformaInvoice->consignee ?? '' }}</td>
                     </tr>
                 </table>
-                
+
                 <!-- CHARGES TABLE -->
                 <table class="charges" style="min-height: 200px;">
                     <thead>
@@ -294,7 +294,7 @@
                     </thead>
                     <tbody>
                         @php $i = 1; @endphp
-                        @php 
+                        @php
                             $totalAmount = 0;
                             $finalAmount = 0;
                             $totalTdsPercent = 0;
@@ -302,20 +302,20 @@
                             $gstAmount = 0;
                         @endphp
                         @foreach($chargeDetails as $charge)
-                        @php 
+                        @php
                             $taxableAmount = $charge->total;
                             $gstValue = $charge->cgst + $charge->sgst + $charge->igst;
                             $totalWithGST = $charge->total;
-                    
+
                             $totalAmount += $charge->freight;
                             $finalAmount += $totalWithGST;
-                    
+
                             $totalTdsPercent += $charge->tds;
                             $totalTdsAmount += $charge->tds_amount;
-                    
+
                             $gstAmount += $gstValue;
                         @endphp
-                    
+
                         <tr>
                             <td class="text-center">{{ $i++ }}</td>
                             <td>{{ $charge->charge->charge_name }}</td>
@@ -324,18 +324,18 @@
                             <td class="text-center">{{ $charge->currency }}</td>
                             <td class="text-center">{{ $charge->exchange_rate }}</td>
                             <td class="text-center">{{ $charge->per_unit ?? 0 }}</td>
-                    
+
                             <!-- Taxable Amount (Correct) -->
                             <td class="text-right">{{ number_format($charge->freight, 2) }}</td>
-                    
+
                             <!-- GST % and components -->
                             <td class="text-right">{{ number_format($charge->gst, 2) }}</td>
                             <td class="text-right">{{ number_format($charge->cgst, 2) }}</td>
                             <td class="text-right">{{ number_format($charge->sgst, 2) }}</td>
                             <td class="text-right">{{ number_format($charge->igst, 2) }}</td>
-                    
+
                             <!-- Total Amount including GST (Correct) -->
-                            <td class="text-right">{{ number_format($totalWithGST, 2) }}</td>
+                            <td class="text-right">{{ $totalWithGST }}</td>
                         </tr>
                     @endforeach
 
@@ -357,16 +357,16 @@
                         @endif
                     </tbody>
                 </table>
-            
+
                 <!-- TAX & TOTALS -->
                 <table class="totals-table">
                     @php
                         // FINAL BEFORE ROUND OFF
                         $finalAmountWithTds = $finalAmount - $totalTdsAmount;
-                
+
                         // ROUND OFF LOGIC
                         $decimal = $finalAmountWithTds - floor($finalAmountWithTds);
-                
+
                         if ($decimal < 0.50) {
                             // ROUND DOWN
                             $roundedTotal = floor($finalAmountWithTds);
@@ -376,43 +376,43 @@
                             $roundedTotal = ceil($finalAmountWithTds);
                             $roundOff = $roundedTotal - $finalAmountWithTds;   // positive
                         }
-                
+
                         // AMOUNT IN WORDS
                         $f = new \NumberFormatter('en_IN', \NumberFormatter::SPELLOUT);
                         $amountInWords = ucfirst($f->format($roundedTotal)) . ' only';
                     @endphp
-                
+
                     <tr>
                         <td width="70%" rowspan="6" class="amount-words">
                             <strong>Amount in Words:</strong><br>
                             {{ $amountInWords ?? '' }}
                         </td>
-                
+
                         <th  colspan="2">WITHOUT GST AMOUNT</th>
                         <td class="text-right">{{ number_format($totalAmount ?? 0, 2) }}</td>
                     </tr>
-                
+
                     <tr>
                         <th  colspan="2">GST</th>
                         <td class="text-right">{{ number_format($gstAmount ?? 0, 2) }}</td>
                     </tr>
-                    
+
                     <tr>
                         <th  colspan="2">TOTAL AMOUNT</th>
                         <td class="text-right">{{ number_format($finalAmount ?? 0, 2) }}</td>
                     </tr>
-                
+
                     <tr>
                         <th  colspan="2">ROUND OFF</th>
                         <td class="text-right">{{ number_format($roundOff, 2) }}</td>
                     </tr>
-                
+
                     <tr>
                         <th colspan="2" class="text-right">GRAND TOTAL Rs</th>
                         <td class="text-right"><strong>{{ number_format($roundedTotal ?? 0, 2) }}</strong></td>
                     </tr>
                 </table>
-            
+
                 <!-- BANK DETAILS -->
                 <table class="bank-details">
                     <tr>

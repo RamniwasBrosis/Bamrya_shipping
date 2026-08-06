@@ -19,7 +19,7 @@ use Carbon\Carbon;
         }
         .bold { font-weight: bold; }
         .center { text-align: center; }
-    
+
         /* Header */
         .header-table {
             width: 100%;
@@ -41,7 +41,7 @@ use Carbon\Carbon;
             font-size: 9px;
             line-height: 1.4;
         }
-    
+
         .invoice-title {
             text-align: center;
             font-size: 11px;
@@ -50,7 +50,7 @@ use Carbon\Carbon;
             padding: 5px;
             margin: 8px 0;
         }
-    
+
         /* Two-column section */
         .two-col {
             width: 100%;
@@ -61,7 +61,7 @@ use Carbon\Carbon;
             vertical-align: top;
             padding: 2px;
         }
-    
+
         .box {
             border: 1px solid #000;
             padding: 4px;
@@ -75,14 +75,14 @@ use Carbon\Carbon;
             margin-bottom: 4px;
             display: block;
         }
-    
+
         /* Reference and shipment tables */
         .ref-table, .ship-table {
             width: 100%;
             border: 1px solid #000;
             border-collapse: collapse;
             font-size: 9px;
-            min-height: 100px;  
+            min-height: 100px;
         }
         .ref-table td, .ship-table td {
             /*border: 1px solid #000;*/
@@ -91,7 +91,7 @@ use Carbon\Carbon;
             padding: 6px 1px;
         }
         .label { font-weight: bold; width: 50px; }
-    
+
         /* Items table */
         .items-table {
             width: 100%;
@@ -106,7 +106,7 @@ use Carbon\Carbon;
         .items-table thead th {
             background: #f2f2f2;
         }
-    
+
         /* Footer */
         .footer-notes {
             font-size: 9px;
@@ -124,18 +124,18 @@ use Carbon\Carbon;
                 </td>
                 <td class="company-details">
                     <div class="bold">{{ $company->company_name }}</div>
-                    {{ $company->address }}<br>
-                    <span class="bold">PAN NO.:</span> {{ $company->companySetting->pan_no ?? '' }} 
-                    <span class="bold">GSTIN:</span> {{ $company->companySetting->gstin_no ?? '' }}<br>
-                    <span class="bold">CIN:</span> {{ $company->companySetting->cin_no ?? '' }}<br>
-                    <span class="bold">PHONE:</span> {{ $company->companySetting->phone ?? '' }}
+                    {{ $seaImport->branch->address ?? $company->address }}<br>
+                    <span class="bold">PAN NO.:</span> {{ $seaImport->branch->pan_no ?? $company->companySetting->pan_no }}
+                    <span class="bold">GSTIN:</span> {{ $seaImport->branch->gstin_no ?? $company->companySetting->gstin_no }}<br>
+                    <span class="bold">CIN:</span> {{ $seaImport->branch->cin_no ?? $company->companySetting->cin_no }}<br>
+                    <span class="bold">PHONE:</span> {{ $seaImport->branch->phone ?? $company->companySetting->phone }}
                     <span class="bold">EMAIL:</span> {{ $company->companySetting->email ?? '' }}
                 </td>
             </tr>
         </table>
-    
+
         <div class="invoice-title">CARGO ARRIVAL NOTICE / PERFORMA INVOICE</div>
-    
+
         <table class="two-col">
             <tr>
                 <td width="50%">
@@ -144,19 +144,19 @@ use Carbon\Carbon;
                         {{ $seaImport->notifyName->party_name ?? '' }}<br>
                         {{ $seaImport->notifyName->address_line1 ?? '' }}<br>
                         {{ $seaImport->notifyName->address_line2 ?? '' }}<br>
-                        <b>GST ID:</b> {{ $seaImport->notifyName->gstin ?? '' }} 
+                        <b>GST ID:</b> {{ $seaImport->notifyName->gstin ?? '' }}
                         <b>STATE Code:</b> 08
                     </div>
-    
+
                     <div class="box">
                         <span class="box-title">Consignee</span>
                         {{ $seaImport->consignee->party_name ?? '' }}<br>
                         {{ $seaImport->consignee->address_line1 ?? '' }}<br>
                         {{ $seaImport->consignee->address_line2 ?? '' }}<br>
-                        <b>GST ID:</b> {{ $seaImport->consignee->gstin ?? '' }} 
+                        <b>GST ID:</b> {{ $seaImport->consignee->gstin ?? '' }}
                         <b>STATE Code:</b> 08
                     </div>
-        
+
                     <div class="box">
                         <span class="box-title">Shipper</span>
                         {{ $seaImport->shipperName->party_name ?? '' }}<br>
@@ -164,7 +164,7 @@ use Carbon\Carbon;
                         {{ $seaImport->shipperName->address_line2 ?? '' }}
                     </div>
                 </td>
-    
+
                 <td width="50%" class="cargo-second-box">
                     <table class="ref-table">
                         <tr><td class="label"></td><td></td></tr>
@@ -173,7 +173,7 @@ use Carbon\Carbon;
                         <tr><td style="font-weight: bold; width: 80px;">IGM NO / DT</td><td>{{ $seaImport->igm_no ?? '' }} / {{ (\Carbon\Carbon::parse($seaImport->igm_date)->format('d-m-Y')) }}</td></tr>
                         <tr><td class="label"></td><td></td></tr>
                     </table>
-    
+
                     <table class="ship-table">
                         <tr>
                           <td class="label">PO #</td>
@@ -239,7 +239,7 @@ use Carbon\Carbon;
                 </td>
             </tr>
         </table>
-    
+
         <table class="items-table" border="1" cellspacing="0" cellpadding="5" style="margin-bottom:1.5rem; width:100%; border-collapse:collapse; font-family:Arial, sans-serif; font-size:12px; text-align:center;">
             <thead>
                 <tr style="background-color:#f2f2f2;">
@@ -250,7 +250,7 @@ use Carbon\Carbon;
                     <th>
                         @php
                             $code = $seaImport->packageName->package_code ?? null;
-        
+
                             switch ($code) {
                                 case 'PKGS': echo 'PKG'; break;
                                 case 'PALLETS': echo 'PLT'; break;
@@ -270,7 +270,7 @@ use Carbon\Carbon;
                     $totalWeight = 0;
                     $totalVolume = 0;
                 @endphp
-        
+
                 @foreach($seaImport->container as $cont)
                     <tr>
                         <td>{{ $cont->mark_and_numbers ?? '' }}</td>
@@ -281,14 +281,14 @@ use Carbon\Carbon;
                         <td>{{ $cont->gross_weight ?? '' }}</td>
                         <td>{{ $cont->cbm ?? '' }}</td>
                     </tr>
-        
+
                     @php
                         $totalQuantity += $cont->total_package ?? 0;
                         $totalWeight += $cont->gross_weight ?? 0;
                         $totalVolume += $cont->cbm ?? 0;
                     @endphp
                 @endforeach
-        
+
                 <tr>
                     <td colspan="4" class="bold" style="text-align:right;">Total :</td>
                     <td class="bold">{{ $totalQuantity }}</td>
@@ -297,7 +297,7 @@ use Carbon\Carbon;
                 </tr>
             </tbody>
         </table>
-    
+
         <div class="footer-notes">
             <p>Kindly submit the ORIGINAL BILL OF LADING with endorsements to release the shipment.</p>
             <p>The above mentioned vessel is expected to arrive on or about {{ $seaImport->delivery_order_date }} at <b>{{ $seaImport->loadingPortName->port_name ?? '' }}</b>.</p>
@@ -306,6 +306,6 @@ use Carbon\Carbon;
             <p>Please note that cargoes remaining undelivered for 30 days from the date of arrival will be listed for auction upon completion of Customs & CFS Formalities.</p>
         </div>
     </div>
-    
+
 </body>
 </html>

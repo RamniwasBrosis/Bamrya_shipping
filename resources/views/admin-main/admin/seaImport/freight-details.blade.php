@@ -166,27 +166,27 @@ use Carbon\Carbon;
         <div class="logo-text">
             {{ $company->company_name }}
         </div>
-    
+
         <div class="company-details">
             <div class="company-name">
                 {{ $company->companySetting->company_name ?? $company->company_name }}
             </div>
-    
+
             <div>
-                {{ $company->address }}
+                {{ $seaImport->branch->address ?? $company->address }}
             </div>
-    
+
             <div>
-                <b>PAN NO:</b> {{ $company->companySetting->pan_no ?? '' }}
+                <b>PAN NO:</b> {{ $seaImport->branch->pan_no ?? $company->companySetting->pan_no }}
                 &nbsp;
-                <b>GSTIN:</b> {{ $company->companySetting->gstin_no ?? '' }}
+                <b>GSTIN:</b> {{ $seaImport->branch->gstin_no ?? $company->companySetting->gstin_no }}
             </div>
-    
+
             <div>
-                <b>CIN:</b> {{ $company->companySetting->cin_no ?? '' }}
+                <b>CIN:</b> {{ $seaImport->branch->cin_no ?? $company->companySetting->cin_no }}
             </div>
             <div>
-                <b>Phone:</b> {{ $company->companySetting->phone ?? '' }} &nbsp;&nbsp; <b>Email:</b> {{ $company->companySetting->email ?? '' }}
+                <b>Phone:</b> {{ $seaImport->branch->phone ?? $company->companySetting->phone }} &nbsp;&nbsp; <b>Email:</b> {{ $company->companySetting->email ?? '' }}
             </div>
         </div>
     </div>
@@ -199,7 +199,7 @@ use Carbon\Carbon;
         $countRate = 0;
         $countContainer = count($seaImport->container);
         $totalCbm = 0;
-        
+
         foreach($seaImport->container as $container){
             $countExRate = $container->ex_rate;
             $countRate = $container->rate;
@@ -218,7 +218,7 @@ use Carbon\Carbon;
             <li>• <strong>PACKAGES</strong>: {{ $seaImport->quantity }}</li>
             <li>• <strong>WEIGHT / VOLUME</strong>: {{ $seaImport->gross_weight }} KGS / {{ $totalCbm }} CBM</li>
             <li>• <strong>TYPE OF CARGO</strong>: {{ $seaImport->cargo_type }}</li>
-            <li>• <strong>FREIGHT</strong>: 
+            <li>• <strong>FREIGHT</strong>:
                 @if($seaImport->freight == 'C')
                     Collect
                 @else
@@ -235,7 +235,7 @@ use Carbon\Carbon;
             @endif
         </ul>
     </div>
-    
+
     @if(!empty($seaImport->container))
     <table class="charges-table">
         <thead>

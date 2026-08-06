@@ -116,7 +116,7 @@ use Carbon\Carbon;
             flex-direction: column;
             gap: 8px; /* Space between boxes within a column */
         }
-        
+
         /* Box Styling */
         .party-box {
             border: 1px solid #000;
@@ -195,15 +195,15 @@ use Carbon\Carbon;
         }
         .footer-notes p { margin: 5px 0; }
     </style>
-    
+
     <div class="invoice-header">
         <div class="logo-text">{{ $company->company_name }}</div>
         <div class="company-details">
             <div class="company-name">{{ $company->company_name }}</div>
-            <div>{{ $company->address }}</div>
-            <div><span class="bold">PAN NO.:</span> {{ $company->companySetting->pan_no ?? '' }} <span class="bold">GSTIN:</span> {{ $company->companySetting->gstin_no ?? '' }}</div>
-            <div><span class="bold">CIN:</span> {{ $company->companySetting->cin_no ?? '' }}</div>
-            <div><span class="bold">PHONE:</span> {{ $company->companySetting->phone ?? '' }} &nbsp; <b>Email:</b>{{ $company->companySetting->email ?? '' }}</div>
+            <div>{{ $seaImport->branch->address ?? $company->address }}</div>
+            <div><span class="bold">PAN NO.:</span> {{ $seaImport->branch->pan_no ?? $company->companySetting->pan_no }} <span class="bold">GSTIN:</span> {{ $seaImport->branch->gstin_no ?? $company->companySetting->gstin_no }}</div>
+            <div><span class="bold">CIN:</span> {{ $seaImport->branch->cin_no ?? $company->companySetting->cin_no }}</div>
+            <div><span class="bold">PHONE:</span> {{ $seaImport->branch->phone ?? $company->companySetting->phone }} &nbsp; <b>Email:</b>{{ $company->companySetting->email ?? '' }}</div>
         </div>
     </div>
     <div class="invoice-title-box">CARGO ARRIVAL NOTICE/PERFORMA INVOICE</div>
@@ -232,7 +232,7 @@ use Carbon\Carbon;
                 <!--<div style="margin-top: 5px;"><span class="bold">Sales Ref.:</span> 8591017</div>-->
             </div>
         </div>
-    
+
         <div class="right-column">
             <div class="reference-box">
                 <div class="ref-row"><div class="ref-label">Job Ref No.</div><div class="ref-value">: {{ ($seaImport->ref_no ?? '') . ' . / . ' . (\Carbon\Carbon::parse($seaImport->hbl_date)->format('d-m-Y')) }}</div></div>
@@ -315,7 +315,7 @@ use Carbon\Carbon;
         @php
             // Fix package code label
             $code = $seaImport->packageName->package_code ?? null;
-        
+
             switch ($code) {
                 case 'PKGS':   $pkgLabel = 'PKG'; break;
                 case 'PALLETS':$pkgLabel = 'PLT'; break;
@@ -323,13 +323,13 @@ use Carbon\Carbon;
                 case 'ROLLS':  $pkgLabel = 'ROLLS'; break;
                 default:       $pkgLabel = 'Qty';
             }
-        
+
             // Totals
             $totalQty = 0;
             $totalGross = 0;
             $totalCbm = 0;
         @endphp
-        
+
         <table border="1" cellspacing="0" cellpadding="5" style="width:100%; border-collapse:collapse; font-family:Arial, sans-serif; font-size:12px; text-align:center;">
             <thead>
                 <tr style="background-color:#f2f2f2;">
@@ -342,43 +342,43 @@ use Carbon\Carbon;
                     <th style="width:15%;">Volume</th>
                 </tr>
             </thead>
-        
+
             <tbody>
-        
+
                 @foreach($seaImport->container as $c)
-        
+
                     @php
                         $totalQty   += $c->total_package ?? 0;
                         $totalGross += $c->gross_weight ?? 0;
                         $totalCbm   += $c->cbm ?? 0;
                     @endphp
-        
+
                     <tr>
                         <td>{{ $c->mark_and_numbers ?? '' }}</td>
-        
+
                         <td>
                             {{ $c->goods_description ?? '' }}<br>
                             Cus Inv: {{ $c->customer_inv_no ?? '' }}
                         </td>
-        
+
                         <td>
                             {{ $c->container_no ?? '' }} <br>
                             <small>Size: {{ $c->size ?? '' }}</small>
                         </td>
-        
+
                         <td>
                             {{ $c->agentSealNo ?? '' }}
                         </td>
-        
+
                         <td>{{ $c->total_package ?? '0' }}</td>
-        
+
                         <td>{{ $c->gross_weight ?? '0' }} KGS</td>
-        
+
                         <td>{{ $c->cbm ?? '0' }} CBM</td>
                     </tr>
-        
+
                 @endforeach
-        
+
                 <!-- Totals Row -->
                 <tr style="font-weight:bold;">
                     <td colspan="4" style="text-align:right;">Total :</td>
@@ -386,11 +386,11 @@ use Carbon\Carbon;
                     <td>{{ $totalGross }} KGS</td>
                     <td>{{ $totalCbm }} CBM</td>
                 </tr>
-        
+
             </tbody>
         </table>
         <br><br>
-    
+
     <div class="footer-notes">
         <p>Kindly submit the ORIGINAL BILL OF LADING with endorsements to release the shipment.</p>
         <p>The above mentioned vessel is expected to arrive on or about {{ $seaImport->delivery_order_date }} at <span class="bold">{{ $seaImport->loadingPortName->port_name ?? '' }}</span></p>

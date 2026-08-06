@@ -37,7 +37,7 @@
     .header-left { width: 30%; }
     .header-center { text-align: center; width: 40%; }
     .header-right { text-align: right; width: 30%; font-size: 11px; font-weight: bold;}
-    
+
     .job-file-box {
         border: 3px solid black;
         padding: 5px 15px;
@@ -49,26 +49,26 @@
     .company-name { font-size: 18px; font-weight: bold; margin: 5px 0; }
     .sub-title { font-weight: bold; font-size: 12px; }
     .address { font-size: 11px; line-height: 1.2; }
-    
+
     .row { display: flex; align-items: flex-end; margin-bottom: 10px; }
     .field { display: flex; align-items: flex-end; flex-grow: 1; margin-right: 10px;width: 0px; }
     .label { font-weight: 800; white-space: nowrap; margin-right: 5px; font-size: 13px; }
     .line { border-bottom: 1.5px solid black; flex-grow: 1; min-height: 1.2em; }
-    
+
     .section-split { display: flex; border-top: 3px solid black; border-bottom: 3px solid black; margin-top: 10px; }
     .split-col { width: 50%; padding: 8px; }
     .split-col:first-child { border-right: 3px solid black; }
     .split-row { display: flex; align-items: flex-end; margin-bottom: 6px; }
-    
+
     .yes-no-field { display: flex; align-items: center; margin-left: 10px; }
     .short-line { border-bottom: 1.5px solid black; width: 35px; display: inline-block; margin-left: 5px;}
-    
+
     .footer-section { border-top: 3px solid black; display: flex; min-height: 120px; }
     .remark-col { width: 50%; border-right: 3px solid black; padding: 10px; font-weight: bold; }
     .flight-col { width: 50%; display: flex; flex-direction: column; }
     .flight-details { padding: 10px; flex-grow: 1; }
     .flight-line { border-bottom: 1.5px solid black; margin-top: 20px; }
-    
+
     .bottom-boxes { display: flex; border-top: 2px solid black; padding: 5px 10px; justify-content: space-between; }
     .box-field { display: flex; align-items: center; }
     .box { border: 2px solid black; width: 45px; height: 18px; margin-left: 5px; }
@@ -89,12 +89,12 @@
         flex-direction: column;
         flex-grow: 1;
     }
-    
+
     .line-text {
         border-bottom: 1.5px solid black;
         min-height: 1.2em;
     }
-    
+
     .line-date {
         /*font-size: 10px;*/
         /*text-align: right;*/
@@ -116,7 +116,7 @@
             <div class="header-left">
                 <div class="row">
                     <span class="label">AIR JOB NO.</span>
-                
+
                     <div class="line-block">
                         <div class="line-text">{{ $data['air_job_no'] ?? '' }}</div>
                         <div class="line-date">{{ $data['air_job_date'] ?? '' }}</div>
@@ -132,13 +132,13 @@
                 <div class="company-name">{{ $company->company_name }}</div>
                 <div class="sub-title">CLEARING, FORWARDING & FREIGHT BROKER</div>
                 <div class="address">
-                    {{ $company->address }}<br>
+                    {{ $branch->address }}<br>
                     Mob.: {{ $company->companySetting->phone ?? '-' }}
                 </div>
             </div>
             <div class="header-right">
-                <div>GSTIN: {{ $company->companySetting->gstin_no }}</div>
-                <div>CIN: {{ $company->companySetting->cin_no }}</div>
+                <div>GSTIN: {{ $branch->gstin_no }}</div>
+                <div>CIN: {{ $branch->cin_no }}</div>
             </div>
         </div>
 
@@ -199,19 +199,19 @@
             <div class="split-col" style="border-left: 3px solid black;">
                 <div class="split-row">
                     <span class="label" style="width: 20px;">GSP</span>
-                
+
                     <!-- Blank before YES -->
                     <span class="short-line"></span>
-                
+
                     YES
-                
+
                     <!-- Check for YES -->
                     <span class="short-line">
                         {{ ($data['gsp'] ?? '') === 'yes' ? '✔' : '' }}
                     </span>
-                
+
                     NO
-                
+
                     <!-- Check for NO -->
                     <span class="short-line">
                         {{ ($data['gsp'] ?? '') === 'no' ? '✔' : '' }}
@@ -278,22 +278,22 @@
             </div>
         </div>
     </div>
-    
+
     <!--second page-->
     <div class="page-break"></div>
-    
+
     <!-- SECOND PAGE -->
         <div style="text-align: center; font-weight: bold; margin-bottom: 10px;margin-top: 20px;">
             AIR JOB PRO-FORMA INVOICE
         </div>
           <div style="text-align: center; font-weight: bold; font-size: 1.2em; border: 1px solid black;padding: 10px;">{{ $company->company_name }}</div>
-         
+
           <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border: 1px solid black; padding: 5px;">
             <div style="flex: 1; border-right: 1px solid black; padding-right: 5px;">POL :-</div>
             <div style="flex: 1; border-right: 1px solid black; padding-left: 5px; padding-right: 5px;">POD :-</div>
             <div style="flex: 1; padding-left: 5px;">SHIPPER NAME :-</div>
           </div>
-         
+
           <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
             <tr>
               <th style="border: 1px solid black; padding: 5px; text-align: center; width: 50px;">S.NO</th>
@@ -356,9 +356,9 @@
               <td style="border: 1px solid black; padding: 5px;"></td>
             </tr>
           </table>
-         
+
           <div style="margin-top: 10px; font-style: italic;border: 1px solid black;padding-bottom: 80px;">NOTE / BILLING INSUTRUCITON</div>
-         
+
           <div style="display: flex; justify-content: space-between; margin-top: 50px;">
             <div style="text-align: center; width: 30%;">
               <div style="border-top: 1px solid black; width: 80%; margin: 0 auto;"></div>
@@ -383,8 +383,8 @@ document.getElementById('downloadBtn').addEventListener('click', function () {
         margin: 0,
         filename: 'Job_File_Form.pdf',
         image: { type: 'jpeg', quality: 1 },
-        html2canvas: { 
-            scale: 2, 
+        html2canvas: {
+            scale: 2,
             useCORS: true,
             width: 794, // Fixed A4 width in pixels at 96 DPI
         },

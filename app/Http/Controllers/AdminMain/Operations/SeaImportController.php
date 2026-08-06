@@ -22,6 +22,7 @@ use App\Models\Operations\OperationSeaImportCont;
 use App\Models\Operations\OperationSalesPerson;
 use App\Models\MasterShipping;
 use App\Models\Company;
+use App\Models\CompanyBranch;
 
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
@@ -658,7 +659,7 @@ class SeaImportController extends Controller
     public function cargoArrivelDetails($id)
     {
         $page_title = 'Sea Import Cargo Arrival';
-        $seaImport = OperationSeaImport::with(['shipperName', 'jobMaster', 'notifyName', 'consignee', 'dischargePortName', 'container', 'receiptPortName', 'loadingPortName', 'packageName', 'cfsYardName','shippingLine'])
+        $seaImport = OperationSeaImport::with(['shipperName', 'jobMaster', 'notifyName', 'consignee', 'dischargePortName', 'container', 'receiptPortName', 'loadingPortName', 'packageName', 'cfsYardName','shippingLine', 'branch'])
             ->where('company_id', $this->company_id)
             ->where('id', $id)
             ->first();
@@ -677,7 +678,7 @@ class SeaImportController extends Controller
     //mourya
     public function cargoArrivelDetailsExport($id)
     {
-        $seaImport = OperationSeaImport::with(['shipperName', 'jobMaster', 'notifyName', 'consignee', 'dischargePortName', 'container', 'receiptPortName', 'loadingPortName', 'packageName','cfsYardName','shippingLine'])
+        $seaImport = OperationSeaImport::with(['branch','shipperName', 'jobMaster', 'notifyName', 'consignee', 'dischargePortName', 'container', 'receiptPortName', 'loadingPortName', 'packageName','cfsYardName','shippingLine'])
             ->where('company_id', $this->company_id)
             ->where('id', $id)
             ->first();
@@ -715,7 +716,7 @@ class SeaImportController extends Controller
     public function freightCertificateDetails($id)
     {
         $page_title = 'Sea Import Freight Certificate';
-        $seaImport = OperationSeaImport::with(['shipperName', 'jobMaster', 'notifyName', 'consignee', 'dischargePortName', 'container', 'loadingPortName', 'packageName'])
+        $seaImport = OperationSeaImport::with(['shipperName', 'jobMaster', 'notifyName', 'consignee', 'dischargePortName', 'container', 'loadingPortName', 'packageName', 'branch'])
             ->where('company_id', $this->company_id)
             ->where('id', $id)
             ->first();
@@ -727,7 +728,7 @@ class SeaImportController extends Controller
         return view('admin-main/admin/seaImport/freight-details', [
                 'seaImport' => $seaImport,
                 'company'   => $company,
-                'page_title'=>$page_title
+                'page_title'=> $page_title,
             ]);
     }
 
@@ -736,7 +737,7 @@ class SeaImportController extends Controller
     {
         $seaImport = OperationSeaImport::with([
             'shipperName', 'jobMaster', 'notifyName', 'consignee',
-            'dischargePortName', 'container', 'loadingPortName', 'deliveryPortName'
+            'dischargePortName', 'container', 'loadingPortName', 'deliveryPortName', 'branch'
         ])
         ->where('company_id', $this->company_id)
         ->findOrFail($id);
