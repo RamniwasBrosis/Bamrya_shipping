@@ -172,9 +172,9 @@
             <td class="header-right">
                 <div class="company-name">{{ $company->company_name }}</div>
                 <div class="company-address">
-                    {{ $company->address }}<br>
-                    PAN: {{ $company->companySetting->pan_no }} | GSTIN: {{ $company->companySetting->gstin_no }} | TAN: {{ $company->companySetting->tan_no }} <br>
-                    PHONE: {{ $company->companySetting->phone }} | CIN: {{ $company->companySetting->cin }}
+                    {{ $porformaInvoice->branch->address ?? $company->address }}<br>
+                    PAN: {{ $porformaInvoice->branch->pan_no ?? $company->companySetting->pan_no }} | GSTIN: {{ $porformaInvoice->branch->gstin_no ?? $company->companySetting->gstin_no }} | TAN: {{ $porformaInvoice->branch->tan_no ?? $company->companySetting->tan_no }} <br>
+                    PHONE: {{ $porformaInvoice->branch->phone ?? $company->companySetting->phone }} | CIN: {{ $porformaInvoice->branch->cin_no ?? $company->companySetting->cin }}
                     <br> EMAIL: {{ $company->companySetting->email }}
                 </div>
             </td>
@@ -282,7 +282,7 @@
                     <td class="text-right">{{ fmt($totalWithGST) }}</td>
                 </tr>
             @endforeach
-    
+
             {{-- If you want blank rows to keep table height similar to preview, uncomment and adjust --}}
             {{-- @for($r = count($chargeDetails); $r < 6; $r++)
                 <!--<tr>-->

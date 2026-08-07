@@ -76,7 +76,7 @@
         .header-table { margin-bottom: 1px; border-left: 1px solid #000;border-right: 1px solid #000;border-top: 1px solid #000;border-bottom: none;}
         .header-left { width: 30%; vertical-align: top; padding: 3px; }
         .header-right { width: 70%; vertical-align: top; padding: 15px 6px 6px 6px; text-align: center; }
-    
+
         .logo { max-width: 160px; height: auto; display: block; margin-bottom: 1px; }
         .company-name { color: #004080; font-weight: 800; font-size: 24px; letter-spacing: 0.3px; }
         .company-address { font-size: 12px; margin-top: 3px; line-height: 1.4; }
@@ -99,7 +99,7 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-        
+
             /* outer box */
             border-top: 1px solid #000;
             border-bottom: 1px solid #000;
@@ -125,7 +125,7 @@
             padding: 2px 2px;
             vertical-align: top;
         }
-        
+
         /* VERTICAL COLUMN LINES ONLY */
         .charges tbody td:not(:last-child) {
             border-right: 1px solid #000;
@@ -197,10 +197,10 @@
             <td class="header-right">
                 <div class="company-name">{{ $company->company_name }}</div>
                 <div class="company-address">
-                    {{ $company->address }}<br>
-                    PAN: {{ $company->companySetting->pan_no }} | GSTIN: {{ $company->companySetting->gstin_no }} | TAN: {{ $company->companySetting->tan_no }} <br>
-                    PHONE: {{ $company->companySetting->phone }} | LandLine: {{ $company->companySetting->land_line_ph }}
-                    <br>CIN: {{ $company->companySetting->cin_no }} | EMAIL: {{ $company->companySetting->email }}
+                    {{ $salesInvoice->operationJob->branch->address ?? $company->address }}<br>
+                    PAN: {{ $salesInvoice->operationJob->branch->pan_no ?? $company->companySetting->pan_no }} | GSTIN: {{ $salesInvoice->operationJob->branch->gstin_no ?? $company->companySetting->gstin_no }} | TAN: {{ $salesInvoice->operationJob->branch->tan_no ?? $company->companySetting->tan_no }} <br>
+                    PHONE: {{ $salesInvoice->operationJob->branch->phone ?? $company->companySetting->phone }} | LandLine: {{ $salesInvoice->operationJob->branch->landline_phone ?? $company->companySetting->land_line_ph }}
+                    <br>CIN: {{ $salesInvoice->operationJob->branch->cin_no ?? $company->companySetting->cin_no }} | EMAIL: {{ $company->companySetting->email }}
                 </div>
             </td>
         </tr>
@@ -285,16 +285,16 @@
             $minRows = 12; // adjust based on your  preview height
             $currentRows = count($chargeDetails);
         @endphp
-        
+
         <tbody>
             @php $i = 1; @endphp
-        
+
             @foreach ($chargeDetails as $charge)
                 <tr>
                     <td class="text-center">{{ $i++ }}</td>
                     <td>
                         {{ $charge->chargeName->charge_name }}<br>
-                            
+
                         @if(!empty($charge->charge_desc))
                             ({{ $charge->charge_desc }})
                         @endif
@@ -312,7 +312,7 @@
                     <td class="text-right">{{ fmt($charge->total ?? 0) }}</td>
                 </tr>
             @endforeach
-            
+
             {{-- FILL EMPTY ROWS --}}
             @for ($r = $currentRows; $r < $minRows; $r++)
                 <tr>
@@ -409,31 +409,33 @@
             <td style="width:30%; border:1px solid #000; padding:0;">
 
                 <table style="width:100%; height:150px; border-collapse:collapse;">
-                    
+
                     <!-- Top -->
                     <tr>
                         <td style="text-align:center; vertical-align:top; padding-top:8px;">
                             <strong>{{ $company->company_name }}</strong>
                         </td>
                     </tr>
-            
+
                     <!-- Middle -->
                     <tr>
                         <td style="text-align:center; vertical-align:middle;">
-                            <img src="https://crm.bamryashipping.com/public/images/seal-sign.jpg" 
-                                 style="height:108px;">
+                            <img src="{{ optional($salesInvoice->branch)->seal_sign
+                                ? asset('public/uploads/branch_seal_sign/' . $salesInvoice->operationJob->branch->seal_sign)
+                                : asset('public/images/seal-sign.jpg') }}"
+                                style="height:108px;">
                         </td>
                     </tr>
-                
+
                     <!-- Bottom -->
                     <tr>
                         <td style="text-align:center; vertical-align:bottom; padding-bottom:8px;font-size:12px;">
                             AUTHORISED SIGNATORY
                         </td>
                     </tr>
-            
+
                 </table>
-            
+
             </td>
         </tr>
     </table>

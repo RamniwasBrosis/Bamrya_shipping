@@ -166,11 +166,11 @@
                             <img src="{{ $logoUrl }}" alt="Logo" style="width:200px;">
                         </td>
                         <td width="70%" class="text-end">
-                            <div class="company-name">{{ $company->company_name }}</div>
-                            <div class="company-address">{{ $company->address }}</div>
-                            <div class="company-address">PAN: {{ $company->companySetting->pan_no }} | GSTIN: {{ $company->companySetting->gstin_no }} | TAN: {{ $company->companySetting->tan_no }}</div>
-                            <div class="company-address">LandLine: {{ $company->companySetting->land_line_ph }} | CIN: {{ $company->companySetting->cin_no }}</div>
-                            <div class="company-address">PHONE: {{ $company->companySetting->phone }} | EMAIL: {{ $company->companySetting->email }}</div>
+                            <div class="company-name">{{$company->company_name }}</div>
+                            <div class="company-address">{{ $salesInvoice->operationJob->branch->address ?? $company->address }}</div>
+                            <div class="company-address">PAN: {{ $salesInvoice->operationJob->branch->pan_no ?? $company->companySetting->pan_no }} | GSTIN: {{ $salesInvoice->operationJob->branch->gstin_no ?? $company->companySetting->gstin_no }} | TAN: {{ $salesInvoice->operationJob->branch->tan_no ?? $company->companySetting->tan_no }}</div>
+                            <div class="company-address">LandLine: {{ $salesInvoice->operationJob->branch->landline_phone ?? $company->companySetting->land_line_ph }} | CIN: {{ $salesInvoice->operationJob->branch->cin_no ?? $company->companySetting->cin_no }}</div>
+                            <div class="company-address">PHONE: {{ $salesInvoice->operationJob->branch->phone ?? $company->companySetting->phone }} | EMAIL: {{ $company->companySetting->email }}</div>
                         </td>
                     </tr>
                 </table>
@@ -462,8 +462,10 @@
 
                                 <!-- Middle Signature Image -->
                                 <div>
-                                    <img src="{{ asset('public/images/seal-sign.jpg') }}"
-                                         style="height: 103px; width:auto;">
+                                    <img src="{{ $salesInvoice->branch && $salesInvoice->operationJob->branch->seal_sign
+                                        ? asset('public/uploads/branch_seal_sign/' . $salesInvoice->operationJob->branch->seal_sign)
+                                        : asset('public/images/seal-sign.jpg') }}"
+                                        style="height:103px; width:auto;">
                                 </div>
 
                                 <!-- Bottom Text -->

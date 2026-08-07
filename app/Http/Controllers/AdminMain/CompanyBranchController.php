@@ -80,27 +80,33 @@ class CompanyBranchController extends Controller
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             'status' => 'required|boolean',
+            'seal_sign' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $data = $request->except('logo');
+        $data = $request->except(['logo', 'seal_sign']);
 
         $data['company_id'] = Auth::user()->company_id;
 
         if ($request->hasFile('logo')) {
-
             $path = public_path('uploads/branch_logo');
-
             if (!file_exists($path)) {
                 mkdir($path, 0777, true);
             }
-
             $file = $request->file('logo');
-
             $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
-
             $file->move($path, $filename);
-
             $data['logo'] = $filename;
+        }
+
+        if ($request->hasFile('seal_sign')) {
+            $path = public_path('uploads/branch_seal_sign');
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
+            }
+            $file = $request->file('seal_sign');
+            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+            $file->move($path, $filename);
+            $data['seal_sign'] = $filename;
         }
 
         CompanyBranch::create($data);
@@ -164,9 +170,10 @@ class CompanyBranchController extends Controller
             'manager_name' => 'nullable|max:150',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'status' => 'required|boolean',
+            'seal_sign' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $data = $request->except('logo');
+        $data = $request->except(['logo', 'seal_sign']);
         if ($request->hasFile('logo')) {
             $path = public_path('uploads/branch_logo');
             if (!file_exists($path)) {
@@ -180,6 +187,20 @@ class CompanyBranchController extends Controller
             $file->move($path,$filename);
             $data['logo'] = $filename;
         }
+        if ($request->hasFile('seal_sign')) {
+            $path = public_path('uploads/branch_seal_sign');
+            if (!file_exists($path)) {
+                mkdir($path, 0777, true);
+            }
+            if ($branch->seal_sign && file_exists($path.'/'.$branch->seal_sign)) {
+                unlink($path.'/'.$branch->seal_sign);
+            }
+            $file = $request->file('seal_sign');
+            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+            $file->move($path, $filename);
+            $data['seal_sign'] = $filename;
+        }
+
         $branch->update($data);
 
         return response()->json([
@@ -196,9 +217,13 @@ class CompanyBranchController extends Controller
                     ->findOrFail($id);
 
         if ($branch->logo) {
-
             $path = public_path('uploads/branch_logo/'.$branch->logo);
-
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+        if ($branch->seal_sign) {
+            $path = public_path('uploads/branch_seal_sign/'.$branch->seal_sign);
             if (file_exists($path)) {
                 unlink($path);
             }

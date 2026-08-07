@@ -625,7 +625,8 @@ class PurchaseInvoiceController extends Controller
             'operationJob.seaExport',
             'operationJob.seaImport',
             'operationJob.airExport',
-            'operationJob.airImport'
+            'operationJob.airImport',
+            'branch'
         ])->findOrFail($id);
 
         $accountDetails = MasterBank::where('company_id', $this->company_id)->first();

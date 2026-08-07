@@ -213,6 +213,26 @@
                                             @endisset
                                         </div>
                                     </div>
+                                    <div class="mb-3 col-xl-6 row">
+                                        <label class="col-sm-3 col-form-label">
+                                            Seal & Sign
+                                        </label>
+
+                                        <div class="col-sm-9">
+                                            <input type="file"
+                                                name="seal_sign"
+                                                class="form-control">
+
+                                            @isset($branch)
+                                                @if($branch->seal_sign)
+                                                    <div class="mt-2">
+                                                        <img src="{{ asset('uploads/branch_seal_sign/'.$branch->seal_sign) }}"
+                                                            width="150">
+                                                    </div>
+                                                @endif
+                                            @endisset
+                                        </div>
+                                    </div>
                                     <div class="mb-3 col-xl-6 col-md-6 row">
                                         <label class="col-sm-4 col-form-label">
                                             Status

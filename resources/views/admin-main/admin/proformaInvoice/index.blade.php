@@ -150,6 +150,7 @@
                                         <td>{{ $userName ?? '-' }}</td>
                                         <td>{{ $proforma_invoice->branch->branch_name ?? '-'}}</td>
                                         <td>
+                                            <a href="{{ route('ImportProformaInvoice.import', $proforma_invoice->id) }}" type="button" class="badge badge-success light border-0">Print</a>
                                             <a class="badge badge-info light border-0" href="{{url('admin/proforma-invoices/'.$proforma_invoice->uuid.'/edit')}}">Edit</a>
                                             <a class="badge badge-danger light border-0 delete-proformaInvoice" href="javascript:void(0);" data-id="{{$proforma_invoice->id}}">Delete</a>
                                         </td>

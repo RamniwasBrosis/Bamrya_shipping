@@ -718,7 +718,8 @@ class SalesInvoiceController extends Controller
             'operationJob.seaExport',
             'operationJob.seaImport',
             'operationJob.airExport',
-            'operationJob.airImport'
+            'operationJob.airImport',
+            'operationJob.branch'
         ])->findOrFail($id);
 
         $accountDetails = MasterBank::where('company_id', $this->company_id)->first();
@@ -747,7 +748,8 @@ class SalesInvoiceController extends Controller
             'operationJob.seaExport',
             'operationJob.seaImport',
             'operationJob.airExport',
-            'operationJob.airImport'
+            'operationJob.airImport',
+            'operationJob.branch'
         ])->findOrFail($id);
 
         $accountDetails = MasterBank::where('company_id', $this->company_id)->first();

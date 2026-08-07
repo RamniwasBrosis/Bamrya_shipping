@@ -556,7 +556,8 @@ class ProformaInvoiceController extends Controller
             'operationJob.seaExport',
             'operationJob.seaImport',
             'operationJob.airExport',
-            'operationJob.airImport'
+            'operationJob.airImport',
+            'branch'
         ])->findOrFail($id);
 
         $accountDetails = MasterBank::where('company_id', $this->company_id)->first();
@@ -610,7 +611,8 @@ class ProformaInvoiceController extends Controller
             'operationJob.seaImport',
             'operationJob.airExport',
             'operationJob.airImport',
-            'salesPerson'
+            'salesPerson',
+            'branch'
         ])->findOrFail($id);
 
         $accountDetails = MasterBank::where('company_id', $this->company_id)->first();

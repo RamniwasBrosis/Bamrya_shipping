@@ -92,48 +92,6 @@
         </div>
 
         <div class="card-body">
-            {{-- URL TYPE --}}
-            <div class="row align-items-center mb-3">
-                <div class="col-md-2">
-                    <label class="fw-bold">URL Type:</label>
-                </div>
-                <div class="col-md-10">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="url_type" id="demo" value="demo">
-                        <label class="form-check-label" for="demo">DEMO</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="url_type" id="prd" value="prd" checked>
-                        <label class="form-check-label" for="prd">PRD</label>
-                    </div>
-                </div>
-            </div>
-
-            {{-- ACCOUNT NO --}}
-            <div class="row align-items-center mb-3">
-                <div class="col-md-2">
-                    <label class="fw-bold">Account No:</label>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="account_no" id="na1" value="na" checked>
-                        <label class="form-check-label" for="na1">NA</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="account_no" id="na2" value="na2">
-                        <label class="form-check-label" for="na2">NA</label>
-                    </div>
-                </div>
-
-                {{-- ADVANCE INPUT --}}
-                <div class="col-md-2 text-end">
-                    <label class="fw-bold">Advance:</label>
-                </div>
-                <div class="col-md-2">
-                    <input type="number" class="form-control" id="advance" value="0" min="0">
-                </div>
-            </div>
-
             {{-- BUTTONS --}}
             <div class="row mt-3">
                 <div class="col-md-12 text-start">
@@ -145,7 +103,7 @@
                        PRINT PROFORMA
                     </a>
 
-                    <a href="{{ url('/admin/sales-invoices') }}" class="btn btn-outline-warning float-end">GO TO IMPORT BL</a>
+                    <a href="{{ url('/admin/proforma-invoices') }}" class="btn btn-outline-warning float-end">Proforma List</a>
                 </div>
             </div>
 
@@ -164,10 +122,10 @@
                         </td>
                         <td width="70%" class="text-end">
                             <div class="company-name">{{ $company->company_name }}</div>
-                            <div>{{ $company->address }}</div>
-                            <div>PAN: {{ $company->companySetting->pan_no }} | GSTIN: {{ $company->companySetting->gstin_no }} | TAN: {{ $company->companySetting->tan_no }}</div>
-                            <div>CIN: {{ $company->companySetting->cin_no }}</div>
-                            <div>PHONE: {{ $company->companySetting->phone }} | EMAIL: {{ $company->companySetting->email }}</div>
+                            <div>{{ $porformaInvoice->branch->address ?? $company->address }}</div>
+                            <div>PAN: {{ $porformaInvoice->branch->pan_no ?? $company->companySetting->pan_no }} | GSTIN: {{ $porformaInvoice->branch->gstin_no ?? $company->companySetting->gstin_no }} | TAN: {{ $porformaInvoice->branch->tan_no ?? $company->companySetting->tan_no }}</div>
+                            <div>CIN: {{ $porformaInvoice->branch->cin_no ?? $company->companySetting->cin_no }}</div>
+                            <div>PHONE: {{ $porformaInvoice->branch->phone ?? $company->companySetting->phone }} | EMAIL: {{ $company->companySetting->email }}</div>
                         </td>
                     </tr>
                 </table>
