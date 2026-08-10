@@ -110,7 +110,43 @@
                                                     <option value="outstation" {{$proforma_invoice->gst_type == 'outstation'? 'selected' : ''}}>OUTSTATION</option>
                                                 </select>
                                             </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Invoice Type:</label>
+                                                <select name="invoice_type" class="form-control select2">
+                                                    <option value="">Select</option>
+                                                    <option value="PRO-FORMA INVOICE" selected >PRO-FORMA INVOICE</option>
+                                                    <!--<option value="DEBITNOTE(Rs)" {{$proforma_invoice->invoice_type == 'DEBITNOTE(Rs)'? 'selected' : ''}}>DEBITNOTE(Rs)</option>-->
+                                                    <!--<option value="CREDITNOTE(Rs)" {{$proforma_invoice->invoice_type == 'CREDITNOTE(Rs)'? 'selected' : ''}}>CREDITNOTE(Rs)</option>-->
+                                                    <!--<option value="DEBITNOTE(Ovr.)" {{$proforma_invoice->invoice_type == 'DEBITNOTE(Ovr.)'? 'selected' : ''}}>DEBITNOTE(Ovr.)</option>-->
+                                                    <!--<option value="CREDITNOTE(Ovr.)" {{$proforma_invoice->invoice_type == 'CREDITNOTE(Ovr.)'? 'selected' : ''}}>CREDITNOTE(Ovr.)</option>-->
 
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Billing Party:</label>
+                                                <select name="billing_party_id" class="form-control select2">
+                                                    <option value="">Select</option>
+                                                    @foreach ($parties->where('party_type', 10) as $party)
+                                                        <option value="{{$party->id}}" {{$proforma_invoice->billing_party_id == $party->id? 'selected' : ''}}>{{$party->party_name}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Party Type:</label>
+                                                <select name="party_type" class="form-control select2">
+                                                    <option value="">Select</option>
+                                                    <option value="customer" {{$proforma_invoice->party_type == 'customer'? 'selected' : ''}}>Customer</option>
+                                                    <option value="other" {{$proforma_invoice->party_type == 'other'? 'selected' : ''}}>Other Billing Party</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Job Date:</label>
+                                                <input type="text" name="job_date" class="form-control" value="{{$proforma_invoice->job_date}}" style="background: #eee; cursor: not-allowed;">
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Shipper Name:</label>
+                                                <input type="text" name="shipper_name" class="form-control" value="{{$proforma_invoice->shipper_name}}" style="background: #eee; cursor: not-allowed;">
+                                            </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Voyage Code:</label>
                                                 <input type="text" name="voyage_date" class="form-control" value="{{$proforma_invoice->voyage_date}}" style="background: #eee; cursor: not-allowed;">
@@ -173,28 +209,6 @@
                                                 <input type="text" name="awb_bl_no" class="form-control" value="{{ $proforma_invoice->awb_bl_no }}" style="background: #eee; cursor: not-allowed;">
                                             </div>
 
-
-
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">Party Type:</label>
-                                                <select name="party_type" class="form-control select2">
-                                                    <option value="">Select</option>
-                                                    <option value="customer" {{$proforma_invoice->party_type == 'customer'? 'selected' : ''}}>Customer</option>
-                                                    <option value="other" {{$proforma_invoice->party_type == 'other'? 'selected' : ''}}>Other Billing Party</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">Invoice Type:</label>
-                                                <select name="invoice_type" class="form-control select2">
-                                                    <option value="">Select</option>
-                                                    <option value="PRO-FORMA INVOICE" selected >PRO-FORMA INVOICE</option>
-                                                    <!--<option value="DEBITNOTE(Rs)" {{$proforma_invoice->invoice_type == 'DEBITNOTE(Rs)'? 'selected' : ''}}>DEBITNOTE(Rs)</option>-->
-                                                    <!--<option value="CREDITNOTE(Rs)" {{$proforma_invoice->invoice_type == 'CREDITNOTE(Rs)'? 'selected' : ''}}>CREDITNOTE(Rs)</option>-->
-                                                    <!--<option value="DEBITNOTE(Ovr.)" {{$proforma_invoice->invoice_type == 'DEBITNOTE(Ovr.)'? 'selected' : ''}}>DEBITNOTE(Ovr.)</option>-->
-                                                    <!--<option value="CREDITNOTE(Ovr.)" {{$proforma_invoice->invoice_type == 'CREDITNOTE(Ovr.)'? 'selected' : ''}}>CREDITNOTE(Ovr.)</option>-->
-
-                                                </select>
-                                            </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Account No:</label>
                                                 <select name="bank_id" class="form-control select2">
@@ -205,15 +219,7 @@
                                                 </select>
                                             </div>
 
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">Billing Party:</label>
-                                                <select name="billing_party_id" class="form-control select2">
-                                                    <option value="">Select</option>
-                                                    @foreach ($parties as $party)
-                                                        <option value="{{$party->id}}" {{$proforma_invoice->billing_party_id == $party->id? 'selected' : ''}}>{{$party->party_name}}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
+
 
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Sale / Purchase:</label>
@@ -1066,7 +1072,7 @@
             // === MAIN CALCULATION FUNCTION ===
             function calculateTotals() {
                 let gstType = $('select[name="gst_type"]').val(); // local / otherState
-                let perUnit = parseFloat($('input[name="per_unit"]').val()) || 0;
+                let perUnit = parseFloat($('input[name="per_unit"]').val()) || 1;
                 let totalUnit = parseFloat($('input[name="total_unit"]').val()) || 0;
                 let exchRate = parseFloat($('input[name="exchange_rate"]').val()) || 0;
                 let gstPercent = parseFloat($('input[name="gst"]').val()) || 0;

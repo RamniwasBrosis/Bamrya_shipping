@@ -7,12 +7,18 @@
 
     // GST total (combined)
     $gstAmount = 0;
+    $cgstAmount = 0;
+    $sgstAmount = 0;
+    $igstAmount = 0;
     foreach ($chargeDetails as $charge) {
         if (($porformaInvoice->gst_type ?? 'local') === 'local') {
             $gstAmount += ($charge->cgst ?? 0) + ($charge->sgst ?? 0);
         } else {
             $gstAmount += ($charge->igst ?? 0);
         }
+        $cgstAmount += $charge->cgst ?? 0;
+        $sgstAmount += $charge->sgst ?? 0;
+        $igstAmount += $charge->igst ?? 0;
     }
 
     // Final amount before rounding (subtract TDS amount if applicable)
@@ -47,19 +53,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Porforma Invoice - {{ $porformaInvoice->invoice_no ?? '' }}</title>
+    <title>Proforma Invoice - {{ $porformaInvoice->invoice_no ?? '' }}</title>
 
     <style>
         /* Page size and margins */
-        @page { size: A4 portrait; margin: 28mm 14mm; }
+        @page {
+            size: A4 portrait;
+            margin:8mm 8mm;
+        }
 
         /* Base */
         html, body {
-            font-family: "DejaVu Sans", DejaVuSans, sans-serif;
-            font-size: 10px;
-            color: #000;
-            margin: 0px 5px;
-            padding: 0;
+            margin: 5px;
+            padding: 5px;
         }
 
         /* Prevent table breaks inside rows */
@@ -67,21 +73,21 @@
         tr, td, th { page-break-inside: avoid; }
 
         /* Header */
-        .header-table { margin-bottom: 2px; }
-        .header-left { width: 50%; vertical-align: top; padding: 6px; }
-        .header-right { width: 50%; vertical-align: top; padding: 6px; text-align: left; }
+        .header-table { margin-bottom: 1px; border-left: 1px solid #000;border-right: 1px solid #000;border-top: 1px solid #000;border-bottom: none;}
+        .header-left { width: 30%; vertical-align: top; padding: 3px; }
+        .header-right { width: 70%; vertical-align: top; padding: 15px 6px 6px 6px; text-align: center; }
 
-        .logo { max-width: 180px; height: auto; display: block; margin-bottom: 6px; }
-        .company-name { color: #004080; font-weight: 800; font-size: 22px; letter-spacing: 0.2px; }
-        .company-address { font-size: 11px; margin-top: 4px; line-height: 1.2; }
+        .logo { max-width: 160px; height: auto; display: block; margin-bottom: 1px; }
+        .company-name { color: #004080; font-weight: 800; font-size: 24px; letter-spacing: 0.3px; }
+        .company-address { font-size: 12px; margin-top: 3px; line-height: 1.4; }
 
-        .invoice-title { text-align: center; font-weight: 700; text-transform: uppercase; font-size: 15px; margin: 8px 0; }
+        .invoice-title { text-align: center; font-weight: 700; text-transform: uppercase; font-size: 18px; margin: 3px 0; }
 
         /* Info grid */
         .info-table th, .info-table td {
             border: 1px solid #000;
             padding: 3px 3px;
-            font-size: 11px;
+            font-size: 10px;
             vertical-align: top;
         }
         .info-left { width: 40%; }
@@ -89,36 +95,51 @@
         .info-right { width: 30%; }
 
         /* Charges table */
+        .charges {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+
+            /* outer box */
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+        }
         .charges thead th {
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            border-right: 1px solid #000;
             background: #f3f3f3;
             font-weight: 700;
-            padding: 3px 3px;
-            border: 1px solid #000;
             font-size: 10.8px;
+            padding: 4px 3px;
             text-align: center;
         }
-        .charges tbody{
-            min-height: 200px !important;
-        }
         .charges tbody td {
-            border: 1px solid #000;
+            border-right: 1px solid #000;
             font-size: 10.8px;
+            padding: 2px 2px;
             vertical-align: top;
-            padding: 2px;
+        }
+
+        /* VERTICAL COLUMN LINES ONLY */
+        .charges tbody td:not(:last-child) {
+            border-right: 1px solid #000;
         }
 
         /* Explicit column widths for Dompdf */
         .charges thead th:nth-child(1){ width: 4%; }   /* S.NO */
         .charges thead th:nth-child(2){ width: 20%; }  /* PARTICULARS */
-        .charges thead th:nth-child(3){ width: 9%; }   /* HAN/SAC */
+        .charges thead th:nth-child(3){ width: 7%; }   /* HAN/SAC */
         .charges thead th:nth-child(4){ width: 6%; }   /* UNIT */
         .charges thead th:nth-child(5){ width: 5%; }   /* CUR */
         .charges thead th:nth-child(6){ width: 7%; }   /* EX-RATE */
         .charges thead th:nth-child(7){ width: 7%; }   /* RATE */
         .charges thead th:nth-child(8){ width: 10%; }  /* TAXABLE AMOUNT */
         .charges thead th:nth-child(9){ width: 6%; }   /* GST RATE */
-        .charges thead th:nth-child(10){ width: 6%; }  /* CGST */
-        .charges thead th:nth-child(11){ width: 6%; }  /* SGST */
+        .charges thead th:nth-child(10){ width: 7%; }  /* CGST */
+        .charges thead th:nth-child(11){ width: 7%; }  /* SGST */
         .charges thead th:nth-child(12){ width: 6%; }  /* IGST */
         .charges thead th:nth-child(13){ width: 8%; }  /* TOTAL AMOUNT */
 
@@ -127,18 +148,18 @@
         .text-left { text-align: left; }
 
         /* Totals area */
-        .totals-table { margin-top: 8px; width: 100%; border-collapse: collapse; }
+        .totals-table { margin-top: 3px; width: 100%; border-collapse: collapse; }
         .totals-table th, .totals-table td {
             border: 1px solid #000;
             padding: 3px 3px;
-            font-size: 11px;
+            font-size: 10px;
         }
         .amount-words {
             border: 1px solid #000;
             padding: 6px;
             min-height: 70px;
             font-weight: 700;
-            font-size: 11px;
+            font-size: 10px;
             line-height: 1.35;
         }
 
@@ -147,7 +168,7 @@
             font-size: 10.5px;
             border: 1px solid #000;
             padding: 8px;
-            margin-top: 8px;
+            margin-top: 4px;
         }
 
         /* Minor helpers */
@@ -161,7 +182,7 @@
 </head>
 <body>
 
-    <div class="invoice-title">{{ $porformaInvoice->invoice_type ?? 'TAX INVOICE' }}</div>
+    <div class="invoice-title">{{ $porformaInvoice->invoice_type ?? 'PROFORMA INVOICE' }}</div>
 
     {{-- Header: Logo + Company Info --}}
     <table class="header-table">
@@ -172,67 +193,66 @@
             <td class="header-right">
                 <div class="company-name">{{ $company->company_name }}</div>
                 <div class="company-address">
-                    {{ $porformaInvoice->branch->address ?? $company->address }}<br>
-                    PAN: {{ $porformaInvoice->branch->pan_no ?? $company->companySetting->pan_no }} | GSTIN: {{ $porformaInvoice->branch->gstin_no ?? $company->companySetting->gstin_no }} | TAN: {{ $porformaInvoice->branch->tan_no ?? $company->companySetting->tan_no }} <br>
-                    PHONE: {{ $porformaInvoice->branch->phone ?? $company->companySetting->phone }} | CIN: {{ $porformaInvoice->branch->cin_no ?? $company->companySetting->cin }}
-                    <br> EMAIL: {{ $company->companySetting->email }}
+                    {{ $porformaInvoice->operationJob->branch->address ?? $company->address }}<br>
+                    PAN: {{ $porformaInvoice->operationJob->branch->pan_no ?? $company->companySetting->pan_no }} | GSTIN: {{ $porformaInvoice->operationJob->branch->gstin_no ?? $company->companySetting->gstin_no }} | TAN: {{ $porformaInvoice->operationJob->branch->tan_no ?? $company->companySetting->tan_no }} <br>
+                    PHONE: {{ $porformaInvoice->operationJob->branch->phone ?? $company->companySetting->phone }} | LandLine: {{ $porformaInvoice->operationJob->branch->landline_phone ?? $company->companySetting->land_line_ph }}
+                    <br>CIN: {{ $porformaInvoice->operationJob->branch->cin_no ?? $company->companySetting->cin_no }} | EMAIL: {{ $company->companySetting->email }}
                 </div>
             </td>
         </tr>
     </table>
 
     {{-- Invoice & Shipper Info --}}
-    <table class="info-table" style="margin-bottom:6px;">
+    <table class="info-table" style="margin-bottom:5px;">
         <tr>
-            <td class="info-left" rowspan="5">
-                <strong>PROFROMA TO</strong><br><br>
+            <td class="info-left" rowspan="4">
+                <strong>PROFORMA TO</strong><br><br>
                 <strong>{{ $porformaInvoice->partyName->party_name ?? '' }}</strong><br>
                 {!! nl2br(e($porformaInvoice->partyName->address ?? $porformaInvoice->partyName->address_line1 ?? '')) !!}<br>
-                {{ $porformaInvoice->partyName->city ?? '' }}<br><br>
-                GSTIN: {{ $porformaInvoice->partyName->gstin ?? '' }}
+                {!! nl2br(e($porformaInvoice->partyName->address_line2 ?? '')) !!}<br>
+                {{ $porformaInvoice->partyName->city ?? '' }} &nbsp;{{ $porformaInvoice->partyName->state ?? '' }} - {{ $porformaInvoice->partyName->pincode ?? '' }}<br>
+                State Code - ({{ $porformaInvoice->partyName->state_code ?? '' }})&nbsp;&nbsp;&nbsp;&nbsp;GSTIN: {{ $porformaInvoice->partyName->gstin ?? '' }}
             </td>
-            <td class="info-mid"><strong>INVOICE NO:</strong></td>
-            <td class="info-right">{{ $porformaInvoice->invoice_no ?? '' }}</td>
+            <td class="info-mid"><strong>INVOICE NO: {{ $porformaInvoice->invoice_no ?? '' }}</strong></td>
+            <td class="info-right"><strong>INVOICE DATE: {{ \Carbon\Carbon::parse($porformaInvoice->invoice_date)->format('d-m-Y') }}</strong></td>
         </tr>
         <tr>
-            <td class="info-mid"><strong>DATE:</strong></td>
-            <td class="info-right">{{ $porformaInvoice->invoice_date ?? now()->format('Y-m-d') }}</td>
+            <td class="info-mid"><strong>JOB NO: {{ $porformaInvoice->full_job_no ?? '' }}</strong></td>
+            <td class="info-right"><strong>JOB DATE: {{$porformaInvoice->job_date??''}}</strong></td>
         </tr>
         <tr>
-            <td class="info-mid"><strong>JOB NO:</strong></td>
-            <td class="info-right">{{ $porformaInvoice->full_job_no ?? '' }}</td>
+            <td class="info-mid"><strong>SHIPPER NAME: {{$porformaInvoice->shipper_name??''}}</strong></td>
+            <td class="info-right"><strong>SALES PERSON: {{$porformaInvoice->salesPerson->name??''}}</strong></td>
         </tr>
         <tr>
-            <td class="info-mid"><strong>PORT OF LOADING:</strong></td>
-            <td class="info-right">{{ $porformaInvoice->pol ?? '' }}</td>
+            <td class="info-mid"><strong>LOADING PORT: {{ $porformaInvoice->pol ?? '' }}</strong></td>
+            <td class="info-right"><strong>DISCHARGE PORT: {{ $porformaInvoice->pod ?? '' }}</strong></td>
         </tr>
 
         <tr>
-            <td class="info-mid"><strong>PORT OF DELIVERY:</strong></td>
-            <td class="info-right">{{ $porformaInvoice->pod ?? '' }}</td>
+            <td class="info-left"><strong>SHIPPER INV. NO: {{ $porformaInvoice->shipper_invoice_no ?? '' }}</strong></td>
+            <td class="info-mid"><strong>CHARGEABLE WEIGHT: {{ $porformaInvoice->chargeable_weight ?? '' }}</strong></td>
+            <td class="info-right"><strong>NO OF PKGS: {{ $porformaInvoice->packages ?? 0 }}</strong></td>
         </tr>
         <tr>
-            <td class="info-left"><strong>S.BILL/BOE NO:</strong> {{ $porformaInvoice->shipping_no ?? '' }}</td>
-            <td class="info-mid"><strong>GROSS WEIGHT:</strong></td>
-            <td class="info-right">{{ $porformaInvoice->gross_weight ?? '' }}</td>
+            <td class="info-left"><strong>S.BILL/BOE NO. & DATE: {{ $porformaInvoice->shipping_no ?? '' }}</strong></td>
+            <td class="info-mid"><strong>MBL/MAWB: {{ $porformaInvoice->awb_bl_no ?? '' }}</strong></td>
+            {{-- <td class="info-right"><strong>HBL/HAWB: {{ $porformaInvoice->hawb_no ?? '' }}</strong></td> --}}
+            <td class="info-left"><strong>CBM: {{ $porformaInvoice->cbm ?? '' }}</strong></td>
+
+        </tr>
+        {{-- <tr>
+            <td class="info-left"><strong>CBM: {{ $porformaInvoice->cbm ?? '' }}</strong></td>
+            <td class="info-mid"><strong>ETD/ETA: {{ $porformaInvoice->etd_date ?? '' }} / {{ $porformaInvoice->eta_date ?? '' }}</strong></td>
+            <td class="info-right"><strong>SHIPMENT TYPE: {{ $porformaInvoice->remarks ?? '' }}</strong></td>
+        </tr> --}}
+        <tr>
+            <td class="info-left"><strong>VESSEL & VOY / AIRLINE: {{ $porformaInvoice->vessel_name ?? '' }}</strong></td>
+            <td class="info-mid"><strong>CONTAINER NO: {{ $porformaInvoice->container_no ?? '' }}</strong></td>
+            <td class="info-right"><strong>CONTAINER QTY: {{ $porformaInvoice->container_qty ?? '0' }}</strong></td>
         </tr>
         <tr>
-            <td class="info-left"><strong>CBM:</strong> {{ $porformaInvoice->cbm ?? '' }}</td>
-            <td class="info-mid"><strong>NO OF PKGS:</strong></td>
-            <td class="info-right">{{ $porformaInvoice->packages ?? 0 }}</td>
-        </tr>
-        <tr>
-            <td class="info-left"><strong>VESSEL & VOY / AIRLINE:</strong> {{ $porformaInvoice->vessel_name ?? '' }}</td>
-            <td class="info-mid"><strong>CONTAINER NO:</strong></td>
-            <td class="info-right">{{ $porformaInvoice->container_no ?? '' }}</td>
-        </tr>
-        <tr>
-            <td colspan="1"><strong>AWB/BL NO: </strong> {{ $porformaInvoice->awb_bl_no ?? '' }}</td>
-            <td colspan="2"><strong>CHARGEABLE WEIGHT : </strong> {{ $porformaInvoice->chargeable_weight ?? '' }}</td>
-            <!--<td colspan="2"><strong>Shipper Invoice NO: </strong> {{ $porformaInvoice->shipper_invoice_no ?? '' }}</td>-->
-        </tr>
-        <tr>
-            <td colspan="3"><strong>CONSIGNEE / CONSIGNER: </strong> {{ $porformaInvoice->consignee ?? '' }}</td>
+            <td colspan="3"><strong>CONSIGNEE / CONSIGNER: {{ $porformaInvoice->consignee ?? '' }}</strong></td>
         </tr>
     </table>
 
@@ -255,76 +275,109 @@
                 <th class="text-right">TOTAL AMOUNT</th>
             </tr>
         </thead>
+        @php
+            $minRows = 12; // adjust based on your preview height
+            $currentRows = count($chargeDetails);
+        @endphp
+
         <tbody>
             @php $i = 1; @endphp
+
             @foreach ($chargeDetails as $charge)
-                @php
-                    $taxable = $charge->freight ?? $charge->total ?? 0;
-                    $gstRate = $charge->gst ?? 0;
-                    $cgst = $charge->cgst ?? 0;
-                    $sgst = $charge->sgst ?? 0;
-                    $igst = $charge->igst ?? 0;
-                    $totalWithGST = $charge->total ?? ($taxable + (($cgst+$sgst+$igst) ?? 0));
-                @endphp
                 <tr>
                     <td class="text-center">{{ $i++ }}</td>
-                    <td class="text-left">{{ $charge->charge->charge_name ?? '' }}</td>
+                    <td>
+                        {{ $charge->charge->charge_name ?? '' }}<br>
+                        @if(!empty($charge->charge_desc))
+                            ({{ $charge->charge_desc }})
+                        @endif
+                    </td>
                     <td class="text-center">{{ $charge->charge->charge_code ?? '' }}</td>
                     <td class="text-center">{{ $charge->total_unit ?? '' }}</td>
                     <td class="text-center">{{ $charge->currency ?? 'INR' }}</td>
-                    <td class="text-center">{{ $charge->exchange_rate ?? '' }}</td>
-                    <td class="text-center">{{ fmt($charge->per_unit ?? 0) }}</td>
-                    <td class="text-right">{{ fmt($taxable) }}</td>
-                    <td class="text-center">{{ fmt($gstRate) }}</td>
-                    <td class="text-right">{{ fmt($cgst) }}</td>
-                    <td class="text-right">{{ fmt($sgst) }}</td>
-                    <td class="text-right">{{ fmt($igst) }}</td>
-                    <td class="text-right">{{ fmt($totalWithGST) }}</td>
+                    <td class="text-center">{{ number_format((float) ($charge->exchange_rate ?? 0), 2) }}</td>
+                    <td class="text-center">{{ number_format((float) ($charge->per_unit ?? 0), 2) }}</td>
+                    <td class="text-right">{{ fmt($charge->freight ?? 0) }}</td>
+                    <td class="text-center">{{ number_format((float) ($charge->gst ?? 0), 2) }}</td>
+                    <td class="text-right">{{ fmt($charge->cgst ?? 0) }}</td>
+                    <td class="text-right">{{ fmt($charge->sgst ?? 0) }}</td>
+                    <td class="text-right">{{ fmt($charge->igst ?? 0) }}</td>
+                    <td class="text-right">{{ fmt($charge->total ?? 0) }}</td>
                 </tr>
             @endforeach
 
-            {{-- If you want blank rows to keep table height similar to preview, uncomment and adjust --}}
-            {{-- @for($r = count($chargeDetails); $r < 6; $r++)
-                <!--<tr>-->
-                <!--    <td class="text-center">&nbsp;</td>-->
-                <!--    <td>&nbsp;</td>-->
-                <!--    <td class="text-center">&nbsp;</td>-->
-                <!--    <td class="text-center">&nbsp;</td>-->
-                <!--    <td class="text-center">&nbsp;</td>-->
-                <!--    <td class="text-center">&nbsp;</td>-->
-                <!--    <td class="text-center">&nbsp;</td>-->
-                <!--    <td class="text-right">&nbsp;</td>-->
-                <!--    <td class="text-center">&nbsp;</td>-->
-                <!--    <td class="text-right">&nbsp;</td>-->
-                <!--    <td class="text-right">&nbsp;</td>-->
-                <!--    <td class="text-right">&nbsp;</td>-->
-                <!--    <td class="text-right">&nbsp;</td>-->
-                <!--</tr>-->
-            @endfor --}}
+            {{-- FILL EMPTY ROWS --}}
+            @for ($r = $currentRows; $r < $minRows; $r++)
+                <tr>
+                    <td class="text-center">&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td class="text-center">&nbsp;</td>
+                    <td class="text-center">&nbsp;</td>
+                    <td class="text-center">&nbsp;</td>
+                    <td class="text-center">&nbsp;</td>
+                    <td class="text-center">&nbsp;</td>
+                    <td class="text-right">&nbsp;</td>
+                    <td class="text-center">&nbsp;</td>
+                    <td class="text-right">&nbsp;</td>
+                    <td class="text-right">&nbsp;</td>
+                    <td class="text-right">&nbsp;</td>
+                    <td class="text-right">&nbsp;</td>
+                </tr>
+            @endfor
+            <tr style="border-top: 1px solid #000;">
+                <td style="text-align:right;"><strong>Total</strong></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td style="text-align:right;"><strong>{{ number_format($totalAmount ?? 0, 2) }}</strong></td>
+                <td></td>
+                <td style="text-align:right;"><strong>{{number_format($cgstAmount ?? 0, 2)}}</strong></td>
+                <td style="text-align:right;"><strong>{{number_format($sgstAmount ?? 0, 2)}}</strong></td>
+                <td style="text-align:right;"><strong>{{number_format($igstAmount ?? 0, 2)}}</strong></td>
+                <td style="text-align:right;"><strong>{{number_format($finalAmount ?? 0, 2)}}</strong></td>
+            </tr>
         </tbody>
+
     </table>
 
     {{-- Totals & Amount in Words --}}
     <table class="totals-table">
         <tr>
             <td style="width:70%;" rowspan="6" class="amount-words">
-                <strong>Amount in Words:</strong><br>
-                {{ $amountInWords }}
+                <strong style="font-size:11px!important;">Amount in Words:</strong><br>
+                <span style="font-size:11px!important;">{{ $amountInWords }}</span><br><br>
+                <strong>BANK DETAILS :</strong><br>
+                A/C NAME : {{ $accountDetails->beneficiary_name ?? 'N/A' }}<br>
+                BANK NAME : {{ $accountDetails->bank_name ?? 'N/A' }}<br>
+                BRANCH : {{ $accountDetails->branch_name ?? 'N/A' }}<br>
+                A/C NO. : {{ $accountDetails->account_no ?? 'N/A' }}<br>
+                IFSC CODE : {{ $accountDetails->ifsc_code ?? 'N/A' }}<br>
             </td>
-            <th colspan="2" class="small">WITHOUT GST AMOUNT</th>
+            <th class="small">WITHOUT GST AMOUNT</th>
             <td class="text-right">{{ fmt($totalAmount) }}</td>
         </tr>
         <tr>
-            <th colspan="2" class="small">GST</th>
+            <th class="small">GST</th>
             <td class="text-right">{{ fmt($gstAmount) }}</td>
         </tr>
         <tr>
-            <th colspan="2" class="small">TOTAL AMOUNT</th>
+            <th class="small">TOTAL AMOUNT</th>
             <td class="text-right">{{ fmt($finalAmount) }}</td>
         </tr>
         <tr>
-            <th colspan="2" class="small">ROUND OFF</th>
+            <th class="small">ROUND OFF</th>
             <td class="text-right">{{ fmt($roundOff) }}</td>
+        </tr>
+        <tr>
+            <th class="small">TDS %</th>
+            <td class="text-right">{{ fmt($totalTdsPercent) }}</td>
+        </tr>
+        <tr>
+            <th class="small">TDS AMOUNT</th>
+            <td class="text-right">{{ fmt($totalTdsAmount) }}</td>
         </tr>
         <tr>
             <th colspan="2" class="text-right">GRAND TOTAL Rs</th>
@@ -353,17 +406,5 @@
         </tr>
     </table>
 
-
-<script>
-    const today = new Date();
-
-    let day = String(today.getDate()).padStart(2, '0');
-    let month = String(today.getMonth() + 1).padStart(2, '0');
-    let year = today.getFullYear();
-
-    let formattedDate = day + '-' + month + '-' + year;
-
-    document.getElementById('currentDate').innerText = formattedDate;
-</script>
 </body>
 </html>

@@ -48,32 +48,32 @@
                                         <div class="mb-6 row">
                                             <div class="d-flex gap-3">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio" value="AI" name="search_by">
-                                                    <label class="form-check-label" for="lcl">
+                                                    <input class="form-check-input" type="radio" value="AI" name="search_by" id="airImport">
+                                                    <label class="form-check-label" for="airImport">
                                                         Air Import
                                                     </label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio" value="AE" name="search_by">
-                                                    <label class="form-check-label" for="fcl20">
+                                                    <input class="form-check-input" type="radio" value="AE" name="search_by" id="airExport">
+                                                    <label class="form-check-label" for="airExport">
                                                         Air Export
                                                     </label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio" value="SI" name="search_by">
-                                                    <label class="form-check-label" for="fcl40">
+                                                    <input class="form-check-input" type="radio" value="SI" name="search_by" id="seaImport">
+                                                    <label class="form-check-label" for="seaImport">
                                                         Sea Import
                                                     </label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio" value="SE" name="search_by">
-                                                    <label class="form-check-label" for="air">
+                                                    <input class="form-check-input" type="radio" value="SE" name="search_by" id="seaExport">
+                                                    <label class="form-check-label" for="seaExport">
                                                         Sea Export
                                                     </label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio" value="TR" name="search_by">
-                                                    <label class="form-check-label" for="air">
+                                                    <input class="form-check-input" type="radio" value="TR" name="search_by" id="transport">
+                                                    <label class="form-check-label" for="transport">
                                                         Transport
                                                     </label>
                                                 </div>
@@ -111,6 +111,49 @@
                                                     <option value="local" selected>LOCAL</option>
                                                     <option value="otherState">Other State</option>
                                                 </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Invoice Type:</label>
+                                                <select name="invoice_type" class="form-control select2">
+                                                    <option value="">Select</option>
+                                                    <option value="PRO-FORMA INVOICE" Selected>PRO-FORMA INVOICE</option>
+                                                    <option value="DEBITNOTE(Rs)">DEBITNOTE(Rs)</option>
+                                                    <option value="CREDITNOTE(Rs)">CREDITNOTE(Rs)</option>
+                                                    <option value="DEBITNOTE(Ovr.)">DEBITNOTE(Ovr.)</option>
+                                                    <option value="CREDITNOTE(Ovr.)">CREDITNOTE(Ovr.)</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Bill To: <span class="text-danger">*</span></label>
+                                                <div class="d-flex">
+                                                    <select class="form-control wide me-2 select2"
+                                                        name="billing_party_id">
+                                                        <option value="">Select Billing_Party</option>
+                                                        @foreach ($parties->where('party_type', 10) as $party)
+                                                        <option value="{{$party->id}}" {{ old('billing_party_id') == $party->id ? 'selected' : '' }}>{{$party->party_name}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        data-bs-toggle="modal" data-bs-target="#partyDetailsModal" data-target-field="billing_party_id">
+                                                        <i class="bi bi-plus-lg">+</i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Party Type:</label>
+                                                <select name="party_type" class="form-control">
+                                                    <option value="">Select</option>
+                                                    <option value="customer" selected>Customer</option>
+                                                    <option value="other">Other Billing Party</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Shipper Name:</label>
+                                                <input type="text" name="shipper_name" class="form-control" style="background: #eee; cursor: not-allowed;">
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Job Date:</label>
+                                                <input type="text" name="job_date" class="form-control" style="background: #eee; cursor: not-allowed;">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Voyage Code:</label>
@@ -175,28 +218,7 @@
                                                 <label class="form-label">AWB / BL NO: <span class="text-danger">*</span></label>
                                                 <input type="text" name="awb_bl_no" required class="form-control" style="background: #eee; cursor: not-allowed;">
                                             </div>
-
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">Party Type:</label>
-                                                <select name="party_type" class="form-control">
-                                                    <option value="">Select</option>
-                                                    <option value="customer" selected>Customer</option>
-                                                    <option value="other">Other Billing Party</option>
-                                                </select>
-                                            </div>
-
                                             <!-- Row 4 -->
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">Invoice Type:</label>
-                                                <select name="invoice_type" class="form-control select2">
-                                                    <option value="">Select</option>
-                                                    <option value="PRO-FORMA INVOICE" Selected>PRO-FORMA INVOICE</option>
-                                                    <option value="DEBITNOTE(Rs)">DEBITNOTE(Rs)</option>
-                                                    <option value="CREDITNOTE(Rs)">CREDITNOTE(Rs)</option>
-                                                    <option value="DEBITNOTE(Ovr.)">DEBITNOTE(Ovr.)</option>
-                                                    <option value="CREDITNOTE(Ovr.)">CREDITNOTE(Ovr.)</option>
-                                                </select>
-                                            </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Account No:</label>
                                                 <select name="bank_id" class="form-control select2">
@@ -209,23 +231,8 @@
                                             </div>
                                             <!-- Row 5 -->
                                             <div class="col-md-4 mb-3">
-                                                <label class="form-label">Billing Party: <span class="text-danger">*</span></label>
-                                                <div class="col-sm-12 d-flex align-items-center">
-                                                    <select name="billing_party_id" class="form-control select2" required>
-                                                        <option value="">Select</option>
-                                                        @foreach ($parties as $party)
-                                                            <option value="{{$party->id}}">{{$party->party_name}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                                        data-bs-toggle="modal" data-bs-target="#billingPartyDetailsModal">
-                                                        <i class="bi bi-plus-lg">+</i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">Sale / Purchase:</label>
-                                                <input type="text" name="sale_purchase" class="form-control" value="{{ old('sale_purchase', $salesInvoice->sale_purchase ?? '') }}">
+                                                <label class="form-label">Sale / Purchase / Proforma:</label>
+                                                <input type="text" name="sale_purchase" class="form-control" value="Proforma">
                                             </div>
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label">Shipper Invoice No:</label>
@@ -714,7 +721,7 @@
 
     <!-- Charge Name Details -->
 @include('admin-main.admin.commonModelForms.charge_name_model')
-@include('admin-main.admin.commonModelForms.addNewBillingParty')
+@include('admin-main.admin.commonModelForms.modelPartyDetails')
 @include('admin-main.admin.commonModelForms.salesperson_modal')
 @endsection
 
@@ -866,46 +873,92 @@
             });
         });
     </script>
+    <script>
+        // party details model
+        let targetField = null;
 
+        // Capture which button triggered the modal
+        $(document).on('click', '[data-bs-target="#partyDetailsModal"]', function () {
+            targetField = $(this).data('target-field'); // e.g. 'billing_party_id', 'notify_id', etc.
+        });
+
+        // Handle form submission
+        $('#modelPartyDetails').on('submit', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "{{ route('new-party.store') }}",
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        const partyId = response.party.id;
+                        const partyName = response.party.name;
+                        const activeSelect = $('select[name="' + targetField + '"]');
+
+                        if (activeSelect.find('option[value="' + partyId + '"]').length === 0) {
+                            const newOption = new Option(partyName, partyId, true, true);
+                            activeSelect.append(newOption).trigger('change');
+                        }
+
+                        $('#modelPartyDetails')[0].reset();
+                        $('#partyDetailsModal').modal('hide');
+                        toastr.success('Party added successfully!');
+                    } else {
+                        toastr.error(response.message || 'Something went wrong.');
+                    }
+                },
+                error: function (xhr) {
+                    toastr.error('Failed to add party details.');
+                    console.error('Error:', xhr.responseText);
+                }
+            });
+        });
+
+        // Reset target field after modal closes
+        $('#partyDetailsModal').on('hidden.bs.modal', function () {
+            targetField = null;
+        });
+    </script>
 
     <script>
         $(document).ready(function(){
 
-            $(document).on('submit', '#billingPartyAdd', function (e) {
-                e.preventDefault(); // stop reload
+            // $(document).on('submit', '#billingPartyAdd', function (e) {
+            //     e.preventDefault(); // stop reload
 
-                const form = $(this);
-                const btn = form.find('button[type="submit"]');
-                btn.prop('readonly', true).text('Saving...');
+            //     const form = $(this);
+            //     const btn = form.find('button[type="submit"]');
+            //     btn.prop('readonly', true).text('Saving...');
 
-                $.ajax({
-                    url: "{{ route('new-billing-party.store') }}",
-                    type: "POST",
-                    data: form.serialize(),
-                    success: function (res) {
-                        btn.prop('readonly', false).text('Save');
+            //     $.ajax({
+            //         url: "{{ route('new-billing-party.store') }}",
+            //         type: "POST",
+            //         data: form.serialize(),
+            //         success: function (res) {
+            //             btn.prop('readonly', false).text('Save');
 
-                        if (res.success) {
-                            const shipperSelect = $('#shipper_id');
-                            const newOption = new Option(res.party.name, res.party.id, true, true);
-                            shipperSelect.append(newOption).trigger('change');
+            //             if (res.success) {
+            //                 const shipperSelect = $('#shipper_id');
+            //                 const newOption = new Option(res.party.name, res.party.id, true, true);
+            //                 shipperSelect.append(newOption).trigger('change');
 
-                            form[0].reset();
-                            $('#exportPartyDetails').modal('hide');
-                        } else {
-                            alert(res.message || 'Failed to save export party.');
-                        }
-                    },
-                    error: function (xhr) {
-                        btn.prop('readonly', false).text('Save');
-                        let msg = 'Failed to add export party.';
-                        if (xhr.responseJSON?.errors) {
-                            msg = Object.values(xhr.responseJSON.errors).flat().join("\n");
-                        }
-                        alert(msg);
-                    }
-                });
-            });
+            //                 form[0].reset();
+            //                 $('#exportPartyDetails').modal('hide');
+            //             } else {
+            //                 alert(res.message || 'Failed to save export party.');
+            //             }
+            //         },
+            //         error: function (xhr) {
+            //             btn.prop('readonly', false).text('Save');
+            //             let msg = 'Failed to add export party.';
+            //             if (xhr.responseJSON?.errors) {
+            //                 msg = Object.values(xhr.responseJSON.errors).flat().join("\n");
+            //             }
+            //             alert(msg);
+            //         }
+            //     });
+            // });
 
 
             $('input[name="search_by"]').on('change', function() {
@@ -951,11 +1004,17 @@
                 let type = selectedOption.data('type');
                 let fullJobNo = selectedOption.data('fulljob');
                 let originalJob = selectedOption.data('job_id');
+                let jobDate = selectedOption.data('jobdate');
+                let shipperName = selectedOption.data('shippername');
+
+                console.log(shipperName);
 
                 $('input[name="full_job_no"]').val(fullJobNo);
                 $('input[name="Inv_cat"]').val(type);
                 $('input[name="job_no"]').val(originalJob); // hidden input
                 $('#hidden_job_no').val(originalJob);
+                $('input[name="job_date"]').val(jobDate);
+                $('input[name="shipper_name"]').val(shipperName);
 
                 $.ajax({
                     url: '{{route("proforma-invoices.getInvoiceRecord")}}',
@@ -1072,7 +1131,7 @@
             // --- MAIN CALCULATION FUNCTION ---
             function calculateTotals() {
                 let gstType = $('select[name="gst_type"]').val(); // local / otherState
-                let perUnit = parseFloat($('input[name="per_unit"]').val()) || 0;
+                let perUnit = parseFloat($('input[name="per_unit"]').val()) || 1;
                 let totalUnit = parseFloat($('input[name="total_unit"]').val()) || 0;
                 let exchRate = parseFloat($('input[name="exchange_rate"]').val()) || 0;
                 let gstPercent = parseFloat($('input[name="gst"]').val()) || 0;
@@ -1096,19 +1155,19 @@
                     }
                 }
 
-                $('input[name="cgst"]').val(cgst.toFixed(2))
+                $('input[name="cgst"]').val(cgst.toFixed(3))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
-                $('input[name="sgst"]').val(sgst.toFixed(2))
+                $('input[name="sgst"]').val(sgst.toFixed(3))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
-                $('input[name="igst"]').val(igst.toFixed(2))
+                $('input[name="igst"]').val(igst.toFixed(3))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
 
 
                 let amountWithTax = baseAmount + cgst + sgst + igst;
-                $('input[name="amount"]').val(amountWithTax.toFixed(2))
+                $('input[name="amount"]').val(amountWithTax.toFixed(3))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
 
@@ -1117,14 +1176,14 @@
                 if (tdsPercent > 0) {
                     tdsAmount = (baseAmount * tdsPercent) / 100;
                 }
-                $('#tds_amount').val(tdsAmount.toFixed(2))
+                $('#tds_amount').val(tdsAmount.toFixed(3))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
 
                 // --- Step 4: Final Total = (Base + GST) - TDS ---
                 let finalTotal = baseAmount + cgst + sgst + igst - tdsAmount;
                 let roundedTotal = finalTotal;
-                $('input[name="total"]').val(roundedTotal.toFixed(2))
+                $('input[name="total"]').val(roundedTotal.toFixed(3))
                     .css('background', '#ded9d9')
                     .prop('readonly', true);
             }

@@ -122,10 +122,10 @@
                         </td>
                         <td width="70%" class="text-end">
                             <div class="company-name">{{ $company->company_name }}</div>
-                            <div>{{ $porformaInvoice->branch->address ?? $company->address }}</div>
-                            <div>PAN: {{ $porformaInvoice->branch->pan_no ?? $company->companySetting->pan_no }} | GSTIN: {{ $porformaInvoice->branch->gstin_no ?? $company->companySetting->gstin_no }} | TAN: {{ $porformaInvoice->branch->tan_no ?? $company->companySetting->tan_no }}</div>
-                            <div>CIN: {{ $porformaInvoice->branch->cin_no ?? $company->companySetting->cin_no }}</div>
-                            <div>PHONE: {{ $porformaInvoice->branch->phone ?? $company->companySetting->phone }} | EMAIL: {{ $company->companySetting->email }}</div>
+                            <div>{{ $porformaInvoice->operationJob->branch->address ?? $company->address }}</div>
+                            <div>PAN: {{ $porformaInvoice->operationJob->branch->pan_no ?? $company->companySetting->pan_no }} | GSTIN: {{ $porformaInvoice->operationJob->branch->gstin_no ?? $company->companySetting->gstin_no }} | TAN: {{ $porformaInvoice->operationJob->branch->tan_no ?? $company->companySetting->tan_no }}</div>
+                            <div>CIN: {{ $porformaInvoice->operationJob->branch->cin_no ?? $company->companySetting->cin_no }}</div>
+                            <div>PHONE: {{ $porformaInvoice->operationJob->branch->phone ?? $company->companySetting->phone }} | EMAIL: {{ $company->companySetting->email }}</div>
                         </td>
                     </tr>
                 </table>

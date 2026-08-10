@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Operations\OperationJobMaster;
 use App\Models\Operations\OperationSalesPerson;
 use App\Models\CompanyBranch;
-use PhpOffice\PhpSpreadsheet\Calculation\Engine\BranchPruner;
+use App\Models\MasterImportParty;
 
 class AccountProformaInvoice extends Model
 {
@@ -19,7 +19,7 @@ class AccountProformaInvoice extends Model
 
     protected $fillable = [
         'company_id','branch_id',
-        'uuid',
+        'uuid','job_date','shipper_name',
         'Inv_cat',
         'job_no',
         'voyage_code',
@@ -90,7 +90,7 @@ class AccountProformaInvoice extends Model
     }
 
     public function partyName(){
-        return $this->belongsTo(MasterBillingParty::class, 'billing_party_id');
+        return $this->belongsTo(MasterImportParty::class, 'billing_party_id');
     }
 
     public function accountNumber(){

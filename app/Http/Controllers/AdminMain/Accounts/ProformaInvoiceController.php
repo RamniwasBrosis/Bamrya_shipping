@@ -77,12 +77,12 @@ class ProformaInvoiceController extends Controller
      */
     public function create()
     {
-        $parties = MasterBillingParty::where('company_id', $this->company_id)->get();
+        $parties = MasterImportParty::where('company_id', $this->company_id)->get();
         $charges = MasterCharge::where('company_id', $this->company_id)->get();
         $salesPerson = OperationSalesPerson::where('company_id', $this->company_id)->get();
         $account_numbers = MasterBank::where('company_id', $this->company_id)->get();
         $files = AccountFileUpload::where('company_id', $this->company_id)->where('file_related', 'proforma_invoice')->get();
-        $party_lists  = MasterParty::whereIn('party_type', [1, 2])->get();
+        $party_lists  = MasterParty::all();
 
         // echo "<pre>"; print_r($parties); exit();
 
@@ -165,7 +165,7 @@ class ProformaInvoiceController extends Controller
      */
     public function edit(string $uuid)
     {
-        $parties = MasterBillingParty::where('company_id', $this->company_id)->get();
+        $parties = MasterImportParty::where('company_id', $this->company_id)->get();
         $charges = MasterCharge::where('company_id', $this->company_id)->get();
         $account_numbers = MasterBank::where('company_id', $this->company_id)->get();
         $salesPerson = OperationSalesPerson::where('company_id', $this->company_id)->get();
@@ -278,14 +278,18 @@ class ProformaInvoiceController extends Controller
         foreach ($job_numbers as $job_number) {
             $job_num = $job_number->jobMaster->full_job_no;
             $activity = $request->search_by;
+            $job_date = $job_number->jobMaster->job_date ?? '';
+            $shipper_name = $job_number->shipperName->party_name ?? '';
 
-            $FullJobNum .= '<option value="'.$job_number->id.'" data-type="'.$activity.'" data-fulljob="' . $job_num . '" job_id="'.$job_number->job_no.'" >'.$job_num.'</option>';
+            $FullJobNum .= '<option value="'.$job_number->id.'" data-type="'.$activity.'" data-fulljob="' . $job_num . '" job_id="'.$job_number->job_no.'" data-jobdate="' . $job_date . '" data-shippername="' . $shipper_name . '">'.$job_num.'</option>';
         }
 
         return response()->json([
             'status' => 'success',
             'result' => $FullJobNum,
-            'Inv_cat' => $activity
+            'Inv_cat' => $activity,
+            'job_date' => $job_date,
+            'shipper_name'=>$shipper_name,
         ]);
     }
 
@@ -397,7 +401,6 @@ class ProformaInvoiceController extends Controller
         ]);
 
     }
-
 
     public function proformaInvoiceCharge(Request $request)
     {
@@ -557,7 +560,7 @@ class ProformaInvoiceController extends Controller
             'operationJob.seaImport',
             'operationJob.airExport',
             'operationJob.airImport',
-            'branch'
+            'operationJob.branch'
         ])->findOrFail($id);
 
         $accountDetails = MasterBank::where('company_id', $this->company_id)->first();
@@ -612,7 +615,7 @@ class ProformaInvoiceController extends Controller
             'operationJob.airExport',
             'operationJob.airImport',
             'salesPerson',
-            'branch'
+            'operationJob.branch'
         ])->findOrFail($id);
 
         $accountDetails = MasterBank::where('company_id', $this->company_id)->first();
